@@ -80,3 +80,12 @@ project:
   tech_stack: "技术栈"
   vote: "去投票"
   view_repo: "查看代码"
+guide:
+  hacker_title: "参赛者指南"
+  hacker_subtitle: "从注册到提交，完整参赛流程"
+  organizer_title: "组织者指南"
+  organizer_subtitle: "如何创建和管理 Hackathon 活动"
+  judge_title: "评委指南"
+  judge_subtitle: "评审流程与评分卡使用说明"
+  step: "步骤"
+  back_to_guides: "返回指南"

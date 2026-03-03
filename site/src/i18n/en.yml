@@ -80,3 +80,12 @@ project:
   tech_stack: "Tech Stack"
   vote: "Vote on GitHub"
   view_repo: "View Code"
+guide:
+  hacker_title: "Hacker Guide"
+  hacker_subtitle: "From registration to submission — the complete flow"
+  organizer_title: "Organizer Guide"
+  organizer_subtitle: "How to create and manage a Hackathon"
+  judge_title: "Judge Guide"
+  judge_subtitle: "Judging process and how to use the Score Card"
+  step: "Step"
+  back_to_guides: "Back to Guides"
