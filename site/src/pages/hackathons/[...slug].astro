@@ -6,6 +6,7 @@ import JudgeCard from '../../components/JudgeCard.astro';
 import FAQAccordion from '../../components/FAQAccordion.astro';
 import EventCalendar from '../../components/EventCalendar.astro';
 import GitHubRedirect from '../../components/GitHubRedirect.astro';
+import ScoreCard from '../../components/ScoreCard.astro';
 import { getCollection } from 'astro:content';
 import { t, localize, getCurrentStage } from '../../lib/i18n';
 import type { Lang } from '../../lib/i18n';
@@ -181,6 +182,23 @@ const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
             <FAQAccordion items={h.faq} lang={lang} />
           </section>
         )}
+
+        {/* ScoreCard (visible during judging stage) */}
+        {stage === 'judging' && h.tracks && h.tracks.map(track => (
+          track.judging?.criteria && track.judging.criteria.length > 0 && (
+            <section>
+              <h2 class="text-xl font-heading font-bold text-white mb-4">
+                {t(lang, 'score.title')} — {localize(lang, track.name, track.name_zh)}
+              </h2>
+              <ScoreCard
+                hackathonSlug={h.slug}
+                trackSlug={track.slug}
+                criteria={track.judging.criteria}
+                lang={lang}
+              />
+            </section>
+          )
+        ))}
       </div>
 
       {/* --- Sidebar (1/3) --- */}

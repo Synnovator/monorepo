@@ -64,3 +64,13 @@ auth:
   login_github: "Sign in with GitHub"
   logout: "Sign Out"
   my_profile: "My Profile"
+score:
+  title: "Score Card"
+  criterion: "Criterion"
+  weight: "Weight"
+  comment: "Comment"
+  overall: "Overall Comment"
+  total: "Weighted Total"
+  submit: "Submit Score"
+  select_team: "Select Team"
+  team_name: "Team Name"
