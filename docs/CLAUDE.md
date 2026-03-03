@@ -6,8 +6,9 @@
 
 ```
 docs/
-├── specs/       → 系统规格文档（PRD 等）
-├── plans/       → 实施计划
+├── specs/       → 系统规格文档（PRD、设计系统等）
+├── acceptance/  → 验收规范（Given-When-Then BDD 格式）
+├── plans/       → 实施计划和架构设计
 ├── *-guide.md   → 用户指南（组织者、参赛者、评委）
 └── README.md    → 文档导航
 ```
@@ -17,6 +18,8 @@ docs/
 | 类型 | 位置 | 说明 |
 |------|------|------|
 | PRD | `specs/synnovator-prd.md` | 权威数据 Schema 和架构设计 |
+| 设计系统 | `specs/design-system.md` | Neon Forge 主题：色彩、字体、间距、布局 |
+| 验收规范 | `acceptance/*.spec.md` | 按角色组织的 Given-When-Then 验收场景 |
 | 计划 | `plans/YYYY-MM-DD-*.md` | 实施计划和设计决策 |
 | 用户指南 | `*-guide.md` | 面向组织者/参赛者/评委的操作指南 |
 
