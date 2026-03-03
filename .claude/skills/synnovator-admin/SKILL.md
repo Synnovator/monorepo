@@ -1,80 +1,225 @@
 ---
 name: synnovator-admin
-description: Synnovator platform admin commands — create hackathons, manage timelines, export scores, audit changes. Use when user needs to manage hackathon data, profiles, or platform configuration.
+description: >
+  Synnovator platform admin CLI — create/update/close hackathons, manage profiles and submissions,
+  export scores and registrations, audit changes and permissions. Use whenever the admin needs to
+  manage hackathon data, create profiles, export reports, query audit history, or perform any
+  platform management operation. Also trigger when the user mentions hackathon management,
+  YAML data editing, score exports, or NDA approvals in the Synnovator context.
 ---
 
 # Synnovator Admin
 
-Platform administration commands for the Synnovator Git-native Hackathon platform.
+Platform administration skill for the Synnovator Git-native Hackathon platform. Every management
+operation goes through this skill — it wraps `scripts/` CLI tools, YAML editing, Schema validation,
+and PR creation into guided interactive workflows.
 
-## Available Commands
+## Quick Reference
 
-### /synnovator-admin create-hackathon
+| Command | Type | What it does |
+|---------|------|-------------|
+| `create-hackathon` | Write | Generate hackathon from template, guide field editing, validate, PR |
+| `update-timeline` | Write | Modify timeline stages in hackathon.yml, validate, PR |
+| `update-track` | Write | Modify track config (rewards, criteria, deliverables), validate, PR |
+| `close-hackathon` | Write | Set `status: archived`, PR |
+| `create-profile` | Write | Generate hacker profile skeleton, guide editing, PR |
+| `submit-project` | Write | Generate submission skeleton, guide editing, PR |
+| `approve-nda` | Write | Find NDA issue, add `nda-approved` label |
+| `list-registrations` | Read | Query registration issues for a hackathon |
+| `list-submissions` | Read | Scan submission directories and show status |
+| `export-scores` | Read | Parse score issues into CSV |
+| `export-report` | Read | Generate comprehensive activity report |
+| `audit-log` | Read | Query git history for a hackathon |
+| `audit-permissions` | Read | Check RBAC config (collaborators + CODEOWNERS) |
+| `audit-secrets` | Read | Verify required GitHub Secrets are configured |
 
-Create a new hackathon event.
+When the admin invokes `/synnovator-admin` without a specific command, display this table and
+ask which operation they need.
 
-**Flow:**
-1. Ask for: slug, type (community/enterprise/youth-league/open-source), name
-2. Run: `bash scripts/create-hackathon.sh <slug> <type> "<name>"`
-3. Open the generated `hackathons/<slug>/hackathon.yml` for editing
-4. Guide admin through filling required fields (timeline, tracks, eligibility)
-5. Commit and offer to create PR
+---
 
-### /synnovator-admin create-profile
+## Write Operations
 
-Create a new hacker profile.
+All write operations follow the same pattern:
 
-**Flow:**
-1. Ask for: GitHub username
-2. Run: `bash scripts/create-profile.sh <username>`
-3. Open generated profile for editing
-4. Commit and offer to create PR
+```
+Collect params → Create branch → Execute → Validate → Commit → Offer PR
+```
 
-### /synnovator-admin submit-project
+Branch naming: `feat/hackathon-{slug}` for hackathon ops, `feat/profile-{username}` for profiles,
+`feat/submission-{slug}-{team}` for submissions.
 
-Create a project submission skeleton.
+Commit format: `type(scope): description` — types are `feat`, `fix`, `chore`; scope is usually
+`hackathons` or `profiles`.
 
-**Flow:**
+Before committing, always run validation:
+```bash
+bash scripts/validate-hackathon.sh hackathons/<slug>/hackathon.yml
+```
+
+After commit, offer to create PR but never push without the admin's confirmation.
+
+### create-hackathon
+
+1. Ask for: `slug` (lowercase alphanumeric + hyphens), `type` (community / enterprise / youth-league / open-source), `name`
+2. Create branch: `git checkout -b feat/hackathon-{slug}`
+3. Run: `bash scripts/create-hackathon.sh {slug} {type} "{name}"`
+4. Check if `docs/templates/{type}/hackathon.yml` exists — if so, read the template and use its
+   structure to replace the generated skeleton. Preserve the `slug`, `name`, and `type` values
+   from step 1; copy everything else from the template.
+5. Read `references/schema-v2.md` to understand the full field structure.
+   Guide the admin through filling required fields:
+   - Timeline stages (at minimum: registration, development, submission, judging, announcement)
+   - Tracks (name, slug, rewards, judging criteria with weights summing to 1.0)
+   - Organizers (name, role)
+   - Eligibility (open_to, team_size)
+   - For enterprise type: legal section (NDA, IP ownership, compliance)
+6. Validate: `bash scripts/validate-hackathon.sh hackathons/{slug}/hackathon.yml`
+7. Stage and commit:
+   ```bash
+   git add hackathons/{slug}/
+   git commit -m "feat(hackathons): create hackathon {slug}"
+   ```
+8. Offer: `gh pr create --title "feat(hackathons): add {slug}" --body "New hackathon: {name}"`
+
+### update-timeline
+
+1. Ask for hackathon `slug`
+2. Read `hackathons/{slug}/hackathon.yml` — verify it exists
+3. Display current timeline stages with dates
+4. Ask which stage(s) to update and the new start/end dates (ISO 8601 format)
+5. Edit the YAML using the Edit tool
+6. Validate → branch (if not already on one) → commit → offer PR
+
+### update-track
+
+1. Ask for hackathon `slug`
+2. Read and display current tracks (name, slug, rewards, judging criteria)
+3. Ask what to change: rewards, criteria weights, deliverables, or add/remove a track
+4. Edit the YAML — when modifying criteria weights, remind the admin they must sum to 1.0
+5. Validate → branch → commit → offer PR
+
+### close-hackathon
+
+1. Ask for hackathon `slug`
+2. Read the YAML — confirm the hackathon exists and is not already archived
+3. Add `status: archived` under the `hackathon:` key
+4. Branch → validate → commit with message `chore(hackathons): close hackathon {slug}` → offer PR
+
+### create-profile
+
+1. Ask for GitHub username
+2. Run: `bash scripts/create-profile.sh {username}`
+3. The script outputs the created file path — read it
+4. Guide the admin through filling: name, bio, location, skills, identity
+5. Branch → commit `feat(profiles): create profile for {username}` → offer PR
+
+### submit-project
+
 1. Ask for: hackathon slug, team name, track slug
-2. Run: `bash scripts/submit-project.sh <slug> <team> <track>`
-3. Open generated project.yml for editing
-4. Commit and offer to create PR
+2. Verify the hackathon exists and the track slug matches one in `hackathon.yml`
+3. Run: `bash scripts/submit-project.sh {slug} {team} {track}`
+4. Guide editing: project name, team members, deliverables, tech stack
+5. Branch → commit `feat(hackathons): add submission {team} for {slug}` → offer PR
 
-### /synnovator-admin update-timeline
+### approve-nda
 
-Update a hackathon's timeline dates.
+1. Ask for: hackathon `slug` and GitHub `username`
+2. Verify the hackathon requires NDA (`legal.nda.required == true`)
+3. Find the NDA issue — read `references/github-api-patterns.md` for the query pattern:
+   ```bash
+   gh issue list --label "nda-sign" --search "{username} {slug}" --json number,title,author --limit 10
+   ```
+4. Confirm with admin which issue to approve
+5. Add label: `gh issue edit {number} --add-label "nda-approved"`
+6. Add comment: `gh issue comment {number} --body "NDA approved by @{admin}"`
 
-**Flow:**
-1. Ask for: hackathon slug
-2. Read current timeline from `hackathons/<slug>/hackathon.yml`
-3. Show current dates, ask which stage to update
-4. Edit the YAML with new dates
-5. Commit and offer to create PR
+---
 
-### /synnovator-admin export-scores
+## Read Operations
 
-Export scores for a hackathon to CSV.
+Read operations never modify repo data. They query git history, GitHub API, or scan local files
+and output formatted results.
 
-**Flow:**
-1. Ask for: hackathon slug
-2. Use `gh issue list` to find Issues with label `judge-score,hackathon:<slug>`
-3. Parse YAML scores from each Issue body
-4. Generate CSV output (judge, team, track, criterion, score, comment)
-5. Save to file or display
+For commands that use `gh` CLI, read `references/github-api-patterns.md` for exact query patterns
+and JSON parsing.
 
-### /synnovator-admin audit
+### list-registrations
 
-View change history for a hackathon.
+1. Ask for hackathon `slug`
+2. Query:
+   ```bash
+   gh issue list --label "register,hackathon:{slug}" --json number,title,author,createdAt,labels --limit 500
+   ```
+3. Format as a table: #, Author, Date, Status (check for `registration-approved` label)
 
-**Flow:**
-1. Ask for: hackathon slug, optional date range
-2. Run: `git log --oneline hackathons/<slug>/`
-3. Display formatted results
+### list-submissions
+
+1. Ask for hackathon `slug`
+2. Scan `hackathons/{slug}/submissions/*/project.yml`
+3. For each project.yml, read and extract: project name, track, team members, deliverables status
+4. Format as a table with completion indicators (repo URL present? video? document?)
+
+### export-scores
+
+1. Ask for hackathon `slug` and optional track filter
+2. Query score issues — see `references/github-api-patterns.md` for the parsing pattern
+3. From each issue body, extract the YAML score block
+4. Generate CSV with columns: `judge,team,track,criterion,score,weight,comment`
+5. Save to `hackathons/{slug}/scores-export.csv` (local file, do NOT commit)
+6. Display summary statistics (average scores per team, per criterion)
+
+### export-report
+
+1. Ask for hackathon `slug`
+2. Gather data from multiple sources:
+   - Basic info from `hackathon.yml`
+   - Registration count from `list-registrations`
+   - Submission count and status from `list-submissions`
+   - Score summary from `export-scores` (if scores exist)
+3. Output a structured report with sections: Overview, Timeline Status, Registrations,
+   Submissions, Scores (if available), Tracks Summary
+
+### audit-log
+
+1. Ask for: hackathon `slug`, optional date range (`--since`, `--until`)
+2. Run:
+   ```bash
+   git log --oneline --since="{from}" --until="{to}" -- hackathons/{slug}/
+   ```
+3. For more detail on a specific commit, offer: `git show {hash} -- hackathons/{slug}/`
+
+### audit-permissions
+
+1. Query collaborators:
+   ```bash
+   gh api repos/{owner}/{repo}/collaborators --jq '.[] | {login: .login, role: .role_name}'
+   ```
+2. Read `.github/CODEOWNERS` and parse path → team mappings
+3. Display a permissions matrix comparing GitHub roles against CODEOWNERS coverage
+4. Flag any mismatches (e.g., a user with Write access but not in CODEOWNERS for their area)
+
+### audit-secrets
+
+1. List configured secrets:
+   ```bash
+   gh secret list
+   ```
+2. Check against required secrets: `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`,
+   `R2_BUCKET_NAME`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `AUTH_SECRET`
+3. Report which are present and which are missing (values are never shown)
+
+---
 
 ## Important Rules
 
-- Always validate inputs before running scripts
-- Always show generated files for review before committing
-- Never commit directly to main — always create a branch and PR
-- Use `pnpm` (never npm/npx)
-- Follow commit convention: `type(scope): description`
+- Use `pnpm` for any JavaScript tooling — never `npm` or `npx` (enforced by hook)
+- Always show generated/modified files for review before committing
+- Never commit directly to `main` — always create a feature branch and PR
+- Never push without admin confirmation
+- Commit messages follow `type(scope): description` convention
+- Write operations create local changes only — the admin decides when to push and create PR
+- Read operations are side-effect-free — they output data but never modify files
+- When editing YAML, preserve existing comments and formatting where possible
+- For Schema details beyond what's in this file, read `references/schema-v2.md`
+- For GitHub API query patterns, read `references/github-api-patterns.md`
