@@ -1,0 +1,238 @@
+synnovator_version: "2.0"
+
+hackathon:
+  name: "Dishui Lake AI+OPC Global Service Challenge 2026"
+  name_zh: "滴水湖AI+OPC服务全球挑战赛 2026"
+  slug: "dishuihu-ai-opc-global-challenge-2026"
+  tagline: "Discover young entrepreneurs serving the global market through AI+OPC"
+  tagline_zh: "围绕AI+OPC模式，发掘服务全球市场的青年创业者"
+  type: "community"
+  description: |
+    A hybrid developer competition combining a main track with enterprise challenges,
+    centered on the "AI+OPC" (One-Person Company) model. The challenge aims to discover
+    young entrepreneurs serving the global market, build a cross-border service technology
+    innovation platform, and shape Lingang's global innovation brand.
+
+    Highlights:
+    - Hybrid format: Main track + Enterprise challenges running in parallel
+    - Real-world scenarios: Enterprise partners provide actual business challenges
+    - Full data coverage: Synnovator platform supports the entire journey from browsing to awards
+    - Multiple paths to finals: Auto-promotion, revival challenges, and direct entry
+  description_zh: |
+    复合型开发者竞赛，主赛道与企业命题并行，围绕"AI+OPC"（一人公司）模式展开。
+    旨在发掘服务全球市场的青年创业者，构建跨境服务技术创新平台，塑造临港全球创新品牌。
+
+    活动亮点：
+    - 复合赛制：主赛道+企业命题并行，满足不同参赛者需求
+    - 真实场景：联合企业发布真实业务挑战
+    - 全程数据化：Synnovator平台提供从浏览到获奖的全流程数据支持
+    - 多路径晋级：支持自动晋级、复活挑战、高门槛直通等多种方式参与决赛
+
+  organizers:
+    - name: "Lingang Group"
+      name_zh: "临港集团"
+      role: "organizer"
+    - name: "PKU Lingang Innovation Center"
+      name_zh: "北大临港科创中心"
+      role: "co-organizer"
+    - name: "Lingang Science and Technology City"
+      name_zh: "临港科技城"
+      role: "co-organizer"
+
+  sponsors:
+    - name: "Zhihai Technology"
+      name_zh: "智海科技"
+      role: "enterprise-challenge-partner"
+      website: ""
+
+  eligibility:
+    open_to: "all"
+    team_size:
+      min: 1
+      max: 5
+    allow_solo: true
+
+  legal:
+    license: "MIT"
+    ip_ownership: "participant"
+    compliance_notes:
+      - "Main track: MIT open-source license, participants retain attribution rights"
+      - "Enterprise challenge track: supplementary agreement required, IP ownership transfers to enterprise sponsor, participants retain attribution and priority collaboration rights"
+
+  timeline:
+    draft:
+      start: "2026-02-01T00:00:00Z"
+      end: "2026-02-28T23:59:59Z"
+    registration:
+      start: "2026-03-01T00:00:00Z"
+      end: "2026-03-21T23:59:59Z"
+    development:
+      start: "2026-03-22T00:00:00Z"
+      end: "2026-04-20T23:59:59Z"
+    submission:
+      start: "2026-04-21T00:00:00Z"
+      end: "2026-04-27T23:59:59Z"
+    judging:
+      start: "2026-04-28T00:00:00Z"
+      end: "2026-05-11T23:59:59Z"
+    announcement:
+      start: "2026-05-12T00:00:00Z"
+      end: "2026-05-18T23:59:59Z"
+    award:
+      start: "2026-11-15T00:00:00Z"
+      end: "2026-11-30T23:59:59Z"
+
+  events:
+    - name: "Global Launch Event"
+      name_zh: "全球发布会"
+      type: "livestream"
+      datetime: "2026-02-15T10:00:00+08:00"
+      duration_minutes: 120
+    - name: "Zhihai Technology Enterprise Challenge Release"
+      name_zh: "智海科技企业命题发布"
+      type: "livestream"
+      datetime: "2026-03-01T14:00:00+08:00"
+      duration_minutes: 60
+    - name: "AMA Session #1"
+      name_zh: "AMA答疑第1场"
+      type: "ama"
+      datetime: "2026-03-28T19:00:00+08:00"
+      duration_minutes: 90
+    - name: "Weekend 48h Hackathon: Cross-border E-commerce AI Assistant"
+      name_zh: "周末48小时Hackathon：跨境电商AI助手"
+      type: "workshop"
+      datetime: "2026-04-05T09:00:00+08:00"
+      duration_minutes: 2880
+    - name: "Submission Deadline"
+      name_zh: "提交截止"
+      type: "deadline"
+      datetime: "2026-04-27T23:59:59+08:00"
+      duration_minutes: 0
+    - name: "AI Carnival and Awards Ceremony"
+      name_zh: "AI嘉年华与颁奖典礼"
+      type: "meetup"
+      datetime: "2026-11-22T09:00:00+08:00"
+      duration_minutes: 480
+
+  tracks:
+    - name: "AI+ Application Track"
+      name_zh: "AI+应用赛道"
+      slug: "ai-application"
+      description: "Screen outstanding AI+industry application products and solutions for the global market."
+      description_zh: "筛选优质的AI+行业应用产品和解决方案，面向全球市场。"
+      rewards:
+        - type: "cash"
+          rank: "Global Finals 1st"
+          amount: "¥150,000"
+        - type: "cash"
+          rank: "Global Finals 2nd"
+          amount: "¥100,000"
+        - type: "cash"
+          rank: "Global Finals 3rd"
+          amount: "¥50,000"
+        - type: "cash"
+          rank: "Regional Winners (Top 30)"
+          amount: "¥150,000 total"
+        - type: "other"
+          rank: "Computing Resources"
+          amount: "¥960,000"
+          description: "Cloud computing credits for development and deployment"
+      judging:
+        mode: "expert_only"
+        criteria:
+          - name: "Innovation"
+            name_zh: "创新性"
+            weight: 0.25
+            score_range: [0, 100]
+          - name: "Technical Depth"
+            name_zh: "技术深度"
+            weight: 0.25
+            score_range: [0, 100]
+          - name: "Business Viability"
+            name_zh: "商业可行性"
+            weight: 0.25
+            score_range: [0, 100]
+          - name: "Presentation"
+            name_zh: "展示与答辩"
+            weight: 0.25
+            score_range: [0, 100]
+      deliverables:
+        required:
+          - "Source code repository"
+          - "Product demo or live URL"
+          - "Technical documentation (PDF)"
+        optional:
+          - "Demo video (5 min max)"
+          - "Business plan"
+
+    - name: "Zhihai Tech - Intelligent Customer Service Robot Challenge"
+      name_zh: "智海科技-智能客服机器人挑战"
+      slug: "zhihai-customer-service"
+      description: "Optimize intent recognition accuracy for Zhihai Technology's customer service robot using desensitized data and API."
+      description_zh: "基于智海科技提供的脱敏数据和API，优化其客服机器人的意图识别准确率。"
+      rewards:
+        - type: "cash"
+          rank: "1st"
+          amount: "¥50,000"
+        - type: "cash"
+          rank: "2nd"
+          amount: "¥30,000"
+        - type: "cash"
+          rank: "3rd"
+          amount: "¥20,000"
+      judging:
+        mode: "expert_only"
+        criteria:
+          - name: "Intent Recognition Accuracy"
+            name_zh: "意图识别准确率"
+            weight: 0.40
+            score_range: [0, 100]
+            hard_constraint: true
+            constraint_rule: "Must demonstrate measurable improvement over baseline"
+          - name: "Solution Innovation"
+            name_zh: "方案创新性"
+            weight: 0.30
+            score_range: [0, 100]
+          - name: "Engineering Quality"
+            name_zh: "工程质量"
+            weight: 0.30
+            score_range: [0, 100]
+      deliverables:
+        required:
+          - "Source code repository"
+          - "Model evaluation report with metrics"
+          - "Technical documentation"
+        optional:
+          - "Demo video"
+
+  datasets:
+    - name: "Zhihai Customer Service Dataset"
+      name_zh: "智海科技客服数据集"
+      version: "1.0"
+      description: "Desensitized customer service conversation data and API access for the enterprise challenge"
+      access_control: "nda-required"
+      format: "JSON/API"
+      size: "TBD"
+      download_url: ""
+
+  faq:
+    - q: "主赛道和企业命题可以同时参加吗？"
+      q_en: "Can I participate in both the main track and enterprise challenges?"
+      a: "可以。您需要先报名主赛道，然后可以额外选择接受企业命题挑战。两者的开发期重叠，请合理分配时间。"
+      a_en: "Yes. You need to register for the main track first, then you can additionally accept enterprise challenges. Development periods overlap, so plan your time accordingly."
+    - q: "企业命题的知识产权如何处理？"
+      q_en: "How is IP handled for enterprise challenge submissions?"
+      a: "主赛道默认采用MIT开源协议，参赛者保留署名权。企业命题赛道需签署补充协议，优胜作品知识产权归企业所有，但作者保留署名权和优先合作权。"
+      a_en: "Main track uses MIT license with participant attribution. Enterprise challenge requires a supplementary agreement — winning IP transfers to the enterprise, but authors retain attribution and priority collaboration rights."
+    - q: "如何晋级全球总决赛？"
+      q_en: "How do I advance to the Global Finals?"
+      a: "有三种路径：1) 自动晋级——主赛道总分排名前5%自动晋级；2) 高门槛直通——未参加前期比赛的知名团队可申请直接参加决赛；3) 其他特邀方式。"
+      a_en: "Three paths: 1) Auto-promotion — top 5% in main track; 2) Direct entry — established teams can apply with portfolio; 3) Special invitation."
+
+  settings:
+    allow_multi_track: true
+    multi_track_rule: "independent"
+    language: ["zh", "en"]
+    ai_review: false
+    ai_team_matching: false
+    public_vote: "none"
