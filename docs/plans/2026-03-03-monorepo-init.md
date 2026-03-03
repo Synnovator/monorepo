@@ -671,7 +671,7 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://synnovator.github.io',
+  site: 'https://home.synnovator.space',
   base: '/page',
   output: 'static',
   vite: {

@@ -9,7 +9,7 @@ docs/
 ├── specs/       → 系统规格文档（PRD、设计系统等）
 ├── acceptance/  → 验收规范（Given-When-Then BDD 格式）
 ├── plans/       → 实施计划和架构设计
-├── *-guide.md   → 用户指南（组织者、参赛者、评委）
+├── guides/      → 指南（基础设施配置、用户指南）
 └── README.md    → 文档导航
 ```
 
@@ -21,7 +21,7 @@ docs/
 | 设计系统 | `specs/design-system.md` | Neon Forge 主题：色彩、字体、间距、布局 |
 | 验收规范 | `acceptance/*.spec.md` | 按角色组织的 Given-When-Then 验收场景 |
 | 计划 | `plans/YYYY-MM-DD-*.md` | 实施计划和设计决策 |
-| 用户指南 | `*-guide.md` | 面向组织者/参赛者/评委的操作指南 |
+| 指南 | `guides/*.md` | 基础设施配置指南、用户操作指南 |
 
 ## 文档编写规范
 
@@ -35,7 +35,7 @@ docs/
 - 设计系统：`design-system.md`
 - 计划文档：`YYYY-MM-DD-{name}.md`
 - 验收规范：`{role}.spec.md`
-- 用户指南：`{role}-guide.md`
+- 指南：`guides/{topic}.md` 或 `guides/{role}-guide.md`
 
 ## 注意事项
 

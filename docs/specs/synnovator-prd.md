@@ -213,7 +213,7 @@ hackathon:
       name_zh: "Synnovator 社区"
       github: "synnovator"
       logo: "./assets/organizer-logo.png"
-      website: "https://synnovator.dev"
+      website: "https://home.synnovator.space"
       role: "host"                       # host | co-host
     - name: "Pengcheng Laboratory"
       name_zh: "鹏城实验室"
@@ -825,7 +825,7 @@ Pages Functions 职责范围（最小化原则）：
 | `R2_ACCESS_KEY_ID` | R2 S3 兼容 API 凭证 | CF Pages Environment Variables |
 | `R2_SECRET_ACCESS_KEY` | R2 S3 兼容 API 密钥 | CF Pages Environment Variables |
 | `R2_BUCKET_NAME` | R2 存储桶名称 | CF Pages Environment Variables |
-| `CLAUDE_API_KEY` | Claude API Key | GitHub Repo Secrets（Actions 用）|
+| `CLAUDE_CODE_OAUTH_TOKEN` | Claude OAuth Token（MVP: 个人订阅；后续迁移 ANTHROPIC_API_KEY） | GitHub Repo Secrets（Actions 用）|
 | `GITHUB_APP_ID` | GitHub App 凭证（Functions 鉴权） | CF Pages Environment Variables |
 | `GITHUB_APP_SECRET` | GitHub App Secret | CF Pages Environment Variables |
 

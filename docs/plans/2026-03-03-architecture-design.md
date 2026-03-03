@@ -127,7 +127,7 @@ export default defineConfig({
   output: 'hybrid',           // 默认静态，按需动态
   adapter: cloudflare(),
   integrations: [tailwind()],
-  site: 'https://synnovator.dev',  // 或 pages.dev 域名
+  site: 'https://home.synnovator.space',
 });
 ```
 
@@ -157,7 +157,7 @@ GitHub Repo Secrets (Actions 用):
 ├── R2_SECRET_ACCESS_KEY      # R2 S3 API 密钥
 ├── R2_BUCKET_NAME            # R2 存储桶名称
 ├── R2_ENDPOINT               # R2 S3 endpoint
-└── CLAUDE_API_KEY            # Claude API Key（AI 评审/匹配用）
+└── CLAUDE_CODE_OAUTH_TOKEN    # Claude OAuth Token（MVP: 个人订阅；后续迁移 ANTHROPIC_API_KEY）
 ```
 
 ---
@@ -320,7 +320,7 @@ GitHub Repo Secrets (Actions 用):
 | `R2_ENDPOINT` | R2 S3 endpoint | GitHub Secrets | Actions |
 | `GITHUB_APP_ID` | OAuth App ID | CF Pages Env Vars | Functions |
 | `GITHUB_APP_SECRET` | OAuth App Secret | CF Pages Env Vars | Functions |
-| `CLAUDE_API_KEY` | Claude API Key | GitHub Secrets | Actions |
+| `CLAUDE_CODE_OAUTH_TOKEN` | Claude OAuth Token（MVP: 个人订阅） | GitHub Secrets | Actions (Claude Code Action) |
 
 ### 5.3 安全边界与风险
 

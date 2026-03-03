@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import yaml from '@modyfi/vite-plugin-yaml';
 
 export default defineConfig({
-  site: 'https://synnovator.pages.dev',
+  site: 'https://home.synnovator.space',
   adapter: cloudflare({
     platformProxy: { enabled: true },
   }),
