@@ -1,0 +1,93 @@
+---
+import { localize } from '../lib/i18n';
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  project: {
+    name: string;
+    name_zh?: string;
+    tagline?: string;
+    track: string;
+    team: Array<{ github: string; role?: string }>;
+    tech_stack?: string[];
+    deliverables?: {
+      repo?: string;
+      demo?: string;
+    };
+  };
+  lang: Lang;
+}
+
+const { project, lang } = Astro.props;
+---
+
+<div class="rounded-lg border border-secondary-bg bg-dark-bg p-5 hover:border-lime-primary/30 transition-colors">
+  <div class="flex items-start justify-between mb-3">
+    <div>
+      <h4 class="text-white font-medium text-sm">
+        {localize(lang, project.name, project.name_zh)}
+      </h4>
+      {project.tagline && (
+        <p class="text-muted text-xs mt-1">{project.tagline}</p>
+      )}
+    </div>
+    <span class="text-xs px-2 py-1 rounded-full bg-secondary-bg text-muted whitespace-nowrap">
+      {project.track}
+    </span>
+  </div>
+
+  <!-- Team -->
+  <div class="flex flex-wrap gap-2 mb-3">
+    {project.team.map(member => (
+      <a
+        href={`https://github.com/${member.github}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center gap-1 text-xs text-muted hover:text-lime-primary transition-colors"
+      >
+        <img
+          src={`https://github.com/${member.github}.png?size=20`}
+          alt={member.github}
+          class="w-4 h-4 rounded-full"
+          loading="lazy"
+        />
+        {member.github}
+      </a>
+    ))}
+  </div>
+
+  <!-- Tech stack -->
+  {project.tech_stack && project.tech_stack.length > 0 && (
+    <div class="flex flex-wrap gap-1 mb-3">
+      {project.tech_stack.map(tech => (
+        <span class="text-xs px-2 py-0.5 rounded-full bg-neon-blue/10 text-neon-blue">
+          {tech}
+        </span>
+      ))}
+    </div>
+  )}
+
+  <!-- Links -->
+  <div class="flex gap-3 mt-3">
+    {project.deliverables?.repo && (
+      <a
+        href={project.deliverables.repo}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-xs text-lime-primary hover:underline"
+      >
+        {lang === 'zh' ? '查看代码' : 'View Code'} →
+      </a>
+    )}
+    {project.deliverables?.demo && (
+      <a
+        href={project.deliverables.demo}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-xs text-cyan hover:underline"
+      >
+        Demo →
+      </a>
+    )}
+  </div>
+</div>

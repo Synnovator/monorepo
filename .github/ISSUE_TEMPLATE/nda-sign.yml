@@ -1,0 +1,34 @@
+name: "NDA Signing Confirmation"
+description: "Confirm NDA signing for a hackathon with NDA requirements"
+title: "[NDA] {username} — {hackathon-slug}"
+labels: ["nda-sign"]
+body:
+  - type: input
+    id: hackathon
+    attributes:
+      label: "Hackathon Slug"
+      description: "The slug of the hackathon requiring NDA"
+      placeholder: "enterprise-fintech-risk-2025"
+    validations:
+      required: true
+
+  - type: input
+    id: github
+    attributes:
+      label: "GitHub Username"
+      placeholder: "your-username"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: "NDA Confirmation"
+      description: "Please confirm you have read and agree to the NDA terms"
+      options:
+        - label: "I have read and agree to the NDA terms for this hackathon"
+          required: true
+        - label: "I understand the confidentiality requirements and data handling policies"
+          required: true
+        - label: "I acknowledge that violation of the NDA may result in disqualification and legal action"
+          required: true

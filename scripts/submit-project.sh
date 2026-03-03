@@ -1,41 +1,37 @@
 #!/usr/bin/env bash
-# submit-project.sh — Scaffold a project submission directory
-# Usage: ./scripts/submit-project.sh <hackathon-slug> <team-name>
-# Example: ./scripts/submit-project.sh ai-agent-challenge-2026 team-alpha
-
 set -euo pipefail
 
-HACKATHON="${1:-}"
-TEAM="${2:-}"
+# Usage: ./scripts/submit-project.sh <hackathon-slug> <team-name> <track-slug>
+# Example: ./scripts/submit-project.sh ai-challenge-2026 team-alpha ai-agent
 
-if [ -z "$HACKATHON" ] || [ -z "$TEAM" ]; then
-  echo "Usage: $0 <hackathon-slug> <team-name>"
-  echo "Example: $0 ai-agent-challenge-2026 team-alpha"
+SLUG="${1:?Usage: submit-project.sh <hackathon-slug> <team-name> <track-slug>}"
+TEAM="${2:?Team name required}"
+TRACK="${3:?Track slug required}"
+
+HACKATHON_DIR="hackathons/${SLUG}"
+if [ ! -f "${HACKATHON_DIR}/hackathon.yml" ]; then
+  echo "ERROR: Hackathon not found: ${SLUG}" >&2
   exit 1
 fi
 
-HACKATHON_DIR="hackathons/$HACKATHON"
-if [ ! -d "$HACKATHON_DIR" ]; then
-  echo "Error: hackathon '$HACKATHON' not found at $HACKATHON_DIR"
+DIR="${HACKATHON_DIR}/submissions/${TEAM}"
+FILE="${DIR}/project.yml"
+
+if [ -d "$DIR" ]; then
+  echo "ERROR: Submission directory already exists: $DIR" >&2
   exit 1
 fi
 
-SUBMIT_DIR="$HACKATHON_DIR/submissions/$TEAM"
-if [ -d "$SUBMIT_DIR" ]; then
-  echo "Error: $SUBMIT_DIR already exists"
-  exit 1
-fi
+mkdir -p "$DIR"
 
-mkdir -p "$SUBMIT_DIR"
-
-cat > "$SUBMIT_DIR/submission.yml" << YAML
+cat > "$FILE" << YAML
 synnovator_submission: "2.0"
 
 project:
   name: ""
   name_zh: ""
   tagline: ""
-  track: ""                          # Must match a track slug in hackathon.yml
+  track: "${TRACK}"
 
   team:
     - github: ""
@@ -43,21 +39,16 @@ project:
 
   deliverables:
     repo: ""
-    document:
-      local_path: ""
-      r2_url: ""
     video: ""
     demo: ""
 
   tech_stack: []
 
+  references: []
+
   description: |
-    Describe your project here...
-  description_zh: |
-    项目描述...
+    Project description...
 YAML
 
-echo "Created $SUBMIT_DIR/"
-echo "  - $SUBMIT_DIR/submission.yml (edit this file)"
-echo ""
-echo "Next: edit submission.yml, then submit a PR."
+echo "Created submission: $FILE"
+echo "Next: edit $FILE and add deliverables, then commit and create PR"

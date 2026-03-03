@@ -1,0 +1,75 @@
+# Synnovator Community Hackathon Template
+# Usage: Copy this file to hackathons/<your-slug>/hackathon.yml and customize
+synnovator_version: "2.0"
+
+hackathon:
+  name: "Community Hackathon 2026"
+  name_zh: "2026 社区 Hackathon"
+  slug: "community-hackathon-2026"  # Change this!
+  tagline: "Build something amazing with AI"
+  tagline_zh: "用 AI 构建令人惊叹的应用"
+  type: "community"
+
+  organizers:
+    - name: "Your Organization"
+      name_zh: "你的组织名称"
+      role: "organizer"
+
+  eligibility:
+    open_to: "all"
+    team_size:
+      min: 1
+      max: 5
+    allow_solo: true
+
+  legal:
+    license: "Apache-2.0"
+    ip_ownership: "participant"
+
+  timeline:
+    registration:
+      start: "2026-04-01T00:00:00Z"
+      end: "2026-04-15T23:59:59Z"
+    development:
+      start: "2026-04-16T00:00:00Z"
+      end: "2026-05-15T23:59:59Z"
+    submission:
+      start: "2026-05-16T00:00:00Z"
+      end: "2026-05-20T23:59:59Z"
+    judging:
+      start: "2026-05-21T00:00:00Z"
+      end: "2026-05-28T23:59:59Z"
+    announcement:
+      start: "2026-05-29T00:00:00Z"
+      end: "2026-06-01T23:59:59Z"
+
+  tracks:
+    - name: "Open Innovation"
+      slug: "open-innovation"
+      rewards:
+        - type: "prize"
+          rank: "1st"
+          amount: "$1,000"
+        - type: "prize"
+          rank: "2nd"
+          amount: "$500"
+      judging:
+        mode: "weighted"
+        criteria:
+          - name: "Innovation"
+            weight: 0.3
+            score_range: [0, 100]
+          - name: "Technical Depth"
+            weight: 0.3
+            score_range: [0, 100]
+          - name: "Usability"
+            weight: 0.2
+            score_range: [0, 100]
+          - name: "Presentation"
+            weight: 0.2
+            score_range: [0, 100]
+
+  settings:
+    language: ["zh", "en"]
+    public_vote: "reactions"
+    vote_emoji: "👍"

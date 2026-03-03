@@ -6,9 +6,15 @@ import JudgeCard from '../../components/JudgeCard.astro';
 import FAQAccordion from '../../components/FAQAccordion.astro';
 import EventCalendar from '../../components/EventCalendar.astro';
 import GitHubRedirect from '../../components/GitHubRedirect.astro';
+import ScoreCard from '../../components/ScoreCard.astro';
+import DatasetDownload from '../../components/DatasetDownload.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 import { t, localize, getCurrentStage } from '../../lib/i18n';
 import type { Lang } from '../../lib/i18n';
+import fs from 'node:fs';
+import path from 'node:path';
+import yaml from 'js-yaml';
 
 export async function getStaticPaths() {
   const hackathons = await getCollection('hackathons');
@@ -22,6 +28,23 @@ const { entry } = Astro.props;
 const h = entry.data.hackathon;
 const lang: Lang = 'zh';
 const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
+
+// Load submissions for this hackathon
+const submissionsDir = path.resolve(`hackathons/${h.slug}/submissions`);
+let submissions: any[] = [];
+if (fs.existsSync(submissionsDir)) {
+  const teamDirs = fs.readdirSync(submissionsDir);
+  for (const team of teamDirs) {
+    const projectPath = path.join(submissionsDir, team, 'project.yml');
+    if (fs.existsSync(projectPath)) {
+      try {
+        const raw = fs.readFileSync(projectPath, 'utf8');
+        const data = yaml.load(raw) as any;
+        if (data?.project) submissions.push(data.project);
+      } catch { /* skip invalid */ }
+    }
+  }
+}
 ---
 
 <BaseLayout title={localize(lang, h.name, h.name_zh)} description={localize(lang, h.tagline, h.tagline_zh)}>
@@ -145,17 +168,7 @@ const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
         {h.datasets && h.datasets.length > 0 && (
           <section>
             <h2 class="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.datasets')}</h2>
-            {h.datasets.map(ds => (
-              <div class="rounded-lg border border-secondary-bg bg-dark-bg p-6">
-                <p class="text-white font-medium text-sm">{localize(lang, ds.name, ds.name_zh)}</p>
-                {ds.description && <p class="text-muted text-sm mt-1">{ds.description}</p>}
-                <div class="flex gap-4 mt-3 text-xs text-muted">
-                  {ds.format && <span>Format: {ds.format}</span>}
-                  {ds.size && <span>Size: {ds.size}</span>}
-                  {ds.access_control && <span class="text-warning">Access: {ds.access_control}</span>}
-                </div>
-              </div>
-            ))}
+            <DatasetDownload datasets={h.datasets} hackathonSlug={h.slug} lang={lang} />
           </section>
         )}
 
@@ -179,6 +192,35 @@ const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
           <section>
             <h2 class="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.faq')}</h2>
             <FAQAccordion items={h.faq} lang={lang} />
+          </section>
+        )}
+
+        {/* ScoreCard (visible during judging stage) */}
+        {stage === 'judging' && h.tracks && h.tracks.map(track => (
+          track.judging?.criteria && track.judging.criteria.length > 0 && (
+            <section>
+              <h2 class="text-xl font-heading font-bold text-white mb-4">
+                {t(lang, 'score.title')} — {localize(lang, track.name, track.name_zh)}
+              </h2>
+              <ScoreCard
+                hackathonSlug={h.slug}
+                trackSlug={track.slug}
+                criteria={track.judging.criteria}
+                lang={lang}
+              />
+            </section>
+          )
+        ))}
+
+        {/* Submissions */}
+        {submissions.length > 0 && (
+          <section>
+            <h2 class="text-xl font-heading font-bold text-white mb-4">{t(lang, 'project.submissions')}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {submissions.map(project => (
+                <ProjectCard project={project} lang={lang} />
+              ))}
+            </div>
           </section>
         )}
       </div>

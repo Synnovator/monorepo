@@ -1,0 +1,104 @@
+# Synnovator Enterprise Hackathon Template
+# Usage: Copy this file to hackathons/<your-slug>/hackathon.yml and customize
+synnovator_version: "2.0"
+
+hackathon:
+  name: "Enterprise Challenge 2026"
+  name_zh: "2026 企业创新挑战赛"
+  slug: "enterprise-challenge-2026"  # Change this!
+  tagline: "Solve real-world enterprise problems"
+  tagline_zh: "解决真实企业问题"
+  type: "enterprise"
+
+  organizers:
+    - name: "Your Company"
+      name_zh: "你的公司名称"
+      role: "organizer"
+
+  eligibility:
+    open_to: "all"
+    team_size:
+      min: 2
+      max: 5
+    allow_solo: false
+
+  legal:
+    license: "proprietary"
+    ip_ownership: "organizer"
+    nda:
+      required: true
+      url: ""
+    compliance_notes:
+      - "All submissions become property of the organizing company"
+      - "Participants must sign NDA before accessing datasets"
+
+  timeline:
+    registration:
+      start: "2026-04-01T00:00:00Z"
+      end: "2026-04-15T23:59:59Z"
+    development:
+      start: "2026-04-16T00:00:00Z"
+      end: "2026-05-15T23:59:59Z"
+    submission:
+      start: "2026-05-16T00:00:00Z"
+      end: "2026-05-20T23:59:59Z"
+    judging:
+      start: "2026-05-21T00:00:00Z"
+      end: "2026-06-01T23:59:59Z"
+    announcement:
+      start: "2026-06-02T00:00:00Z"
+      end: "2026-06-05T23:59:59Z"
+
+  datasets:
+    - name: "Enterprise Dataset"
+      name_zh: "企业数据集"
+      version: "1.0"
+      description: "Anonymized enterprise data for the challenge"
+      access_control: "nda"
+      format: "CSV/Parquet"
+      size: "2GB"
+
+  tracks:
+    - name: "Risk Assessment"
+      name_zh: "风险评估"
+      slug: "risk-assessment"
+      rewards:
+        - type: "prize"
+          rank: "1st"
+          amount: "$10,000"
+        - type: "prize"
+          rank: "2nd"
+          amount: "$5,000"
+        - type: "prize"
+          rank: "3rd"
+          amount: "$2,000"
+      judging:
+        mode: "weighted"
+        criteria:
+          - name: "Model Accuracy"
+            name_zh: "模型精度"
+            weight: 0.35
+            score_range: [0, 100]
+          - name: "Innovation"
+            name_zh: "创新性"
+            weight: 0.25
+            score_range: [0, 100]
+          - name: "Scalability"
+            name_zh: "可扩展性"
+            weight: 0.20
+            score_range: [0, 100]
+          - name: "Presentation"
+            name_zh: "演示效果"
+            weight: 0.20
+            score_range: [0, 100]
+      deliverables:
+        required:
+          - "Source code repository"
+          - "Technical report (PDF)"
+          - "Demo video (5 min max)"
+        optional:
+          - "Live demo URL"
+
+  settings:
+    language: ["zh", "en"]
+    public_vote: "none"

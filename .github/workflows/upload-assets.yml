@@ -1,0 +1,100 @@
+name: Upload Assets to R2
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - 'hackathons/**/submissions/**'
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip -q awscliv2.zip
+          sudo ./aws/install
+
+      - name: Find asset files in submissions
+        id: find
+        run: |
+          # Get changed files in submissions directories (non-YAML only)
+          FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} HEAD -- 'hackathons/**/submissions/**' | grep -vE '\.(yml|yaml)$' || true)
+          echo "files<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$FILES" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          if [ -z "$FILES" ]; then
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload to R2
+        if: steps.find.outputs.has_files == 'true'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET_NAME }}
+        run: |
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            [ ! -f "$file" ] && continue
+            echo "Uploading $file..."
+            aws s3 cp "$file" "s3://${R2_BUCKET}/${file}" \
+              --endpoint-url "${R2_ENDPOINT}"
+            echo "  → s3://${R2_BUCKET}/${file}"
+          done <<< "${{ steps.find.outputs.files }}"
+
+      - name: Update project.yml r2_url fields
+        if: steps.find.outputs.has_files == 'true'
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET_NAME }}
+        run: |
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            [ ! -f "$file" ] && continue
+
+            BASENAME=$(basename "$file")
+            DIR=$(dirname "$file")
+            PROJECT_YML="${DIR}/project.yml"
+
+            # Walk up directories to find project.yml
+            while [ ! -f "$PROJECT_YML" ] && [ "$DIR" != "." ]; do
+              DIR=$(dirname "$DIR")
+              PROJECT_YML="${DIR}/project.yml"
+            done
+
+            if [ -f "$PROJECT_YML" ]; then
+              R2_URL="${R2_ENDPOINT}/${R2_BUCKET}/${file}"
+              sed -i "s|local_path: \"./${BASENAME}\"|local_path: \"./${BASENAME}\"\n        r2_url: \"${R2_URL}\"|" "$PROJECT_YML" 2>/dev/null || true
+              echo "Updated $PROJECT_YML with R2 URL for $BASENAME"
+            fi
+          done <<< "${{ steps.find.outputs.files }}"
+
+      - name: Commit R2 URL updates
+        if: steps.find.outputs.has_files == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "No changes to commit"
+          else
+            git add -A
+            git commit -m "chore: update R2 URLs for uploaded assets [skip ci]"
+            git push
+          fi

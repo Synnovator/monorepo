@@ -6,16 +6,31 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
-    "astro": "^5.5.0"
+    "@astrojs/cloudflare": "^12.6.12",
+    "@aws-sdk/client-s3": "^3.1000.0",
+    "@aws-sdk/s3-request-presigner": "^3.1000.0",
+    "astro": "^5.5.0",
+    "js-yaml": "^4.1.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
     "@modyfi/vite-plugin-yaml": "^1.1.1",
     "@tailwindcss/vite": "^4.1.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^25.3.3",
     "tailwindcss": "^4.1.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.69.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "workerd"
+    ]
   }
 }

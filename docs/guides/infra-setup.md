@@ -21,13 +21,16 @@
 - 选择 GitHub 账号 → 授权 → 选择 `synnovator/monorepo`
 - 项目名称: `synnovator`（默认域名 `synnovator.pages.dev`）
 
-### 1.2 构建设置
+### 1.2 构建与部署设置
 
 - Framework preset: `Astro`
 - Build command: `cd site && pnpm install && pnpm build`
 - Build output directory: `site/dist`
 - Root directory: `/`（留空，不要设为 `site/`）
+- **Deploy command**: `cd site && pnpm run deploy`（执行 `wrangler deploy`）
 - Node.js version: 环境变量 `NODE_VERSION` = `20`
+
+> **注意**: Production 和 Non-production 的 deploy command 都需要设置为 `cd site && pnpm run deploy`。
 
 ### 1.3 自定义域名
 
@@ -89,29 +92,57 @@
 
 - 创建后记录 Client ID（页面直接显示）
 - 点击 Generate a new client secret → 记录 Secret（仅显示一次）
-- 这两个值后续填入 CF Pages 环境变量:
-  - Client ID → `GITHUB_APP_ID`
-  - Client Secret → `GITHUB_APP_SECRET`
+- Client ID → `GITHUB_CLIENT_ID`（已写入 `wrangler.toml [vars]`）
+- Client Secret → `GITHUB_CLIENT_SECRET`（通过 Worker Secrets 配置）
 
 ---
 
 ## 4. 环境变量与 Secrets
 
-### 4.1 Cloudflare Pages Environment Variables
+> **架构说明**: 站点通过 `wrangler deploy` 部署为 Cloudflare Worker（非 Pages 直接部署）。
+> CF Pages 仅作为 CI/CD 触发构建，实际运行时变量来自 **Worker** 的配置。
+> 非敏感值写入 `wrangler.toml [vars]`，敏感值通过 Worker Secrets 配置。
+
+### 4.1 wrangler.toml 变量（非敏感，提交到仓库）
+
+`site/wrangler.toml` 的 `[vars]` 区段已包含：
+
+| 变量名 | 值 | 说明 |
+|--------|------|------|
+| `SITE_URL` | `https://home.synnovator.space` | 站点 URL（构建回调 URI） |
+| `GITHUB_CLIENT_ID` | `Iv23li...` | GitHub OAuth App Client ID（公开值） |
+
+### 4.2 Worker Secrets（敏感，通过 Dashboard 或 CLI 配置）
+
+Workers & Pages → `synnovator` → Settings → Variables and Secrets → Add
+
+| Secret 名 | 值来源 | 说明 |
+|-----------|--------|------|
+| `GITHUB_CLIENT_SECRET` | §3.2 Client Secret | OAuth token 交换 |
+| `AUTH_SECRET` | `openssl rand -base64 32` | Session cookie AES-GCM 加密密钥 |
+| `R2_ACCESS_KEY_ID` | §2.2 API Token | R2 presigned URL 签发 |
+| `R2_SECRET_ACCESS_KEY` | §2.2 API Token | 同上 |
+| `R2_BUCKET_NAME` | `synnovator-assets` | 同上 |
+| `R2_ENDPOINT` | §2.2 S3 Endpoint | 同上 |
+
+CLI 方式配置 Secrets（需 `CLOUDFLARE_API_TOKEN`）：
+```bash
+cd site
+pnpm exec wrangler secret put GITHUB_CLIENT_SECRET
+pnpm exec wrangler secret put AUTH_SECRET
+# 按提示粘贴值
+```
+
+> **注意**: CF Pages build settings 的环境变量仅在构建阶段可用，Worker 运行时读不到。
+> 所有运行时变量必须通过 `wrangler.toml [vars]` 或 Worker Secrets 配置。
+
+### 4.3 CF Pages Build Settings（仅构建阶段）
 
 Pages 项目 → Settings → Environment variables → Add
 
-| 变量名 | 值来源 | Production | Preview |
-|--------|--------|:---:|:---:|
-| `R2_ACCESS_KEY_ID` | §2.2 API Token | ✓ | ✓ |
-| `R2_SECRET_ACCESS_KEY` | §2.2 API Token | ✓ | ✓ |
-| `R2_BUCKET_NAME` | `synnovator-assets` | ✓ | ✓ |
-| `GITHUB_APP_ID` | §3.2 Client ID | ✓ | ✓ |
-| `GITHUB_APP_SECRET` | §3.2 Client Secret | ✓ | ✓ |
-| `SITE_URL` | `https://home.synnovator.space` | ✓ | ✗ |
-| `NODE_VERSION` | `20` | ✓ | ✓ |
-
-> Encrypt 打开（敏感值自动加密，后续不可查看）
+| 变量名 | 值 | 说明 |
+|--------|------|------|
+| `NODE_VERSION` | `20` | 构建时 Node.js 版本 |
 
 ### 4.2 GitHub Repo Secrets
 
@@ -220,20 +251,34 @@ export default defineConfig({
 - 新增 `adapter: cloudflare()`
 - `site` URL 更新为 `https://home.synnovator.space`
 
-### 6.3 wrangler.toml（可选）
+### 6.3 wrangler.toml
 
-如需本地调试 Pages Functions 或配置 R2 binding:
+Worker 部署配置（`site/wrangler.toml`）:
 
 ```toml
 name = "synnovator"
-compatibility_date = "2026-03-01"
+main = "./dist/_worker.js/index.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
 
-[[r2_buckets]]
-binding = "R2"
-bucket_name = "synnovator-assets"
+[assets]
+binding = "ASSETS"
+directory = "./dist"
+
+[vars]
+SITE_URL = "https://home.synnovator.space"
+GITHUB_CLIENT_ID = "Iv23li..."
 ```
 
-> 仅本地 `wrangler pages dev` 时使用，CF Pages 部署时通过 Dashboard 绑定
+> `[vars]` 存放非敏感运行时变量，敏感值通过 Worker Secrets 配置（见 §4.2）。
+
+### 6.4 .assetsignore
+
+在 `site/public/.assetsignore` 中排除 Worker 代码目录，防止作为静态资源上传：
+
+```
+_worker.js
+```
 
 ---
 
@@ -271,9 +316,10 @@ bucket_name = "synnovator-assets"
 
 ### 7.5 环境变量
 
-- [ ] CF Pages: Settings → Environment variables 7 项已配置
-- [ ] GitHub: Settings → Secrets → Actions 5 项已配置
-- [ ] 验证: `gh secret list` 显示 5 条记录
+- [ ] `wrangler.toml [vars]`: `SITE_URL`, `GITHUB_CLIENT_ID` 已配置
+- [ ] Worker Secrets: `GITHUB_CLIENT_SECRET`, `AUTH_SECRET`, R2 相关 4 项已配置
+- [ ] CF Pages Build Settings: `NODE_VERSION=20` 已配置
+- [ ] GitHub Actions Secrets: 5 项已配置（`gh secret list` 验证）
 
 ---
 

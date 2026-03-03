@@ -1,47 +1,31 @@
 #!/usr/bin/env bash
-# create-profile.sh — Create a hacker profile YAML
+set -euo pipefail
+
 # Usage: ./scripts/create-profile.sh <github-username>
 # Example: ./scripts/create-profile.sh alice-dev
 
-set -euo pipefail
+USERNAME="${1:?Usage: create-profile.sh <github-username>}"
 
-USERNAME="${1:-}"
-if [ -z "$USERNAME" ]; then
-  echo "Usage: $0 <github-username>"
-  echo "Example: $0 alice-dev"
+# Generate short UUID suffix
+UUID=$(head -c 4 /dev/urandom | xxd -p)
+FILE="profiles/${USERNAME}-${UUID}.yml"
+
+if ls profiles/${USERNAME}-*.yml 1>/dev/null 2>&1; then
+  echo "ERROR: Profile already exists for ${USERNAME}" >&2
+  ls profiles/${USERNAME}-*.yml
   exit 1
 fi
 
-# Generate short UUID (first 8 chars)
-UUID=$(uuidgen | tr '[:upper:]' '[:lower:]' | cut -c1-8)
-FILENAME="profiles/${USERNAME}-${UUID}.yml"
-
-if ls profiles/"${USERNAME}"-*.yml 1>/dev/null 2>&1; then
-  echo "Warning: profile for $USERNAME already exists:"
-  ls profiles/"${USERNAME}"-*.yml
-  echo "Continuing will create a duplicate."
-  read -rp "Continue? [y/N] " confirm
-  [ "$confirm" != "y" ] && exit 0
-fi
-
-cat > "$FILENAME" << YAML
+cat > "$FILE" << YAML
 synnovator_profile: "2.0"
 
 hacker:
-  github: "$USERNAME"
+  github: "${USERNAME}"
   name: ""
-  name_zh: ""
   avatar: "https://github.com/${USERNAME}.png"
-
   bio: ""
-  bio_zh: ""
-
   location: ""
-  languages: ["en"]
-
-  identity:
-    type: ""                         # student | professional | academic
-    affiliation: ""
+  languages: ["zh", "en"]
 
   skills:
     - category: ""
@@ -51,19 +35,9 @@ hacker:
 
   looking_for:
     roles: []
-    team_size: ""
-    collaboration_style: ""
-
-  experience:
-    years: 0
-    hackathons: []
-    projects: []
-
-  links:
-    twitter: ""
-    linkedin: ""
-    website: ""
+    team_size: "3-5"
+    collaboration_style: "async-friendly"
 YAML
 
-echo "Created $FILENAME"
-echo "Next: edit the file, then submit a PR."
+echo "Created profile: $FILE"
+echo "Next: edit $FILE to fill in details, then commit and create PR"

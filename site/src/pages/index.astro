@@ -2,18 +2,39 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HackathonCard from '../components/HackathonCard.astro';
 import { getCollection } from 'astro:content';
-import { t } from '../lib/i18n';
+import { t, getCurrentStage } from '../lib/i18n';
 import type { Lang } from '../lib/i18n';
 
-const lang: Lang = 'zh'; // Default language; will be dynamic later
+const lang: Lang = 'zh';
 
 const allHackathons = await getCollection('hackathons');
 
-// Sort by registration start date (newest first), with fallback
 const hackathons = allHackathons.sort((a, b) => {
   const aStart = a.data.hackathon.timeline?.registration?.start || '';
   const bStart = b.data.hackathon.timeline?.registration?.start || '';
   return bStart.localeCompare(aStart);
+});
+
+// Build search index for client-side filtering
+const searchIndex = hackathons.map(entry => {
+  const h = entry.data.hackathon;
+  const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
+  // Determine filter category
+  const upcomingStages = ['draft'];
+  const endedStages = ['ended', 'announcement', 'award'];
+  let filterStatus = 'active';
+  if (upcomingStages.includes(stage)) filterStatus = 'upcoming';
+  else if (endedStages.includes(stage)) filterStatus = 'ended';
+  return {
+    slug: h.slug,
+    name: h.name || '',
+    name_zh: h.name_zh || '',
+    tagline: h.tagline || '',
+    tagline_zh: h.tagline_zh || '',
+    type: h.type || '',
+    stage,
+    filterStatus,
+  };
 });
 ---
 
@@ -29,20 +50,127 @@ const hackathons = allHackathons.sort((a, b) => {
       </p>
     </div>
 
+    <!-- Search + Filters -->
+    <div class="mb-8 space-y-4">
+      <!-- Search input -->
+      <div class="relative max-w-md">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          id="search-input"
+          placeholder={lang === 'zh' ? '搜索活动名称...' : 'Search events...'}
+          class="w-full bg-dark-bg border border-secondary-bg rounded-lg pl-10 pr-4 py-2.5 text-white text-sm placeholder-muted focus:border-lime-primary focus:outline-none transition-colors"
+        />
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="flex flex-wrap gap-2" id="filter-tabs">
+        <button class="filter-tab active text-sm px-4 py-1.5 rounded-full border transition-colors" data-filter="all">
+          {t(lang, 'home.filter_all')}
+        </button>
+        <button class="filter-tab text-sm px-4 py-1.5 rounded-full border transition-colors" data-filter="active">
+          {t(lang, 'home.filter_active')}
+        </button>
+        <button class="filter-tab text-sm px-4 py-1.5 rounded-full border transition-colors" data-filter="upcoming">
+          {t(lang, 'home.filter_upcoming')}
+        </button>
+        <button class="filter-tab text-sm px-4 py-1.5 rounded-full border transition-colors" data-filter="ended">
+          {t(lang, 'home.filter_ended')}
+        </button>
+      </div>
+    </div>
+
     <!-- Hackathon list -->
     {hackathons.length > 0 ? (
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {hackathons.map(entry => (
-          <HackathonCard hackathon={entry.data.hackathon} lang={lang} />
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="hackathon-grid">
+        {hackathons.map((entry, idx) => (
+          <div
+            class="hackathon-item"
+            data-slug={entry.data.hackathon.slug}
+            data-status={searchIndex[idx].filterStatus}
+            data-search={`${searchIndex[idx].name} ${searchIndex[idx].name_zh} ${searchIndex[idx].tagline} ${searchIndex[idx].tagline_zh} ${searchIndex[idx].type}`.toLowerCase()}
+          >
+            <HackathonCard hackathon={entry.data.hackathon} lang={lang} />
+          </div>
         ))}
       </div>
     ) : (
       <div class="text-center py-24">
         <p class="text-muted text-lg mb-4">{t(lang, 'home.empty')}</p>
-        <a href="#" class="text-lime-primary hover:underline">
+        <a href="/guides/organizer" class="text-lime-primary hover:underline">
           {t(lang, 'home.empty_cta')}
         </a>
       </div>
     )}
+
+    <!-- No results message -->
+    <div id="no-results" class="hidden text-center py-24">
+      <p class="text-muted text-lg">{lang === 'zh' ? '没有找到匹配的活动' : 'No matching events found'}</p>
+    </div>
   </div>
 </BaseLayout>
+
+<style>
+  .filter-tab {
+    border-color: var(--color-secondary-bg, #2a2a2a);
+    color: var(--color-muted, #888);
+    background: transparent;
+    cursor: pointer;
+  }
+  .filter-tab:hover {
+    border-color: var(--color-lime-primary, #BBFD3B);
+    color: var(--color-white, #fff);
+  }
+  .filter-tab.active {
+    border-color: var(--color-lime-primary, #BBFD3B);
+    background-color: color-mix(in srgb, var(--color-lime-primary, #BBFD3B) 20%, transparent);
+    color: var(--color-lime-primary, #BBFD3B);
+  }
+</style>
+
+<script>
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const filterTabs = document.querySelectorAll('.filter-tab');
+  const items = document.querySelectorAll('.hackathon-item');
+  const noResults = document.getElementById('no-results');
+
+  let currentFilter = 'all';
+
+  function applyFilters() {
+    const query = searchInput?.value.toLowerCase().trim() || '';
+    let visibleCount = 0;
+
+    items.forEach((item) => {
+      const el = item as HTMLElement;
+      const status = el.dataset.status || '';
+      const searchText = el.dataset.search || '';
+
+      const matchesFilter = currentFilter === 'all' || status === currentFilter;
+      const matchesSearch = !query || searchText.includes(query);
+
+      if (matchesFilter && matchesSearch) {
+        el.style.display = '';
+        visibleCount++;
+      } else {
+        el.style.display = 'none';
+      }
+    });
+
+    if (noResults) {
+      noResults.classList.toggle('hidden', visibleCount > 0 || items.length === 0);
+    }
+  }
+
+  searchInput?.addEventListener('input', applyFilters);
+
+  filterTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      filterTabs.forEach((t) => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentFilter = (tab as HTMLElement).dataset.filter || 'all';
+      applyFilters();
+    });
+  });
+</script>
