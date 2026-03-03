@@ -30,6 +30,7 @@ jobs:
             const title = issue.title;
             const author = issue.user.login;
             const errors = [];
+            const warnings = [];
 
             // Parse title: [Score] team-name — hackathon-slug / track-slug
             const titleMatch = title.match(/\[Score\]\s*(.*?)\s*—\s*(.*?)\s*\/\s*(.*)/);
@@ -59,6 +60,53 @@ jobs:
                   errors.push(`@${author} is not listed as a judge for ${slug.trim()}`);
                 }
 
+                // P1: Check conflict declaration in Profile
+                const profilesDir = 'profiles';
+                if (fs.existsSync(profilesDir)) {
+                  const profileFiles = fs.readdirSync(profilesDir).filter(f => f.endsWith('.yml'));
+                  let profileFound = false;
+                  for (const pf of profileFiles) {
+                    try {
+                      const profileData = yaml.load(fs.readFileSync(`${profilesDir}/${pf}`, 'utf8'));
+                      if (profileData?.hacker?.github === author) {
+                        profileFound = true;
+                        if (!profileData?.hacker?.judge_profile?.conflict_declaration) {
+                          errors.push(`@${author}: Profile is missing \`judge_profile.conflict_declaration\`. Please update your Profile with a conflict declaration document before scoring.`);
+                        }
+                        break;
+                      }
+                    } catch { /* skip invalid profile */ }
+                  }
+                  if (!profileFound) {
+                    errors.push(`@${author}: No Profile found in \`profiles/\`. Judges must have a Profile with \`judge_profile.conflict_declaration\` field.`);
+                  }
+                }
+
+                // P1: Check conflict checkbox in Issue body
+                const bodyText = issue.body || '';
+                const conflictChecked = bodyText.includes('[X]') || bodyText.includes('[x]');
+                const conflictField = bodyText.includes('conflict_declaration: true');
+                if (!conflictChecked && !conflictField) {
+                  errors.push('Conflict of interest checkbox not checked. Please confirm you have no conflict of interest with the team.');
+                }
+
+                // P1: Check for duplicate scoring
+                const { data: existingScores } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: `score-validated,hackathon:${slug.trim()}`,
+                  state: 'all',
+                  per_page: 100,
+                });
+                const duplicate = existingScores.find(i =>
+                  i.user.login === author &&
+                  i.title.includes(team.trim()) &&
+                  i.number !== issue.number
+                );
+                if (duplicate) {
+                  errors.push(`@${author} has already submitted a validated score for team \`${team.trim()}\` in issue #${duplicate.number}. Please edit the existing issue instead.`);
+                }
+
                 // Parse and validate scores from body
                 const body = issue.body || '';
                 const yamlBlock = body.match(/```(?:yaml)?\s*\n([\s\S]*?)```/);
@@ -76,6 +124,13 @@ jobs:
                       const range = criterion.score_range || [0, 100];
                       if (typeof s.score !== 'number' || s.score < range[0] || s.score > range[1]) {
                         errors.push(`"${s.criterion}": score ${s.score} outside range [${range[0]}, ${range[1]}]`);
+                      }
+                      // P1: Hard constraint warning
+                      if (criterion.hard_constraint && typeof s.score === 'number') {
+                        const constraintRule = criterion.constraint_rule || '';
+                        if (constraintRule) {
+                          warnings.push(`⚠️ \`${s.criterion}\` has hard constraint: "${constraintRule}". If triggered during aggregation, this score will be set to 0.`);
+                        }
                       }
                     }
                   }
@@ -97,12 +152,16 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                labels: ['score-validated'],
+                labels: ['score-validated', `track:${trackSlug}`],
               });
+              let successMsg = `✅ **Score validated.** Thank you, @${author}!`;
+              if (warnings.length > 0) {
+                successMsg += `\n\n**Warnings:**\n${warnings.map(w => `- ${w}`).join('\n')}`;
+              }
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                body: `✅ **Score validated.** Thank you, @${author}!`,
+                body: successMsg,
               });
             }
