@@ -1,0 +1,62 @@
+name: "Judge Score"
+description: "Submit structured scoring for a hackathon submission"
+title: "[Score] {team-name} — {hackathon-slug} / {track}"
+labels: ["judge-score"]
+body:
+  - type: input
+    id: hackathon
+    attributes:
+      label: "Hackathon Slug"
+      placeholder: "ai-agent-challenge-2026"
+    validations:
+      required: true
+
+  - type: input
+    id: team
+    attributes:
+      label: "Team Name"
+      placeholder: "team-alpha"
+    validations:
+      required: true
+
+  - type: input
+    id: track
+    attributes:
+      label: "Track Slug"
+      placeholder: "ai-agent-framework"
+    validations:
+      required: true
+
+  - type: textarea
+    id: scores
+    attributes:
+      label: "Scores (YAML format)"
+      description: "Score each criterion on a 0-100 scale"
+      value: |
+        # 请按评审维度逐项打分 (0-100)
+        scores:
+          - criterion: "Innovation"
+            score:
+            comment: ""
+          - criterion: "Technical Depth"
+            score:
+            comment: ""
+          - criterion: "Usability"
+            score:
+            comment: ""
+          - criterion: "Presentation"
+            score:
+            comment: ""
+
+        overall_comment: |
+          整体评语...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: conflict
+    attributes:
+      label: "利益冲突声明"
+      options:
+        - label: "我确认与该团队无利益冲突关系"
+          required: true

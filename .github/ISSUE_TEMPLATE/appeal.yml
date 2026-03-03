@@ -1,0 +1,56 @@
+name: "Appeal"
+description: "Submit an appeal regarding hackathon results or process"
+title: "[Appeal] {team-name} — {hackathon-slug}"
+labels: ["appeal"]
+body:
+  - type: input
+    id: hackathon
+    attributes:
+      label: "Hackathon Slug"
+      placeholder: "ai-agent-challenge-2026"
+    validations:
+      required: true
+
+  - type: input
+    id: team
+    attributes:
+      label: "Team Name"
+      placeholder: "team-alpha"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: appeal_type
+    attributes:
+      label: "Appeal Type"
+      options:
+        - "Scoring dispute"
+        - "Rule interpretation"
+        - "Technical issue during submission"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Appeal Description"
+      description: "Describe your appeal with specific details and evidence"
+      placeholder: "Explain what happened and why you believe the result should be reconsidered..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: "Supporting Evidence"
+      description: "Links to commits, screenshots, or other evidence"
+      placeholder: "- Link 1\n- Link 2"
+
+  - type: checkboxes
+    id: acknowledgment
+    attributes:
+      label: "Acknowledgment"
+      options:
+        - label: "I understand that the organizer's final decision is binding"
+          required: true

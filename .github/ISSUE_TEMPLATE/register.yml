@@ -1,0 +1,59 @@
+name: "Hackathon Registration"
+description: "Register for a hackathon event"
+title: "[Register] {username} — {hackathon-slug}"
+labels: ["registration"]
+body:
+  - type: input
+    id: hackathon
+    attributes:
+      label: "Hackathon Slug"
+      description: "The slug of the hackathon you want to register for (from hackathon.yml)"
+      placeholder: "ai-agent-challenge-2026"
+    validations:
+      required: true
+
+  - type: input
+    id: github
+    attributes:
+      label: "GitHub Username"
+      description: "Your GitHub username (must have a profile in profiles/)"
+      placeholder: "alice-dev"
+    validations:
+      required: true
+
+  - type: input
+    id: track
+    attributes:
+      label: "Track Slug"
+      description: "Which track are you registering for?"
+      placeholder: "ai-agent-framework"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: role
+    attributes:
+      label: "Role"
+      options:
+        - "Participant (Solo)"
+        - "Team Lead"
+        - "Team Member"
+    validations:
+      required: true
+
+  - type: input
+    id: team
+    attributes:
+      label: "Team Name (if applicable)"
+      description: "Leave empty for solo registration"
+      placeholder: "team-alpha"
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: "Agreement"
+      options:
+        - label: "I have read the hackathon rules and agree to the terms"
+          required: true
+        - label: "I confirm my profile in profiles/ is up to date"
+          required: true
