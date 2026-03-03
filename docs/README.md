@@ -28,6 +28,7 @@
 | [acceptance-specs-design](plans/2026-03-03-acceptance-specs-design.md) | 验收规范设计决策 |
 | [monorepo-init-design](plans/2026-03-03-monorepo-init-design.md) | Monorepo 初始化设计 |
 | [monorepo-init](plans/2026-03-03-monorepo-init.md) | Monorepo 初始化实施计划 |
+| [infra-setup-guide](plans/2026-03-03-infra-setup-guide.md) | 基础设施配置指南（CF Pages + R2 + OAuth） |
 
 ### 用户指南
 
