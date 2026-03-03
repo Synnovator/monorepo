@@ -19,6 +19,26 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: track
+    attributes:
+      label: "Track Slug (optional)"
+      description: "The specific track being appealed, if applicable"
+      placeholder: "model-optimization"
+
+  - type: dropdown
+    id: expected_result
+    attributes:
+      label: "Expected Result"
+      description: "What outcome do you expect from this appeal?"
+      options:
+        - "Re-scoring (重新评分)"
+        - "Ranking adjustment (修改排名)"
+        - "Rule clarification (规则解释说明)"
+        - "Other (其他)"
+    validations:
+      required: true
+
   - type: dropdown
     id: appeal_type
     attributes:
