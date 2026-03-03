@@ -1,5 +1,5 @@
 ---
-// NavBar — top navigation for Synnovator
+import OAuthButton from './OAuthButton.astro';
 ---
 
 <nav class="fixed top-0 left-0 right-0 z-50 bg-near-black/80 backdrop-blur-md border-b border-secondary-bg">
@@ -12,8 +12,7 @@
     <!-- Navigation Links -->
     <div class="hidden md:flex items-center gap-8">
       <a href="/" class="text-light-gray hover:text-white transition-colors text-sm">活动</a>
-      <a href="#" class="text-muted hover:text-white transition-colors text-sm">参赛者</a>
-      <a href="#" class="text-muted hover:text-white transition-colors text-sm">指南</a>
+      <a href="/guides/hacker" class="text-muted hover:text-white transition-colors text-sm">指南</a>
     </div>
 
     <!-- Right side -->
@@ -23,9 +22,12 @@
         EN / 中
       </button>
 
+      <!-- Auth button -->
+      <OAuthButton />
+
       <!-- GitHub link -->
       <a
-        href="https://github.com/synnovator/monorepo"
+        href="https://github.com/Synnovator/monorepo"
         target="_blank"
         rel="noopener noreferrer"
         class="text-muted hover:text-white transition-colors"
