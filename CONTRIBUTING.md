@@ -18,26 +18,26 @@
 
 ### Scope
 
-使用子项目名：`synnovator`, `page`, `docs`
+使用模块名：`site`, `docs`
 
 ### 示例
 
 ```
-feat(synnovator): add CLI entry point
-fix(page): fix responsive layout
+feat(site): add hackathon listing page
+fix(site): fix responsive layout
 docs(docs): add architecture spec
-ci: add subtree sync workflow
+ci: add deploy workflow
 ```
 
 ## 分支策略
 
 ```
-feat/xxx → dev → main → [CI 自动同步到子仓库]
+feat/xxx → dev → main → [自动部署]
 ```
 
 | 分支 | 用途 |
 |------|------|
-| `main` | 稳定主分支，子仓库同步来源 |
+| `main` | 稳定主分支，自动部署 |
 | `dev` | 日常开发分支 |
 | `feat/*` | 功能分支，从 `dev` 开出 |
 
@@ -46,7 +46,13 @@ feat/xxx → dev → main → [CI 自动同步到子仓库]
 1. 从 `dev` 创建功能分支：`feat/my-feature`
 2. 开发完成后提交 PR 到 `dev`
 3. PR 标题遵循 Commit 规范格式
-4. 合并到 `main` 后 CI 自动同步子仓库
+4. 合并到 `main` 后自动部署
+
+## 数据贡献
+
+- **创建活动**：运行 `scripts/create-hackathon.sh <slug>`，编辑 YAML，提交 PR
+- **注册 Profile**：运行 `scripts/create-profile.sh <username>`，编辑 YAML，提交 PR
+- **提交项目**：运行 `scripts/submit-project.sh <hackathon> <team>`，编辑 YAML，提交 PR
 
 ## 工具约束
 
@@ -60,8 +66,3 @@ feat/xxx → dev → main → [CI 自动同步到子仓库]
 | `npm init` | `pnpm create` |
 | `npm ci` | `pnpm install --frozen-lockfile` |
 | `npx foo` | `pnpm dlx foo`（一次性）或 `pnpm exec foo`（本地） |
-
-## 重要注意
-
-- **所有开发只在 monorepo 进行**，不要直接向子仓库提交
-- subtree 操作规范详见 **MONOREPO.md**
