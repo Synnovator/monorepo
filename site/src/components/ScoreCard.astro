@@ -96,6 +96,20 @@ const GITHUB_REPO = 'monorepo';
     />
   </div>
 
+  <!-- Conflict of interest declaration -->
+  <div class="mt-6 p-4 rounded-lg border border-secondary-bg bg-surface">
+    <label class="flex items-start gap-3 cursor-pointer">
+      <input
+        type="checkbox"
+        id="sc-conflict"
+        class="mt-0.5 accent-lime-primary"
+      />
+      <span class="text-sm text-light-gray">
+        {lang === 'zh' ? '我确认与该团队无利益冲突关系' : 'I confirm no conflict of interest with this team'}
+      </span>
+    </label>
+  </div>
+
   <!-- Weighted total + submit -->
   <div class="mt-6 flex items-center justify-between">
     <div>
@@ -142,6 +156,23 @@ const GITHUB_REPO = 'monorepo';
 
     updateTotal();
 
+    // Conflict checkbox controls submit button
+    const conflictCb = document.getElementById('sc-conflict');
+    const submitBtn = document.getElementById('sc-submit');
+    if (conflictCb && submitBtn) {
+      submitBtn.setAttribute('disabled', 'true');
+      submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      conflictCb.addEventListener('change', () => {
+        if (conflictCb.checked) {
+          submitBtn.removeAttribute('disabled');
+          submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+          submitBtn.setAttribute('disabled', 'true');
+          submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+      });
+    }
+
     document.getElementById('sc-submit')?.addEventListener('click', () => {
       const team = (document.getElementById('sc-team'))?.value || 'team-name';
       const overall = (document.getElementById('sc-overall'))?.value || '';
@@ -156,6 +187,9 @@ const GITHUB_REPO = 'monorepo';
       yamlLines.push('');
       yamlLines.push(`overall_comment: |`);
       yamlLines.push(`  ${overall.replace(/\n/g, '\n  ')}`);
+
+      yamlLines.push('');
+      yamlLines.push('conflict_declaration: true');
 
       const body = '```yaml\n' + yamlLines.join('\n') + '\n```';
       const title = `[Score] ${team} — ${hackathonSlug} / ${trackSlug}`;
