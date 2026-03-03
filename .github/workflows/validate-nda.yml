@@ -1,0 +1,116 @@
+name: Validate NDA
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  validate:
+    if: contains(github.event.issue.labels.*.name, 'nda-sign')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install js-yaml
+
+      - name: Parse and validate NDA
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('./node_modules/js-yaml');
+            const issue = context.payload.issue;
+            const title = issue.title;
+            const body = issue.body || '';
+            const author = issue.user.login;
+            const errors = [];
+
+            // 1. Parse title: [NDA] {username} — {hackathon-slug}
+            const titleMatch = title.match(/\[NDA\]\s*(.*?)\s*—\s*(.*)/);
+            if (!titleMatch) {
+              errors.push('Issue title must match: [NDA] {username} — {hackathon-slug}');
+            }
+            const [, declaredUser, slug] = titleMatch || [null, '', ''];
+            const trimmedSlug = slug.trim();
+            const trimmedUser = declaredUser.trim();
+
+            if (trimmedSlug) {
+              // 2. Verify hackathon exists
+              const hackathonPath = `hackathons/${trimmedSlug}/hackathon.yml`;
+              if (!fs.existsSync(hackathonPath)) {
+                errors.push(`Hackathon not found: ${trimmedSlug}`);
+              } else {
+                const data = yaml.load(fs.readFileSync(hackathonPath, 'utf8'));
+                const h = data.hackathon;
+
+                // 3. Verify legal.nda.required = true
+                if (!h.legal || !h.legal.nda || h.legal.nda.required !== true) {
+                  errors.push(`Hackathon "${trimmedSlug}" does not require NDA signing`);
+                }
+              }
+            }
+
+            // 4. Verify Issue author == declared username (anti-impersonation, case-insensitive)
+            if (trimmedUser && trimmedUser.toLowerCase() !== author.toLowerCase()) {
+              errors.push(`Username mismatch: title declares "${trimmedUser}" but Issue was filed by @${author}`);
+            }
+
+            // 5. Verify all checkboxes checked (no unchecked checkboxes)
+            const unchecked = body.match(/- \[ \]/g);
+            if (unchecked) {
+              errors.push(`${unchecked.length} checkbox(es) not checked — all NDA confirmations are required`);
+            }
+
+            // 6. Verify user is registered for this hackathon
+            if (trimmedSlug && errors.length === 0) {
+              try {
+                const registrationIssues = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: `register,hackathon:${trimmedSlug}`,
+                  creator: author,
+                  state: 'all',
+                  per_page: 100,
+                });
+
+                const registered = registrationIssues.data.some(i =>
+                  i.labels.some(l => l.name === 'registered')
+                );
+
+                if (!registered) {
+                  errors.push(`@${author} is not registered for hackathon "${trimmedSlug}" — please register first`);
+                }
+              } catch (e) {
+                errors.push(`Failed to check registration status: ${e.message}`);
+              }
+            }
+
+            // 7 & 8. Report results
+            if (errors.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `❌ **NDA validation failed:**\n\n${errors.map(e => `- ${e}`).join('\n')}\n\nPlease fix and re-edit this issue.`,
+              });
+            } else {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['nda-approved'],
+              });
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `✅ **NDA approved.** Thank you, @${author}! Your NDA confirmation for "${trimmedSlug}" has been recorded.`,
+              });
+            }
