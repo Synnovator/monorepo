@@ -1,78 +1,65 @@
 #!/usr/bin/env bash
-# create-hackathon.sh — Scaffold a new hackathon directory with hackathon.yml
-# Usage: ./scripts/create-hackathon.sh <slug>
-# Example: ./scripts/create-hackathon.sh ai-agent-challenge-2026
-
 set -euo pipefail
 
-SLUG="${1:-}"
-if [ -z "$SLUG" ]; then
-  echo "Usage: $0 <slug>"
-  echo "Example: $0 ai-agent-challenge-2026"
-  exit 1
-fi
+# Usage: ./scripts/create-hackathon.sh <slug> <type> <name>
+# Example: ./scripts/create-hackathon.sh my-hackathon-2026 community "My Hackathon 2026"
 
-DIR="hackathons/$SLUG"
+SLUG="${1:?Usage: create-hackathon.sh <slug> <type> <name>}"
+TYPE="${2:?Type required: community|enterprise|youth-league|open-source}"
+NAME="${3:?Name required}"
+
+# Validate type
+case "$TYPE" in
+  community|enterprise|youth-league|open-source) ;;
+  *) echo "ERROR: Invalid type '$TYPE'. Must be: community|enterprise|youth-league|open-source" >&2; exit 1 ;;
+esac
+
+DIR="hackathons/${SLUG}"
+FILE="${DIR}/hackathon.yml"
+
 if [ -d "$DIR" ]; then
-  echo "Error: $DIR already exists"
+  echo "ERROR: Directory $DIR already exists" >&2
   exit 1
 fi
 
-mkdir -p "$DIR/assets" "$DIR/submissions"
+mkdir -p "${DIR}/assets" "${DIR}/submissions"
 
-cat > "$DIR/hackathon.yml" << 'YAML'
+cat > "$FILE" << YAML
 synnovator_version: "2.0"
 
 hackathon:
-  name: ""
+  name: "${NAME}"
   name_zh: ""
-  slug: ""
+  slug: "${SLUG}"
   tagline: ""
   tagline_zh: ""
-  type: "community"              # community | enterprise | youth-league | open-source
+  type: "${TYPE}"
   description: ""
   description_zh: ""
 
-organizers:
-  - github: ""
-    role: "lead"
+  organizers:
+    - name: ""
+      role: "organizer"
 
-timeline:
-  draft: ""                       # ISO 8601 datetime
-  registration: ""
-  development: ""
-  submission: ""
-  judging: ""
-  announcement: ""
-  award: ""
+  eligibility:
+    open_to: "all"
+    team_size:
+      min: 1
+      max: 5
+    allow_solo: true
 
-tracks:
-  - name: ""
-    name_zh: ""
-    slug: ""
-    description: ""
-    rewards: []
-    judging:
-      mode: "expert_only"
-      criteria: []
-    deliverables:
-      required: []
-      optional: []
+  timeline:
+    registration:
+      start: "$(date -u +%Y-%m-%dT00:00:00Z)"
+      end: "$(date -u -v+30d +%Y-%m-%dT23:59:59Z 2>/dev/null || date -u -d '+30 days' +%Y-%m-%dT23:59:59Z)"
 
-settings:
-  allow_multi_track: false
-  language: ["en", "zh"]
-  ai_review: true
-  ai_team_matching: false
-  public_vote: "none"
+  tracks:
+    - name: "Default Track"
+      slug: "default"
+
+  settings:
+    language: ["zh", "en"]
 YAML
 
-# Fill in the slug
-sed -i '' "s/^  slug: \"\"/  slug: \"$SLUG\"/" "$DIR/hackathon.yml"
-
-echo "Created $DIR/"
-echo "  - $DIR/hackathon.yml (edit this file)"
-echo "  - $DIR/assets/"
-echo "  - $DIR/submissions/"
-echo ""
-echo "Next: edit hackathon.yml, then submit a PR."
+echo "Created hackathon: $FILE"
+echo "Next: edit $FILE to fill in details, then commit and create PR"
