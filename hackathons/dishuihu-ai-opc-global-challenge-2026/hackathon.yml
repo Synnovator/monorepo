@@ -158,12 +158,22 @@ hackathon:
             score_range: [0, 100]
       deliverables:
         required:
-          - "Source code repository"
-          - "Product demo or live URL"
-          - "Technical documentation (PDF)"
+          - type: "repo"
+            format: "github-url"
+            description: "Source code repository"
+          - type: "demo"
+            format: "url"
+            description: "Product demo or live URL"
+          - type: "document"
+            format: "pdf"
+            description: "Technical documentation"
         optional:
-          - "Demo video (5 min max)"
-          - "Business plan"
+          - type: "video"
+            format: "url"
+            description: "Demo video (5 min max)"
+          - type: "document"
+            format: "pdf"
+            description: "Business plan"
 
     - name: "Zhihai Tech - Intelligent Customer Service Robot Challenge"
       name_zh: "智海科技-智能客服机器人挑战"
@@ -199,11 +209,19 @@ hackathon:
             score_range: [0, 100]
       deliverables:
         required:
-          - "Source code repository"
-          - "Model evaluation report with metrics"
-          - "Technical documentation"
+          - type: "repo"
+            format: "github-url"
+            description: "Source code repository"
+          - type: "document"
+            format: "pdf"
+            description: "Model evaluation report with metrics"
+          - type: "document"
+            format: "pdf"
+            description: "Technical documentation"
         optional:
-          - "Demo video"
+          - type: "video"
+            format: "url"
+            description: "Demo video"
 
   datasets:
     - name: "Zhihai Customer Service Dataset"
