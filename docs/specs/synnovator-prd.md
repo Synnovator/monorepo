@@ -1,16 +1,21 @@
 # PRD: Synnovator (HackFlow) — AI Hackathon 平台
 
-> **Version:** 3.0
+> **Version:** 3.2
 > **Updated:** 2026-03-03
 > **Status:** Draft
-> **Changelog:** V2→V3: 基于两份模拟档案（绿色AI大赛 + 金融风控挑战赛）重评估，
-> 整合 14 项 P0 Gap，重构 Schema，确立 Git-native 工作流模式
+> **Changelog:**
+> - V3.1→V3.2: 新增 §7.4 Monorepo 管理后端模型——将 Monorepo 定位为管理后端，
+>   通过 GitHub RBAC 实现权限控制，引入 `synnovator-admin` CLI Skill 概念
+> - V3.0→V3.1: 架构决策——从 GitHub Pages 迁移至 Cloudflare Pages (Hybrid mode)，
+>   移除 P0 对 D1 的依赖，引入 Pages Functions 解决 presigned URL 安全问题
+> - V2→V3: 基于两份模拟档案（绿色AI大赛 + 金融风控挑战赛）重评估，
+>   整合 14 项 P0 Gap，重构 Schema，确立 Git-native 工作流模式
 
 ---
 
 ## 1. Introduction
 
-Synnovator（即 HackFlow）是一个专注于 AI 领域的 Git-native Hackathon 组织与管理平台。以 GitHub Monorepo 为核心基础设施，通过 **"静态页面生成 → GitHub Issue/PR 跳转 → Label 路由 → Actions 校验 → Reviewer 审核"** 的统一工作流模式，实现零后端服务的活动全生命周期管理。
+Synnovator（即 HackFlow）是一个专注于 AI 领域的 Git-native Hackathon 组织与管理平台。以 GitHub Monorepo 为核心基础设施，通过 **"静态页面生成 → GitHub Issue/PR 跳转 → Label 路由 → Actions 校验 → Reviewer 审核"** 的统一工作流模式，实现最小服务端依赖的活动全生命周期管理。站点部署于 Cloudflare Pages (Hybrid mode)，大部分页面在构建时生成为纯静态 HTML，仅安全敏感操作（presigned URL 生成等）通过 Pages Functions 处理。
 
 平台支持多种活动类型（社区 Hackathon、企业悬赏、高校竞赛等），面向中国 AI 开发者出海场景提供中英双语原生支持。通过 GitHub Template Repository 提供活动模板继承，让不同类型的组织者都能快速上手。
 
@@ -55,7 +60,7 @@ Synnovator 与 HackFlow 是同一项目。Synnovator 是面向用户的品牌名
 - **G-4**: 建立结构化的 Hacker Profile 系统，支撑 AI 组队匹配和开发者网络
 - **G-5**: 集成 AI Agent 辅助组队匹配、项目评审摘要、自动化评分建议
 - **G-6**: 提供中英双语原生支持，服务中国开发者出海与国际开发者参与
-- **G-7**: MVP 阶段以 GitHub Pages + Cloudflare R2/D1 实现零后端运营
+- **G-7**: MVP 阶段以 Cloudflare Pages (Hybrid) + R2 实现最小服务端运营；D1 作为 P1 可选项，P0 阶段数据全部存储于 Git 仓库 YAML 文件中
 
 ---
 
@@ -67,6 +72,7 @@ Synnovator 与 HackFlow 是同一项目。Synnovator 是面向用户的品牌名
 | **Hacker** | AI 开发者/工程师 | 注册 Profile、发现活动、组队、提交项目（PR）、展示作品 |
 | **Builder** | AI 创业团队 | 展示项目、获取曝光、对接资源 |
 | **Judge** | 投资人/技术专家/监管顾问 | 评审项目、结构化打分、提供反馈、声明利益冲突 |
+| **Admin** | 仓库管理员/Maintainer | 管理活动配置、审核 PR、配置 Secrets、审计操作记录 |
 
 ---
 
@@ -674,7 +680,7 @@ body:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│                          Synnovator Architecture V3                          │
+│                        Synnovator Architecture V3.1                          │
 │                                                                              │
 │  ┌────────────────────────────────────────────────────────────────────────┐  │
 │  │                     GitHub (核心基础设施)                               │  │
@@ -699,37 +705,34 @@ body:
 │  │   其他 GitHub 原生能力                                                  │  │
 │  │   • Discussions (社区交流)    • Reactions (大众投票 MVP)                 │  │
 │  │   • CODEOWNERS (审核路由)    • Labels (状态标记/分类)                   │  │
-│  │   • OAuth (用户认证)         • Pages (站点托管)                         │  │
+│  │   • OAuth (用户认证)                                                    │  │
 │  └────────────────────────────────────────────────────────────────────────┘  │
 │                                                                              │
-│  ┌────────────────────────────────┐   ┌──────────────────────────────────┐  │
-│  │       Cloudflare               │   │        AI Services               │  │
-│  │                                │   │                                  │  │
-│  │   R2 (文件存储)                │   │  Claude API (评审摘要)           │  │
-│  │   • PDF 提案                   │   │  组队匹配 (Profile 分析)         │  │
-│  │   • 活动 Banner                │   │  PDF 内容提取                    │  │
-│  │   • 模型权重                   │   │                                  │  │
-│  │   • NDA 文档                   │   │  触发: GitHub Actions            │  │
-│  │                                │   │  Key:   Repo Secrets             │  │
-│  │   D1 (文件元数据)              │   │                                  │  │
-│  │   • file_id, r2_key            │   │                                  │  │
-│  │   • 关联 hackathon/team        │   │                                  │  │
-│  └────────────────────────────────┘   └──────────────────────────────────┘  │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │              Cloudflare (站点托管 + 存储 + 边缘函数)                    │  │
+│  │                                                                        │  │
+│  │   Pages (站点托管 — Hybrid mode)                                       │  │
+│  │   ┌────────────────────────────────────────────────────────────┐       │  │
+│  │   │  Astro SSG (大部分页面)         Pages Functions (最小动态)  │       │  │
+│  │   │  ├ 活动列表/详情  prerender     ├ /api/presign   R2签名URL │       │  │
+│  │   │  ├ Profile 页面   prerender     ├ /api/search    搜索筛选  │       │  │
+│  │   │  ├ 项目展示       prerender     └ /api/vote      投票缓存  │       │  │
+│  │   │  ├ 操作指南       prerender                                │       │  │
+│  │   │  └ GitHubRedirect 引擎                                     │       │  │
+│  │   │    → JS 生成预填 Issue/PR URL → GitHub 跳转                │       │  │
+│  │   └────────────────────────────────────────────────────────────┘       │  │
+│  │                                                                        │  │
+│  │   R2 (文件存储)                   D1 (结构化元数据 — P1 可选)          │  │
+│  │   ├ PDF 提案/技术文档              ├ file_id → r2_key 映射             │  │
+│  │   ├ 活动 Banner/资源               ├ 搜索索引                          │  │
+│  │   ├ 模型权重                       └ 评分汇总缓存                      │  │
+│  │   └ NDA 文档                                                           │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
 │                                                                              │
 │  ┌────────────────────────────────────────────────────────────────────────┐  │
-│  │                  Synnovator 站点 (GitHub Pages)                        │  │
-│  │                                                                        │  │
-│  │   静态页面 + 前端交互组件                                               │  │
-│  │   ┌────────────────────────────────────────────────────────────┐       │  │
-│  │   │                GitHubRedirect 引擎                         │       │  │
-│  │   │                                                            │       │  │
-│  │   │  用户在站点填写表单/选择选项                                 │       │  │
-│  │   │    → JS 生成预填 Issue/PR body (YAML/Markdown)             │       │  │
-│  │   │    → window.open(github.com/.../new?title=&body=&labels=)  │       │  │
-│  │   │    → 用户在 GitHub 确认提交                                 │       │  │
-│  │   │                                                            │       │  │
-│  │   │  覆盖: 报名 | NDA签署 | 项目提交 | 评分 | 申诉 | 组队     │       │  │
-│  │   └────────────────────────────────────────────────────────────┘       │  │
+│  │                          AI Services                                   │  │
+│  │   Claude API (评审摘要 + 组队匹配 + PDF 内容提取)                      │  │
+│  │   触发: GitHub Actions    Key: Repo Secrets / CF Environment Variables │  │
 │  └────────────────────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -774,6 +777,104 @@ body:
                         → Label: appeal + slug → assign 组织者
                         → 组织者处理 → Label: resolved
 ```
+
+### 7.2 部署架构（V3.1 新增）
+
+```
+站点部署流程：
+  git push main → Cloudflare Pages 自动构建
+    → pnpm install → astro build (hybrid mode)
+    → 静态页面 → CF CDN 全球分发
+    → Functions → CF Workers 运行时
+
+Astro output mode: hybrid
+  ├── prerender: true  (默认) — 活动列表、详情、Profile、指南等
+  └── prerender: false (显式) — /api/* 动态路由
+
+Pages Functions 职责范围（最小化原则）：
+  /api/presign   — 验证用户身份 → 生成 R2 presigned URL（解决 NDA 数据安全问题）
+  /api/search    — 读取预构建 JSON → 返回搜索结果（P0 可用客户端过滤替代）
+  /api/vote      — 缓存 Reactions 计数（可选，优化性能）
+```
+
+> **注意**：GitHub Actions 仍负责所有 YAML 校验、状态管理、R2 上传、AI 评审等自动化任务。
+> Pages Functions 仅处理需要服务端身份验证的操作。两者分工明确，不重叠。
+
+### 7.3 安全模型（V3.1 新增）
+
+**Presigned URL 安全流程**：
+
+```
+用户 NDA 签署通过（Issue 获得 nda-approved Label）
+  → 用户在站点点击「获取数据集」
+  → 前端调用 /api/presign（携带 GitHub OAuth token）
+  → Pages Functions 验证：
+      1. 通过 GitHub API 确认用户身份
+      2. 检查用户在对应 hackathon 的 Issue 中是否有 nda-approved Label
+      3. 通过 → 生成时效性 R2 presigned URL（如 4 小时有效）
+      4. 未通过 → 返回 403
+  → 用户下载数据集
+```
+
+对比旧方案（V3.0）：Actions 生成 presigned URL 并发布在公开 Issue Comment 中（任何人可见）→ **安全隐患**。V3.1 通过 Functions 按需生成，仅经身份验证的用户可获取。
+
+**凭证管理**：
+
+| 凭证 | 用途 | 存储位置 |
+|------|------|---------|
+| `R2_ACCESS_KEY_ID` | R2 S3 兼容 API 凭证 | CF Pages Environment Variables |
+| `R2_SECRET_ACCESS_KEY` | R2 S3 兼容 API 密钥 | CF Pages Environment Variables |
+| `R2_BUCKET_NAME` | R2 存储桶名称 | CF Pages Environment Variables |
+| `CLAUDE_API_KEY` | Claude API Key | GitHub Repo Secrets（Actions 用）|
+| `GITHUB_APP_ID` | GitHub App 凭证（Functions 鉴权） | CF Pages Environment Variables |
+| `GITHUB_APP_SECRET` | GitHub App Secret | CF Pages Environment Variables |
+
+### 7.4 Monorepo 管理后端模型（V3.2 新增）
+
+Synnovator 的 Monorepo 本身即管理后端。管理员通过 `git clone` 获取仓库，使用本地 CLI Skill（如 `synnovator-admin`）直接编辑数据并提交 PR，完成对平台的管理操作。无需独立的 Admin Panel 或管理 API。
+
+**核心映射**：
+
+| 传统管理后端 | Synnovator Git-native 等价 |
+|-------------|---------------------------|
+| Admin Panel Web UI | `synnovator-admin` CLI Skill（本地运行） |
+| 数据库 CRUD | 编辑 YAML 文件 → `git commit` → PR |
+| 用户权限管理 | GitHub Repository Roles（Admin / Write / Triage / Read） |
+| 操作审计日志 | Git commit history + PR review records |
+| 审批工作流 | PR Review + CODEOWNERS 自动 assign |
+| 配置变更回滚 | `git revert` |
+
+**GitHub RBAC 权限模型**：
+
+| GitHub Role | 平台角色 | 可执行操作 |
+|-------------|---------|-----------|
+| Repository Admin | 超级管理员 | 管理 Secrets、配置 Actions、管理 Collaborators、合并任意 PR |
+| CODEOWNERS + Write | 活动管理员 | 合并特定 `hackathons/{slug}/` 下的 PR、管理对应 Issue |
+| Write | Reviewer（评审员）| 审核 PR、管理 Labels、Comment 反馈 |
+| Triage | 协作者 | 管理 Issue Labels、分配 assignees，不可合并 PR |
+| Read / Public | 普通用户 | 提交 Issue/PR（受 Actions 校验约束）|
+
+**`synnovator-admin` CLI Skill 概念**：
+
+管理员在本地通过 Claude Code 的 Skill 系统执行管理操作，Skill 封装常用管理任务：
+
+```
+# 示例命令（概念性，具体 Skill 实现在 P0 后期）
+/synnovator-admin create-hackathon --type community --slug my-hackathon-2026
+/synnovator-admin update-timeline --slug my-hackathon --stage submission --end 2026-04-15
+/synnovator-admin approve-nda --slug my-hackathon --user alice-dev
+/synnovator-admin export-scores --slug my-hackathon --format csv
+/synnovator-admin audit --slug my-hackathon --from 2026-03-01
+```
+
+每个命令的实际效果是：编辑对应 YAML 文件 → 生成 commit → 创建或更新 PR → 经 Actions 校验 → Maintainer 审核合并。
+
+**审计与追溯**：
+
+- 所有管理操作均有 Git commit 记录（who + when + what）
+- PR 审核过程保留完整讨论历史
+- `git log --oneline hackathons/{slug}/` 即可查看某活动全部变更记录
+- `git blame hackathon.yml` 可追溯每行配置的修改者和原因
 
 ---
 
@@ -842,12 +943,16 @@ body:
 - **FR-4**: GitHubRedirect 前端组件生成预填 Issue/PR URL
 - **FR-5**: GitHub Actions 实现全部自动化校验和状态管理
 - **FR-6**: GitHub OAuth 用户认证
-- **FR-7**: Cloudflare R2 文件存储 + D1 元数据
+- **FR-7**: Cloudflare R2 文件存储；D1 结构化元数据作为 P1 可选项
 - **FR-8**: AI Agent 评审摘要 + 组队匹配
 - **FR-9**: 中英双语 i18n
 - **FR-10**: GitHub Reactions 大众投票（MVP）
 - **FR-11**: Issue Template 覆盖报名/NDA/评分/申诉/组队
 - **FR-12**: 赛道双报支持（独立子目录）
+- **FR-13**: Cloudflare Pages (Hybrid mode) 部署，Pages Functions 处理安全敏感的动态操作（presigned URL 生成、身份验证）
+- **FR-14**: 站点 Self-document，包含独立指南页面（`/guides/*`）和功能页面内嵌操作引导
+- **FR-15**: Monorepo 即管理后端，通过 GitHub RBAC 控制管理权限，管理操作通过 PR 工作流执行
+- **FR-16**: `synnovator-admin` CLI Skill 封装常用管理任务（活动管理、数据导出、审计查询）
 
 ---
 
@@ -859,7 +964,7 @@ body:
 - **NG-4**: 不做视频直播
 - **NG-5**: 不做 Bounty 悬赏系统
 - **NG-6**: 不做移动端 App
-- **NG-7**: 不自建后端服务（MVP 阶段）
+- **NG-7**: 不自建独立后端服务；通过 Cloudflare Pages Functions 满足最小动态需求（presigned URL、搜索），不引入独立 API server
 - **NG-8**: 不做高级投票防刷票系统（MVP 用 Reactions）
 - **NG-9**: 不做自动代码抄袭检测
 
@@ -868,7 +973,7 @@ body:
 ## 11. Priority Roadmap
 
 ```
-P0 — MVP (Month 1-2)                        全部 Git-native，零后端
+P0 — MVP (Month 1-2)                        Git-native + 最小服务端
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ├── hackathon.yml Schema V2（全部 P0 字段）
 ├── project.yml Schema V2（deliverables + references）
@@ -877,27 +982,33 @@ P0 — MVP (Month 1-2)                        全部 Git-native，零后端
 ├── GitHubRedirect 前端引擎组件
 ├── 评分卡前端组件 (ScoreCard)
 ├── Issue Templates（报名/评分/申诉）
-├── GitHub Actions（校验/状态管理/R2上传/部署）
-├── Astro SSG 主站（活动列表/详情/Profile）
-├── Cloudflare R2 + D1 集成
+├── GitHub Actions（校验/状态管理/R2上传）
+├── Astro Hybrid 主站（活动列表/详情/Profile）
+├── Cloudflare Pages 部署（Hybrid mode）
+├── Cloudflare R2 文件存储
+├── Pages Functions（/api/presign 等最小动态路由）
 ├── GitHub Reactions 投票
 ├── 中英双语 i18n
+├── Self-document 指南系统（/guides/* + 页面内嵌引导）
 ├── CLI 工具（create-profile / create-hackathon / submit）
+├── synnovator-admin CLI Skill（管理后端操作入口）
+├── GitHub RBAC 权限模型（CODEOWNERS + Collaborator 角色配置）
 └── 首个示范活动上线
 
 P1 — Git-native Workflows (Month 3-4)       全部通过 Issue/PR 实现
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-├── NDA 签署流程（Issue 确认 + R2 presigned URL）
-├── 数据集管理（Schema 声明 + 鉴权下载）
+├── NDA 签署流程（Issue 确认 + Functions presigned URL 鉴权下载）
+├── 数据集管理（Schema 声明 + Functions 鉴权下载）
 ├── 评审模型增强（结构化评分 Issue + 加权计算 + 硬约束）
 ├── 评审利益冲突声明（Profile 必填 + @checker）
 ├── 代码安全扫描（Actions license-checker + 关键词扫描）
 ├── 导师贡献检测（project.yml 声明 + commit 分析）
 ├── 申诉仲裁系统（Issue Template + Label 路由）
 ├── AI 评审摘要（Claude API + Actions）
-└── AI 组队匹配（Profile 分析）
+├── AI 组队匹配（Profile 分析）
+└── Cloudflare D1 集成（可选：搜索索引 + 评分缓存）
 
-P2 — Enhancement (Month 5+)                 唯一需要后端的功能
+P2 — Enhancement (Month 5+)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 └── 代码抄袭检测（Moss/JPlag 集成）
 ```
@@ -919,10 +1030,13 @@ P2 — Enhancement (Month 5+)                 唯一需要后端的功能
 
 ---
 
-## 13. Open Questions (Updated)
+## 13. Open Questions (Updated V3.1)
 
 1. **Reactions 投票的可信度**：MVP 用 Reactions 做大众投票，如何应对刷票（假账号批量点赞）？是否需要最低 Profile 要求？
-2. **Actions 免费额度**：14 项 P0 功能的 Actions workflow 密度较高，需测算月消耗分钟数是否在 2000 分钟内
+2. **Actions 免费额度**：公开仓库 Actions 无分钟限制，但需关注并发任务队列排队时间（公开仓库最多 20 并发 job）
 3. **大文件 PR**：模型权重文件（可能数百 MB）通过 PR 提交再上传 R2 后删除，Git 历史中是否会保留？是否需要 `git filter-branch` 或 BFG 清理？
 4. **评分计算时机**：评委通过 Issue 提交评分后，Actions 何时触发加权汇总？实时？还是评审期结束后统一计算？
 5. **Template Repo 同步**：Template Repo 更新后，已创建的活动仓库如何获取模板更新？
+6. **CF Pages Functions 免费额度**：每日 100K 次函数调用（Free 计划），需评估 presigned URL + 搜索请求量是否足够。按 100 用户 × 10 次/天 = 1K 次/天来看，远低于限制
+7. **GitHub App vs OAuth App**：Functions 鉴权需要验证用户 GitHub 身份。使用 GitHub OAuth App（redirect flow）还是 GitHub App（installation token）？OAuth App 更适合用户级别操作
+8. **CF Pages 构建触发**：是否同时保留 GitHub Actions 和 CF Pages 的构建？建议 CF Pages 直连 repo 做站点构建，Actions 只做校验/R2 上传等非部署任务，避免重复构建
