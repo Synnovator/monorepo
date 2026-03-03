@@ -1,0 +1,93 @@
+# Synnovator Youth League Hackathon Template
+# Usage: Copy this file to hackathons/<your-slug>/hackathon.yml and customize
+synnovator_version: "2.0"
+
+hackathon:
+  name: "University Hackathon 2026"
+  name_zh: "2026 高校创新竞赛"
+  slug: "university-hackathon-2026"  # Change this!
+  tagline: "Empowering the next generation of innovators"
+  tagline_zh: "赋能下一代创新者"
+  type: "youth-league"
+
+  organizers:
+    - name: "Your University"
+      name_zh: "你的大学名称"
+      role: "organizer"
+
+  eligibility:
+    open_to: "students"
+    identity:
+      type: "student"
+      verification: "edu-email"
+    team_size:
+      min: 2
+      max: 4
+    allow_solo: false
+    mentor_rules:
+      max_mentors: 1
+      mentor_can_code: false
+
+  legal:
+    license: "MIT"
+    ip_ownership: "participant"
+
+  timeline:
+    registration:
+      start: "2026-04-01T00:00:00Z"
+      end: "2026-04-20T23:59:59Z"
+    development:
+      start: "2026-04-21T00:00:00Z"
+      end: "2026-05-20T23:59:59Z"
+    submission:
+      start: "2026-05-21T00:00:00Z"
+      end: "2026-05-25T23:59:59Z"
+    judging:
+      start: "2026-05-26T00:00:00Z"
+      end: "2026-06-05T23:59:59Z"
+    announcement:
+      start: "2026-06-06T00:00:00Z"
+      end: "2026-06-10T23:59:59Z"
+
+  tracks:
+    - name: "AI for Social Good"
+      name_zh: "AI 社会公益"
+      slug: "ai-social-good"
+      rewards:
+        - type: "prize"
+          rank: "1st"
+          amount: "¥5,000"
+        - type: "certificate"
+          rank: "Top 10"
+          description: "优秀奖证书"
+      judging:
+        mode: "weighted"
+        criteria:
+          - name: "Innovation"
+            name_zh: "创新性"
+            weight: 0.25
+            score_range: [0, 100]
+          - name: "Social Impact"
+            name_zh: "社会影响力"
+            weight: 0.25
+            score_range: [0, 100]
+          - name: "Technical Implementation"
+            name_zh: "技术实现"
+            weight: 0.25
+            score_range: [0, 100]
+          - name: "Presentation"
+            name_zh: "演示与答辩"
+            weight: 0.25
+            score_range: [0, 100]
+      deliverables:
+        required:
+          - "Source code repository"
+          - "Project report (PDF)"
+        optional:
+          - "Demo video"
+          - "Live demo URL"
+
+  settings:
+    language: ["zh", "en"]
+    public_vote: "reactions"
+    vote_emoji: "👍"
