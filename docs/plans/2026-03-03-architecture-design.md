@@ -127,7 +127,7 @@ export default defineConfig({
   output: 'hybrid',           // 默认静态，按需动态
   adapter: cloudflare(),
   integrations: [tailwind()],
-  site: 'https://synnovator.dev',  // 或 pages.dev 域名
+  site: 'https://home.synnovator.space',
 });
 ```
 

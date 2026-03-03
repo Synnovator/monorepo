@@ -213,7 +213,7 @@ hackathon:
       name_zh: "Synnovator 社区"
       github: "synnovator"
       logo: "./assets/organizer-logo.png"
-      website: "https://synnovator.dev"
+      website: "https://home.synnovator.space"
       role: "host"                       # host | co-host
     - name: "Pengcheng Laboratory"
       name_zh: "鹏城实验室"
