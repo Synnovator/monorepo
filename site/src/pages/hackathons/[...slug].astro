@@ -187,6 +187,52 @@ if (fs.existsSync(submissionsDir)) {
           </section>
         )}
 
+        {/* NDA Information */}
+        {h.legal?.nda?.required && (
+          <section>
+            <h2 class="text-xl font-heading font-bold text-white mb-4">
+              {t(lang, 'hackathon.nda_sign')}
+            </h2>
+            <div class="rounded-lg border border-warning/30 bg-warning/5 p-6 space-y-4">
+              <p class="text-sm text-warning font-medium">
+                {t(lang, 'hackathon.nda_required_msg')}
+              </p>
+              {h.legal.nda.summary && (
+                <div>
+                  <p class="text-xs text-muted mb-1">{t(lang, 'hackathon.nda_summary')}</p>
+                  <p class="text-sm text-light-gray">{h.legal.nda.summary}</p>
+                </div>
+              )}
+              <div class="flex flex-wrap gap-3">
+                {h.legal.nda.document_url && (
+                  <a
+                    href={h.legal.nda.document_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary-bg text-white text-sm hover:bg-secondary-bg/80 transition-colors"
+                  >
+                    {t(lang, 'hackathon.nda_download')}
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </a>
+                )}
+                <a
+                  href={`https://github.com/Synnovator/monorepo/issues/new?template=nda-sign.yml&title=${encodeURIComponent(`[NDA] --- — ${h.slug}`)}&labels=nda-sign`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary/20 text-lime-primary text-sm hover:bg-lime-primary/30 transition-colors"
+                >
+                  {t(lang, 'hackathon.nda_sign')}
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* FAQ */}
         {h.faq && h.faq.length > 0 && (
           <section>
