@@ -123,23 +123,30 @@ Repo → Settings → Secrets and variables → Actions → New repository secre
 | `R2_SECRET_ACCESS_KEY` | §2.2 API Token | 同上 |
 | `R2_BUCKET_NAME` | `synnovator-assets` | 同上 |
 | `R2_ENDPOINT` | §2.2 S3 Endpoint | 同上 |
-| `ANTHROPIC_API_KEY` | §4.3 Anthropic Console | Claude Code Action + 自定义 AI workflow |
+| `CLAUDE_CODE_OAUTH_TOKEN` | §4.3 本地生成 | Claude Code Action（PR Review Bot） |
 
-### 4.3 Anthropic API Key
+### 4.3 Claude Code OAuth Token
 
-MVP 阶段使用单个 `ANTHROPIC_API_KEY` 统一供给 Claude Code GitHub Action（PR Review Bot）和自定义 AI workflow（ai-review、ai-team-match）。
+MVP 阶段使用 `CLAUDE_CODE_OAUTH_TOKEN`（个人 Claude Pro/Max 订阅额度）驱动 Claude Code GitHub Action。无需单独充值 API credits。
 
-**获取步骤**：
-1. 打开 [console.anthropic.com](https://console.anthropic.com) → 登录（与 claude.ai 账号独立）
-2. Settings → API Keys → Create Key → 命名 `synnovator`
-3. 复制 key（`sk-ant-...` 格式，仅显示一次）
-4. Settings → Billing → Add credits（API 按量计费，需预充值，与个人 Pro 订阅独立）
+> **后续迁移**：稳定后可切换到 `ANTHROPIC_API_KEY`（console.anthropic.com 按量计费），适合团队共享和更高并发。
+
+**生成步骤**：
+```bash
+claude setup-token
+# 按提示完成 OAuth 授权，终端输出 token 值
+```
 
 **存入 GitHub Secret**：
 ```bash
-gh secret set ANTHROPIC_API_KEY
-# 粘贴 key 值，回车确认
+gh secret set CLAUDE_CODE_OAUTH_TOKEN
+# 粘贴 token 值，回车确认
 ```
+
+**注意事项**：
+- Token 有过期时间（约 1 天），过期后需重新运行 `claude setup-token` 并更新 Secret
+- 使用个人订阅额度，不产生额外 API 费用
+- 自定义 AI workflow（ai-review、ai-team-match）暂不使用此 token，待迁移 `ANTHROPIC_API_KEY` 后启用
 
 ---
 
@@ -173,7 +180,7 @@ jobs:
     steps:
       - uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 ```
 
 **功能说明**：
@@ -258,7 +265,7 @@ bucket_name = "synnovator-assets"
 ### 7.4 Claude Code Action
 
 - [ ] Claude GitHub App 已安装到仓库
-- [ ] `ANTHROPIC_API_KEY` Secret 已配置
+- [ ] `CLAUDE_CODE_OAUTH_TOKEN` Secret 已配置
 - [ ] `.github/workflows/claude-review.yml` 已创建
 - [ ] PR 中 `@claude` 可触发审查回复
 
@@ -267,3 +274,15 @@ bucket_name = "synnovator-assets"
 - [ ] CF Pages: Settings → Environment variables 7 项已配置
 - [ ] GitHub: Settings → Secrets → Actions 5 项已配置
 - [ ] 验证: `gh secret list` 显示 5 条记录
+
+---
+
+## 附录：后续迁移到 ANTHROPIC_API_KEY
+
+当需要启用自定义 AI workflow（ai-review、ai-team-match）或需要更稳定的 token 时：
+
+1. [console.anthropic.com](https://console.anthropic.com) → Create Key + 充值 credits
+2. `gh secret set ANTHROPIC_API_KEY`
+3. 修改 `claude-review.yml`: `claude_code_oauth_token` → `anthropic_api_key`
+4. 自定义 workflow 中引用 `${{ secrets.ANTHROPIC_API_KEY }}`
+5. 可选：`gh secret delete CLAUDE_CODE_OAUTH_TOKEN`

@@ -157,7 +157,7 @@ GitHub Repo Secrets (Actions 用):
 ├── R2_SECRET_ACCESS_KEY      # R2 S3 API 密钥
 ├── R2_BUCKET_NAME            # R2 存储桶名称
 ├── R2_ENDPOINT               # R2 S3 endpoint
-└── ANTHROPIC_API_KEY          # Anthropic API Key（Claude Code Action + AI 评审/匹配）
+└── CLAUDE_CODE_OAUTH_TOKEN    # Claude OAuth Token（MVP: 个人订阅；后续迁移 ANTHROPIC_API_KEY）
 ```
 
 ---
@@ -320,7 +320,7 @@ GitHub Repo Secrets (Actions 用):
 | `R2_ENDPOINT` | R2 S3 endpoint | GitHub Secrets | Actions |
 | `GITHUB_APP_ID` | OAuth App ID | CF Pages Env Vars | Functions |
 | `GITHUB_APP_SECRET` | OAuth App Secret | CF Pages Env Vars | Functions |
-| `ANTHROPIC_API_KEY` | Anthropic API Key | GitHub Secrets | Actions (Claude Code Action + AI workflow) |
+| `CLAUDE_CODE_OAUTH_TOKEN` | Claude OAuth Token（MVP: 个人订阅） | GitHub Secrets | Actions (Claude Code Action) |
 
 ### 5.3 安全边界与风险
 
