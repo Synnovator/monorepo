@@ -1,0 +1,108 @@
+name: Validate Score
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  validate:
+    if: contains(github.event.issue.labels.*.name, 'judge-score')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install js-yaml
+
+      - name: Parse and validate score
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('./node_modules/js-yaml');
+            const issue = context.payload.issue;
+            const title = issue.title;
+            const author = issue.user.login;
+            const errors = [];
+
+            // Parse title: [Score] team-name — hackathon-slug / track-slug
+            const titleMatch = title.match(/\[Score\]\s*(.*?)\s*—\s*(.*?)\s*\/\s*(.*)/);
+            if (!titleMatch) {
+              errors.push('Issue title must match: [Score] team-name — hackathon-slug / track-slug');
+            }
+            const [, team, slug, track] = titleMatch || [null, '', '', ''];
+
+            if (slug) {
+              const hackathonPath = `hackathons/${slug.trim()}/hackathon.yml`;
+              if (!fs.existsSync(hackathonPath)) {
+                errors.push(`Hackathon not found: ${slug.trim()}`);
+              } else {
+                const data = yaml.load(fs.readFileSync(hackathonPath, 'utf8'));
+                const h = data.hackathon;
+                const trackSlug = track.trim();
+
+                // Check track exists
+                const trackObj = (h.tracks || []).find(t => t.slug === trackSlug);
+                if (!trackObj) {
+                  errors.push(`Track not found: ${trackSlug}`);
+                }
+
+                // Check judge authorization
+                const judges = (h.judges || []).map(j => j.github);
+                if (!judges.includes(author)) {
+                  errors.push(`@${author} is not listed as a judge for ${slug.trim()}`);
+                }
+
+                // Parse and validate scores from body
+                const body = issue.body || '';
+                const yamlBlock = body.match(/```(?:yaml)?\s*\n([\s\S]*?)```/);
+                const scoreYaml = yamlBlock ? yamlBlock[1] : body;
+                try {
+                  const scoreData = yaml.load(scoreYaml);
+                  if (scoreData && scoreData.scores && trackObj) {
+                    const criteria = (trackObj.judging && trackObj.judging.criteria) || [];
+                    for (const s of scoreData.scores) {
+                      const criterion = criteria.find(c => c.name === s.criterion);
+                      if (!criterion) {
+                        errors.push(`Unknown criterion: "${s.criterion}"`);
+                        continue;
+                      }
+                      const range = criterion.score_range || [0, 100];
+                      if (typeof s.score !== 'number' || s.score < range[0] || s.score > range[1]) {
+                        errors.push(`"${s.criterion}": score ${s.score} outside range [${range[0]}, ${range[1]}]`);
+                      }
+                    }
+                  }
+                } catch (e) {
+                  errors.push(`Failed to parse scores YAML: ${e.message}`);
+                }
+              }
+            }
+
+            if (errors.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `❌ **Score validation failed:**\n\n${errors.map(e => `- ${e}`).join('\n')}\n\nPlease fix and re-edit this issue.`,
+              });
+            } else {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['score-validated'],
+              });
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `✅ **Score validated.** Thank you, @${author}!`,
+              });
+            }
