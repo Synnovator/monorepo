@@ -74,3 +74,9 @@ score:
   submit: "提交评分"
   select_team: "选择团队"
   team_name: "团队名称"
+project:
+  submissions: "提交作品"
+  no_submissions: "暂无提交"
+  tech_stack: "技术栈"
+  vote: "去投票"
+  view_repo: "查看代码"

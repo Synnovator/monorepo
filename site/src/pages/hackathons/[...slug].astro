@@ -8,9 +8,13 @@ import EventCalendar from '../../components/EventCalendar.astro';
 import GitHubRedirect from '../../components/GitHubRedirect.astro';
 import ScoreCard from '../../components/ScoreCard.astro';
 import DatasetDownload from '../../components/DatasetDownload.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 import { t, localize, getCurrentStage } from '../../lib/i18n';
 import type { Lang } from '../../lib/i18n';
+import fs from 'node:fs';
+import path from 'node:path';
+import yaml from 'js-yaml';
 
 export async function getStaticPaths() {
   const hackathons = await getCollection('hackathons');
@@ -24,6 +28,23 @@ const { entry } = Astro.props;
 const h = entry.data.hackathon;
 const lang: Lang = 'zh';
 const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
+
+// Load submissions for this hackathon
+const submissionsDir = path.resolve(`hackathons/${h.slug}/submissions`);
+let submissions: any[] = [];
+if (fs.existsSync(submissionsDir)) {
+  const teamDirs = fs.readdirSync(submissionsDir);
+  for (const team of teamDirs) {
+    const projectPath = path.join(submissionsDir, team, 'project.yml');
+    if (fs.existsSync(projectPath)) {
+      try {
+        const raw = fs.readFileSync(projectPath, 'utf8');
+        const data = yaml.load(raw) as any;
+        if (data?.project) submissions.push(data.project);
+      } catch { /* skip invalid */ }
+    }
+  }
+}
 ---
 
 <BaseLayout title={localize(lang, h.name, h.name_zh)} description={localize(lang, h.tagline, h.tagline_zh)}>
@@ -190,6 +211,18 @@ const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
             </section>
           )
         ))}
+
+        {/* Submissions */}
+        {submissions.length > 0 && (
+          <section>
+            <h2 class="text-xl font-heading font-bold text-white mb-4">{t(lang, 'project.submissions')}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {submissions.map(project => (
+                <ProjectCard project={project} lang={lang} />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       {/* --- Sidebar (1/3) --- */}

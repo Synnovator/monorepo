@@ -74,3 +74,9 @@ score:
   submit: "Submit Score"
   select_team: "Select Team"
   team_name: "Team Name"
+project:
+  submissions: "Submissions"
+  no_submissions: "No submissions yet"
+  tech_stack: "Tech Stack"
+  vote: "Vote on GitHub"
+  view_repo: "View Code"
