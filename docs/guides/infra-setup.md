@@ -123,19 +123,75 @@ Repo → Settings → Secrets and variables → Actions → New repository secre
 | `R2_SECRET_ACCESS_KEY` | §2.2 API Token | 同上 |
 | `R2_BUCKET_NAME` | `synnovator-assets` | 同上 |
 | `R2_ENDPOINT` | §2.2 S3 Endpoint | 同上 |
-| `CLAUDE_API_KEY` | Anthropic Console | AI 评审/匹配 workflow |
+| `ANTHROPIC_API_KEY` | §4.3 Anthropic Console | Claude Code Action + 自定义 AI workflow |
+
+### 4.3 Anthropic API Key
+
+MVP 阶段使用单个 `ANTHROPIC_API_KEY` 统一供给 Claude Code GitHub Action（PR Review Bot）和自定义 AI workflow（ai-review、ai-team-match）。
+
+**获取步骤**：
+1. 打开 [console.anthropic.com](https://console.anthropic.com) → 登录（与 claude.ai 账号独立）
+2. Settings → API Keys → Create Key → 命名 `synnovator`
+3. 复制 key（`sk-ant-...` 格式，仅显示一次）
+4. Settings → Billing → Add credits（API 按量计费，需预充值，与个人 Pro 订阅独立）
+
+**存入 GitHub Secret**：
+```bash
+gh secret set ANTHROPIC_API_KEY
+# 粘贴 key 值，回车确认
+```
 
 ---
 
-## 5. 代码变更
+## 5. Claude Code GitHub Action（PR Review Bot）
 
-### 5.1 安装 Cloudflare adapter
+### 5.1 安装 Claude GitHub App
+
+1. 打开 https://github.com/apps/claude → Install
+2. 选择 `synnovator/monorepo` 仓库 → 授权
+
+### 5.2 创建 workflow
+
+创建 `.github/workflows/claude-review.yml`：
+
+```yaml
+name: Claude Code Review
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    if: |
+      (github.event_name == 'pull_request') ||
+      (contains(github.event.comment.body, '@claude'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+**功能说明**：
+- PR 创建/更新时自动审查
+- PR 评论中 `@claude` 可触发对话
+- 审查标准读取仓库根目录的 `CLAUDE.md`
+
+---
+
+## 6. 代码变更
+
+### 6.1 安装 Cloudflare adapter
 
 ```bash
 cd site && pnpm add @astrojs/cloudflare
 ```
 
-### 5.2 修改 site/astro.config.mjs
+### 6.2 修改 site/astro.config.mjs
 
 ```javascript
 import { defineConfig } from 'astro/config';
@@ -157,7 +213,7 @@ export default defineConfig({
 - 新增 `adapter: cloudflare()`
 - `site` URL 更新为 `https://home.synnovator.space`
 
-### 5.3 wrangler.toml（可选）
+### 6.3 wrangler.toml（可选）
 
 如需本地调试 Pages Functions 或配置 R2 binding:
 
@@ -174,9 +230,9 @@ bucket_name = "synnovator-assets"
 
 ---
 
-## 6. 验证清单
+## 7. 验证清单
 
-### 6.1 Cloudflare Pages
+### 7.1 Cloudflare Pages
 
 - [ ] 首次构建成功（Dashboard → Deployments 无报错）
 - [ ] `https://synnovator.pages.dev/` 可访问
@@ -184,7 +240,7 @@ bucket_name = "synnovator-assets"
 - [ ] `synnovator.space` 301 重定向到 `home.synnovator.space`
 - [ ] PR 提交后自动生成 Preview 部署
 
-### 6.2 R2
+### 7.2 R2
 
 - [ ] Dashboard → R2 → `synnovator-assets` 存储桶存在
 - [ ] 用 API Token 测试上传:
@@ -193,13 +249,21 @@ bucket_name = "synnovator-assets"
   ```
 - [ ] 上传的文件在 Dashboard 中可见
 
-### 6.3 OAuth
+### 7.3 OAuth
 
 - [ ] 访问 `https://home.synnovator.space/api/auth/login` 跳转到 GitHub 授权页
 - [ ] 授权后回调到 `/api/auth/callback` 不报错
 - [ ] （需 Functions 代码就绪后验证）
 
-### 6.4 环境变量
+### 7.4 Claude Code Action
+
+- [ ] Claude GitHub App 已安装到仓库
+- [ ] `ANTHROPIC_API_KEY` Secret 已配置
+- [ ] `.github/workflows/claude-review.yml` 已创建
+- [ ] PR 中 `@claude` 可触发审查回复
+
+### 7.5 环境变量
 
 - [ ] CF Pages: Settings → Environment variables 7 项已配置
 - [ ] GitHub: Settings → Secrets → Actions 5 项已配置
+- [ ] 验证: `gh secret list` 显示 5 条记录

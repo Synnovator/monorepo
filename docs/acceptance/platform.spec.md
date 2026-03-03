@@ -477,7 +477,7 @@
   - `R2_SECRET_ACCESS_KEY` — R2 API 密钥
   - `R2_BUCKET_NAME` — R2 存储桶名称
   - `R2_ENDPOINT` — R2 S3 兼容 endpoint（`https://{account_id}.r2.cloudflarestorage.com`）
-  - `CLAUDE_API_KEY` — Claude API Key（AI 评审/组队匹配用）
+  - `ANTHROPIC_API_KEY` — Anthropic API Key（Claude Code Action + AI 评审/组队匹配）
 
 ### SC-P-015.2: Secrets 可用性验证
 
