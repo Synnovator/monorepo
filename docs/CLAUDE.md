@@ -32,10 +32,13 @@ docs/
 ### 命名约定
 
 - 规格文档：`{domain}-spec.md` 或 `{domain}-prd.md`
+- 设计系统：`design-system.md`
 - 计划文档：`YYYY-MM-DD-{name}.md`
+- 验收规范：`{role}.spec.md`
 - 用户指南：`{role}-guide.md`
 
 ## 注意事项
 
 - 修改 spec 后检查交叉引用是否仍然正确
 - 添加新文档时更新 `README.md` 的文档导航
+- 设计系统变更需同步检查 `site/CLAUDE.md` 中的引用
