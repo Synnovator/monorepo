@@ -62,7 +62,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       const ymlText = await ymlRes.text();
       const { default: jsYaml } = await import('js-yaml');
       const hackathonData = jsYaml.load(ymlText) as Record<string, unknown>;
-      const legal = hackathonData?.legal as Record<string, unknown> | undefined;
+      const hackathon = hackathonData?.hackathon as Record<string, unknown> | undefined;
+      const legal = hackathon?.legal as Record<string, unknown> | undefined;
       const nda = legal?.nda as Record<string, unknown> | undefined;
 
       if (nda?.required === true) {

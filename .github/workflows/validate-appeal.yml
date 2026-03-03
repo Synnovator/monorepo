@@ -59,7 +59,6 @@ jobs:
                   if (now < start) {
                     errors.push(`Appeal window has not opened yet. Announcement period: ${h.timeline.announcement.start} — ${h.timeline.announcement.end}`);
                   } else if (now > end) {
-                    errors.push(`Appeal window has closed. Announcement period: ${h.timeline.announcement.start} — ${h.timeline.announcement.end}`);
                     // Close the issue if window expired
                     await github.rest.issues.update({
                       owner: context.repo.owner,
@@ -73,6 +72,13 @@ jobs:
                       issue_number: issue.number,
                       labels: ['appeal:expired'],
                     });
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      body: `❌ **Appeal window has closed.** Announcement period: ${h.timeline.announcement.start} — ${h.timeline.announcement.end}`,
+                    });
+                    return;
                   }
                 }
 
