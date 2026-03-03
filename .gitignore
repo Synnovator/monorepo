@@ -1,0 +1,26 @@
+# OS
+.DS_Store
+._*
+*~
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Claude Code
+.claude/settings.local.json
+.claude/worktrees/
+.claude/plugins/cache/
+
+# Git worktrees
+.worktrees/
+
+# Node.js
+node_modules/
+dist/
+.astro/
+
+# Logs
+*.log
