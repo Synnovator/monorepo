@@ -20,6 +20,7 @@
     "@modyfi/vite-plugin-yaml": "^1.1.1",
     "@tailwindcss/vite": "^4.1.0",
     "@types/js-yaml": "^4.0.9",
+    "@types/node": "^25.3.3",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.9.3"
   },
