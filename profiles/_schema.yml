@@ -1,0 +1,56 @@
+# Profile Schema Reference (from PRD 6.2)
+# File naming: {username}-{uuid}.yml
+# Example: alice-dev-a1b2c3d4.yml
+
+synnovator_profile: "2.0"
+
+hacker:
+  github: ""                         # GitHub username (required)
+  name: ""                           # Display name (English)
+  name_zh: ""                        # Display name (Chinese, optional)
+  avatar: ""                         # Avatar URL (defaults to github.com/{username}.png)
+
+  bio: ""                            # Short bio (English)
+  bio_zh: ""                         # Short bio (Chinese, optional)
+
+  location: ""                       # e.g. "Shanghai / San Francisco"
+  languages: []                      # e.g. ["zh", "en"]
+
+  identity:
+    type: ""                         # student | professional | academic
+    affiliation: ""                  # University or company
+    degree: ""                       # bachelor | master | phd (students only)
+    major: ""                        # Field of study (students only)
+    graduation_year:                 # Expected graduation year (students only)
+
+  skills:                            # Categorized skill list
+    - category: ""                   # e.g. "AI/ML", "Backend", "Frontend"
+      items: []                      # e.g. ["PyTorch", "LangChain"]
+
+  interests: []                      # e.g. ["AI Agent", "Developer Tools"]
+
+  looking_for:
+    roles: []                        # Roles seeking for team, e.g. ["Frontend Developer"]
+    team_size: ""                    # e.g. "3-5"
+    collaboration_style: ""          # e.g. "async-friendly"
+
+  experience:
+    years:                           # Years of experience
+    hackathons:                      # Past hackathon participation
+      - name: ""
+        result: ""
+        project_url: ""
+    projects:                        # Notable projects
+      - name: ""
+        url: ""
+        description: ""
+
+  links:
+    twitter: ""
+    linkedin: ""
+    website: ""
+
+  judge_profile:                     # Fill when serving as judge
+    available: false
+    expertise: []
+    conflict_declaration: ""         # R2 PDF URL
