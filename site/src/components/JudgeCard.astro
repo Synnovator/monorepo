@@ -10,6 +10,7 @@ interface Props {
     title?: string;
     affiliation?: string;
     expertise?: string;
+    conflict_declaration?: string;
   };
   lang: Lang;
 }
@@ -32,6 +33,19 @@ const { judge, lang } = Astro.props;
     {judge.affiliation && <p class="text-muted text-xs">{judge.affiliation}</p>}
     {judge.expertise && (
       <p class="text-cyan text-xs mt-1">{judge.expertise}</p>
+    )}
+    {judge.conflict_declaration && (
+      <a
+        href={judge.conflict_declaration}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-1 mt-2 text-xs text-lime-primary hover:underline"
+      >
+        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {lang === 'zh' ? '已提交利益冲突声明' : 'Conflict declaration filed'}
+      </a>
     )}
   </div>
 </div>
