@@ -87,6 +87,14 @@ if (fs.existsSync(submissionsDir)) {
             class="bg-lime-primary text-near-black hover:bg-lime-primary/80"
           />
         )}
+        {(['announcement', 'award', 'ended'].includes(stage)) && (
+          <a
+            href={`/results/${h.slug}`}
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors"
+          >
+            {t(lang, 'hackathon.results')}
+          </a>
+        )}
         {(stage === 'announcement') && (
           <GitHubRedirect
             action="appeal"
