@@ -125,6 +125,29 @@ if [ "$TYPE" = "enterprise" ]; then
   fi
 fi
 
+# --- Rule 11: Deliverables must be objects, not strings ---
+# The Astro content.config.ts Zod schema expects deliverables as objects with {type, format?, description?}.
+# Plain strings (e.g., "- Source code repository") will cause build failures.
+if [ "$TRACK_COUNT" != "null" ] && [ "$TRACK_COUNT" -gt 0 ] 2>/dev/null; then
+  for i in $(seq 0 $((TRACK_COUNT - 1))); do
+    TRACK_NAME=$(yq ".hackathon.tracks[$i].name" "$FILE")
+    for KIND in required optional; do
+      DELIV_COUNT=$(yq ".hackathon.tracks[$i].deliverables.${KIND} | length" "$FILE" 2>/dev/null)
+      if [ "$DELIV_COUNT" != "null" ] && [ "$DELIV_COUNT" != "0" ] 2>/dev/null; then
+        for j in $(seq 0 $((DELIV_COUNT - 1))); do
+          DELIV_TYPE=$(yq ".hackathon.tracks[$i].deliverables.${KIND}[$j].type" "$FILE" 2>/dev/null)
+          DELIV_TAG=$(yq ".hackathon.tracks[$i].deliverables.${KIND}[$j] | tag" "$FILE" 2>/dev/null)
+          if [ "$DELIV_TAG" = "!!str" ]; then
+            err "track \"$TRACK_NAME\": deliverables.${KIND}[$j] is a plain string — must be an object with {type, format, description}"
+          elif [ "$DELIV_TYPE" = "null" ] || [ -z "$DELIV_TYPE" ]; then
+            err "track \"$TRACK_NAME\": deliverables.${KIND}[$j] missing required 'type' field"
+          fi
+        done
+      fi
+    done
+  done
+fi
+
 # --- Report results ---
 if [ ${#ERRORS[@]} -eq 0 ]; then
   echo "✓ Validation passed: $FILE"
