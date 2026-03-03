@@ -28,7 +28,10 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   const tokenData = (await tokenRes.json()) as { access_token?: string; error?: string };
   if (!tokenData.access_token) {
-    return new Response(`OAuth error: ${tokenData.error || 'unknown'}`, { status: 400 });
+    // Redirect back to login on failure (e.g. expired code) instead of showing raw error
+    const siteUrl = env.SITE_URL || 'https://synnovator.pages.dev';
+    const loginUrl = `${siteUrl}/api/auth/login?returnTo=${encodeURIComponent(returnTo)}`;
+    return new Response(null, { status: 302, headers: { Location: loginUrl } });
   }
 
   const userRes = await fetch('https://api.github.com/user', {
