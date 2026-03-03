@@ -11,7 +11,7 @@ const { items, lang } = Astro.props;
 ---
 
 <div class="space-y-2">
-  {items.map((item, i) => (
+  {items.map((item) => (
     <details class="group rounded-lg border border-secondary-bg bg-dark-bg">
       <summary class="cursor-pointer px-4 py-3 text-sm text-white font-medium flex items-center justify-between hover:text-lime-primary transition-colors">
         <span>{localize(lang, item.q_en, item.q)}</span>
