@@ -28,15 +28,15 @@
 | [acceptance-specs-design](plans/2026-03-03-acceptance-specs-design.md) | 验收规范设计决策 |
 | [monorepo-init-design](plans/2026-03-03-monorepo-init-design.md) | Monorepo 初始化设计 |
 | [monorepo-init](plans/2026-03-03-monorepo-init.md) | Monorepo 初始化实施计划 |
-| [infra-setup-guide](plans/2026-03-03-infra-setup-guide.md) | 基础设施配置指南（CF Pages + R2 + OAuth） |
 
-### 用户指南
+### `guides/` — 指南
 
-| 文档 | 对象 |
+| 文档 | 内容 |
 |------|------|
-| [organizer-guide](organizer-guide.md) | 活动组织者 |
-| [hacker-guide](hacker-guide.md) | 参赛者 |
-| [judge-guide](judge-guide.md) | 评委 |
+| [infra-setup](guides/infra-setup.md) | 基础设施配置指南（CF Pages + R2 + OAuth） |
+| [organizer-guide](guides/organizer-guide.md) | 活动组织者指南 |
+| [hacker-guide](guides/hacker-guide.md) | 参赛者指南 |
+| [judge-guide](guides/judge-guide.md) | 评委指南 |
 
 ## License
 
