@@ -1,0 +1,27 @@
+---
+import { localize } from '../lib/i18n';
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  items: Array<{ q: string; q_en?: string; a: string; a_en?: string }>;
+  lang: Lang;
+}
+
+const { items, lang } = Astro.props;
+---
+
+<div class="space-y-2">
+  {items.map((item, i) => (
+    <details class="group rounded-lg border border-secondary-bg bg-dark-bg">
+      <summary class="cursor-pointer px-4 py-3 text-sm text-white font-medium flex items-center justify-between hover:text-lime-primary transition-colors">
+        <span>{localize(lang, item.q_en, item.q)}</span>
+        <svg class="w-4 h-4 text-muted group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </summary>
+      <div class="px-4 pb-4 text-sm text-muted">
+        {localize(lang, item.a_en, item.a)}
+      </div>
+    </details>
+  ))}
+</div>
