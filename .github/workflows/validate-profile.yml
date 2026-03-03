@@ -1,0 +1,48 @@
+name: Validate Profile
+
+on:
+  pull_request:
+    paths:
+      - 'profiles/*.yml'
+      - '!profiles/_schema.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find changed profile files
+        id: changed
+        run: |
+          FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} -- 'profiles/*.yml' | grep -v '_schema.yml' || true)
+          echo "files=$FILES" >> "$GITHUB_OUTPUT"
+
+      - name: Validate profile schema
+        run: |
+          for file in ${{ steps.changed.outputs.files }}; do
+            echo "Validating $file..."
+
+            # Check version
+            if ! grep -q "synnovator_profile:" "$file"; then
+              echo "ERROR: $file missing synnovator_profile version"
+              exit 1
+            fi
+
+            # Check required hacker fields
+            if ! grep -q "  github:" "$file"; then
+              echo "ERROR: $file missing hacker.github"
+              exit 1
+            fi
+
+            # Validate filename matches github username
+            BASENAME=$(basename "$file" .yml)
+            USERNAME=$(grep "  github:" "$file" | head -1 | sed 's/.*github: *"\?\([^"]*\)"\?.*/\1/')
+            if [[ ! "$BASENAME" == "${USERNAME}-"* ]]; then
+              echo "ERROR: filename $BASENAME does not match github username $USERNAME"
+              echo "Expected format: ${USERNAME}-{uuid}.yml"
+              exit 1
+            fi
+
+            echo "OK: $file"
+          done

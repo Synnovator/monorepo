@@ -1,0 +1,50 @@
+name: Validate Submission
+
+on:
+  pull_request:
+    paths:
+      - 'hackathons/**/submissions/**/submission.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find changed submission files
+        id: changed
+        run: |
+          FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} -- 'hackathons/**/submissions/**/submission.yml')
+          echo "files=$FILES" >> "$GITHUB_OUTPUT"
+
+      - name: Validate submission schema
+        run: |
+          for file in ${{ steps.changed.outputs.files }}; do
+            echo "Validating $file..."
+
+            # Check version
+            if ! grep -q "synnovator_submission:" "$file"; then
+              echo "ERROR: $file missing synnovator_submission version"
+              exit 1
+            fi
+
+            # Check required fields
+            if ! grep -q "  name:" "$file"; then
+              echo "ERROR: $file missing project.name"
+              exit 1
+            fi
+
+            if ! grep -q "  track:" "$file"; then
+              echo "ERROR: $file missing project.track"
+              exit 1
+            fi
+
+            # Verify the parent hackathon exists
+            HACKATHON_DIR=$(echo "$file" | sed 's|/submissions/.*||')
+            if [ ! -f "$HACKATHON_DIR/hackathon.yml" ]; then
+              echo "ERROR: parent hackathon not found at $HACKATHON_DIR/hackathon.yml"
+              exit 1
+            fi
+
+            echo "OK: $file"
+          done

@@ -1,0 +1,52 @@
+name: Validate Hackathon
+
+on:
+  pull_request:
+    paths:
+      - 'hackathons/**/hackathon.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find changed hackathon files
+        id: changed
+        run: |
+          FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} -- 'hackathons/**/hackathon.yml')
+          echo "files=$FILES" >> "$GITHUB_OUTPUT"
+
+      - name: Validate hackathon.yml schema
+        run: |
+          for file in ${{ steps.changed.outputs.files }}; do
+            echo "Validating $file..."
+
+            # Check required top-level keys
+            if ! grep -q "synnovator_version:" "$file"; then
+              echo "ERROR: $file missing synnovator_version"
+              exit 1
+            fi
+
+            if ! grep -q "hackathon:" "$file"; then
+              echo "ERROR: $file missing hackathon section"
+              exit 1
+            fi
+
+            # Check required hackathon fields
+            for field in name slug type; do
+              if ! grep -q "  $field:" "$file"; then
+                echo "ERROR: $file missing hackathon.$field"
+                exit 1
+              fi
+            done
+
+            # Validate type enum
+            TYPE=$(grep "  type:" "$file" | head -1 | sed 's/.*type: *"\?\([^"]*\)"\?.*/\1/')
+            case "$TYPE" in
+              community|enterprise|youth-league|open-source) ;;
+              *) echo "ERROR: $file has invalid type: $TYPE"; exit 1 ;;
+            esac
+
+            echo "OK: $file"
+          done
