@@ -7,6 +7,7 @@ import FAQAccordion from '../../components/FAQAccordion.astro';
 import EventCalendar from '../../components/EventCalendar.astro';
 import GitHubRedirect from '../../components/GitHubRedirect.astro';
 import ScoreCard from '../../components/ScoreCard.astro';
+import DatasetDownload from '../../components/DatasetDownload.astro';
 import { getCollection } from 'astro:content';
 import { t, localize, getCurrentStage } from '../../lib/i18n';
 import type { Lang } from '../../lib/i18n';
@@ -146,17 +147,7 @@ const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
         {h.datasets && h.datasets.length > 0 && (
           <section>
             <h2 class="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.datasets')}</h2>
-            {h.datasets.map(ds => (
-              <div class="rounded-lg border border-secondary-bg bg-dark-bg p-6">
-                <p class="text-white font-medium text-sm">{localize(lang, ds.name, ds.name_zh)}</p>
-                {ds.description && <p class="text-muted text-sm mt-1">{ds.description}</p>}
-                <div class="flex gap-4 mt-3 text-xs text-muted">
-                  {ds.format && <span>Format: {ds.format}</span>}
-                  {ds.size && <span>Size: {ds.size}</span>}
-                  {ds.access_control && <span class="text-warning">Access: {ds.access_control}</span>}
-                </div>
-              </div>
-            ))}
+            <DatasetDownload datasets={h.datasets} hackathonSlug={h.slug} lang={lang} />
           </section>
         )}
 
