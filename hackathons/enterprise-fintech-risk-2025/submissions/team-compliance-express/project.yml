@@ -1,0 +1,37 @@
+synnovator_submission: "2.0"
+
+project:
+  name: "Compliance Express"
+  name_zh: "合规快车"
+  tagline: "Cross-functional compliance + tech solution with highest regulatory format score"
+  track: "explainability"
+
+  team:
+    - github: "liu-compliance"
+      role: "Compliance Manager"
+    - github: "wang-algo"
+      role: "Algorithm Engineer"
+
+  mentors: []
+
+  deliverables:
+    repo: "https://github.com/team-compliance-express/explainability"
+    document:
+      local_path: ""
+      r2_url: ""
+    video: "https://example.com/compliance-demo"
+
+  tech_stack: ["Python", "SHAP", "scikit-learn", "Jinja2"]
+
+  references:
+    - name: "SHAP"
+      url: "https://github.com/shap/shap"
+      usage: "Used for Shapley value-based feature attribution"
+
+  description: |
+    Cross-functional compliance + engineering approach to credit decision explainability.
+    Highest regulatory format adaptation score. Decision explanation templates follow
+    CFPB Adverse Action Notice framework, readable by compliance officers.
+  description_zh: |
+    合规+技术跨职能组合方案，监管格式适配得分最高。决策理由单语言符合监管官员的阅读习惯，
+    参考CFPB不利行动通知框架组织拒绝理由。

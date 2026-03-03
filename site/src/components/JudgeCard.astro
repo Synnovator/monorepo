@@ -1,0 +1,37 @@
+---
+import { localize } from '../lib/i18n';
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  judge: {
+    github: string;
+    name: string;
+    name_zh?: string;
+    title?: string;
+    affiliation?: string;
+    expertise?: string;
+  };
+  lang: Lang;
+}
+
+const { judge, lang } = Astro.props;
+---
+
+<div class="flex items-start gap-4 p-4 rounded-lg border border-secondary-bg bg-dark-bg">
+  <img
+    src={`https://github.com/${judge.github}.png`}
+    alt={localize(lang, judge.name, judge.name_zh)}
+    class="w-12 h-12 rounded-full bg-secondary-bg"
+    loading="lazy"
+  />
+  <div>
+    <p class="text-white font-medium text-sm">
+      {localize(lang, judge.name, judge.name_zh)}
+    </p>
+    {judge.title && <p class="text-muted text-xs">{judge.title}</p>}
+    {judge.affiliation && <p class="text-muted text-xs">{judge.affiliation}</p>}
+    {judge.expertise && (
+      <p class="text-cyan text-xs mt-1">{judge.expertise}</p>
+    )}
+  </div>
+</div>

@@ -1,0 +1,42 @@
+synnovator_submission: "2.0"
+
+project:
+  name: "Refuse Zero"
+  name_zh: "拒绝清零"
+  tagline: "Dual-stage model: XGBoost screening + LightGBM refinement, FRR 7.1%"
+  track: "model-optimization"
+
+  team:
+    - github: "zhou-haoran"
+      role: "Lead Developer"
+    - github: "chen-wei"
+      role: "ML Engineer"
+    - github: "li-ming"
+      role: "Data Analyst"
+
+  mentors: []
+
+  deliverables:
+    repo: "https://github.com/team-refuse-zero/fintech-risk-model"
+    document:
+      local_path: ""
+      r2_url: ""
+    video: "https://example.com/demo-video"
+
+  tech_stack: ["Python", "XGBoost", "LightGBM", "scikit-learn", "pandas"]
+
+  references:
+    - name: "XGBoost"
+      url: "https://github.com/dmlc/xgboost"
+      usage: "Used as first-stage screening model"
+    - name: "LightGBM"
+      url: "https://github.com/microsoft/LightGBM"
+      usage: "Used as second-stage refinement model"
+
+  description: |
+    Dual-stage credit scoring model combining XGBoost for coarse screening with LightGBM
+    for precision refinement. Achieved false rejection rate of 7.1% with bad debt rate
+    increase of only +0.09pp, well within the ±0.2pp constraint.
+  description_zh: |
+    双阶段信贷评分模型：粗筛XGBoost + 精筛LightGBM。误拒率达7.1%，坏账率仅+0.09pp，
+    远在±0.2pp约束范围内。方案工程化程度高，可直接交接给落地团队。

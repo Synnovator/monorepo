@@ -1,0 +1,46 @@
+synnovator_profile: "2.0"
+
+hacker:
+  github: "zhou-haoran"
+  name: "Zhou Haoran"
+  name_zh: "周昊然"
+  avatar: "https://github.com/zhou-haoran.png"
+
+  bio: "Consumer finance algorithm engineer with 6 years of experience in credit risk modeling"
+  bio_zh: "消费金融公司算法工程师，6年信贷风控建模经验"
+
+  location: "Shenzhen"
+  languages: ["zh", "en"]
+
+  identity:
+    type: "professional"
+    affiliation: "Consumer Finance Company"
+
+  skills:
+    - category: "AI/ML"
+      items: ["XGBoost", "LightGBM", "scikit-learn", "Feature Engineering"]
+    - category: "Backend"
+      items: ["Python", "FastAPI", "PostgreSQL"]
+    - category: "Data"
+      items: ["pandas", "SQL", "Spark"]
+
+  interests: ["Credit Risk", "ML Ops", "Financial AI"]
+
+  looking_for:
+    roles: ["ML Engineer", "Data Scientist"]
+    team_size: "2-4"
+    collaboration_style: "sync-preferred"
+
+  experience:
+    years: 6
+    hackathons:
+      - name: "AI Smart Risk Control Optimization Challenge 2025"
+        result: "1st Place — Model Optimization Track"
+        project_url: "https://github.com/team-refuse-zero/fintech-risk-model"
+    projects:
+      - name: "Credit Scoring Engine"
+        url: ""
+        description: "Production credit scoring system serving 10M+ applications annually"
+
+  links:
+    linkedin: "https://linkedin.com/in/zhou-haoran"

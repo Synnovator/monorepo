@@ -1,0 +1,46 @@
+synnovator_profile: "2.0"
+
+hacker:
+  github: "song-yuhan"
+  name: "Song Yuhan"
+  name_zh: "宋雨涵"
+  avatar: "https://github.com/song-yuhan.png"
+
+  bio: "Data scientist specializing in SHAP/LIME interpretability research"
+  bio_zh: "数据科学家，专注 SHAP/LIME 可解释性研究方向"
+
+  location: "Beijing"
+  languages: ["zh", "en"]
+
+  identity:
+    type: "professional"
+    affiliation: "AI Research Lab"
+
+  skills:
+    - category: "AI/ML"
+      items: ["SHAP", "LIME", "PyTorch", "Interpretable ML"]
+    - category: "Backend"
+      items: ["Python", "Flask"]
+    - category: "Research"
+      items: ["Causal Inference", "XAI"]
+
+  interests: ["Explainable AI", "Regulatory Tech", "Trustworthy AI"]
+
+  looking_for:
+    roles: ["Compliance Expert", "Frontend Developer"]
+    team_size: "2-3"
+    collaboration_style: "async-friendly"
+
+  experience:
+    years: 4
+    hackathons:
+      - name: "AI Smart Risk Control Optimization Challenge 2025"
+        result: "2nd Place — Explainability Track"
+        project_url: ""
+    projects:
+      - name: "XAI Toolkit"
+        url: ""
+        description: "Open-source toolkit for post-hoc model explanations"
+
+  links:
+    twitter: "https://twitter.com/song_yuhan"

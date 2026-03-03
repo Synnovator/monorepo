@@ -1,10 +1,48 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HackathonCard from '../components/HackathonCard.astro';
+import { getCollection } from 'astro:content';
+import { t } from '../lib/i18n';
+import type { Lang } from '../lib/i18n';
+
+const lang: Lang = 'zh'; // Default language; will be dynamic later
+
+const allHackathons = await getCollection('hackathons');
+
+// Sort by registration start date (newest first), with fallback
+const hackathons = allHackathons.sort((a, b) => {
+  const aStart = a.data.hackathon.timeline?.registration?.start || '';
+  const bStart = b.data.hackathon.timeline?.registration?.start || '';
+  return bStart.localeCompare(aStart);
+});
 ---
 
-<BaseLayout title="Synnovator">
-  <main>
-    <h1>Synnovator</h1>
-    <p>Coming soon.</p>
-  </main>
+<BaseLayout title={t(lang, 'home.title')}>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Hero -->
+    <div class="mb-12">
+      <h1 class="text-4xl md:text-5xl font-heading font-bold text-white mb-4">
+        {t(lang, 'home.title')}
+      </h1>
+      <p class="text-lg text-muted max-w-2xl">
+        {t(lang, 'home.subtitle')}
+      </p>
+    </div>
+
+    <!-- Hackathon list -->
+    {hackathons.length > 0 ? (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {hackathons.map(entry => (
+          <HackathonCard hackathon={entry.data.hackathon} lang={lang} />
+        ))}
+      </div>
+    ) : (
+      <div class="text-center py-24">
+        <p class="text-muted text-lg mb-4">{t(lang, 'home.empty')}</p>
+        <a href="#" class="text-lime-primary hover:underline">
+          {t(lang, 'home.empty_cta')}
+        </a>
+      </div>
+    )}
+  </div>
 </BaseLayout>

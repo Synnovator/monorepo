@@ -1,1 +1,73 @@
 @import "tailwindcss";
+
+@theme {
+  /* === Neon Forge Color Palette === */
+
+  /* Accent Colors */
+  --color-lime-primary: #BBFD3B;
+  --color-yellow-neon: #F0FF31;
+  --color-light-green: #8AFF80;
+  --color-mint: #74FFBB;
+  --color-cyan: #41FAF4;
+  --color-pink: #FF74A7;
+  --color-neon-blue: #4C78FF;
+  --color-orange: #FB7A38;
+
+  /* Background Colors */
+  --color-surface: #181818;
+  --color-near-black: #00000E;
+  --color-dark-bg: #222222;
+  --color-secondary-bg: #333333;
+
+  /* Semantic Colors */
+  --color-success: #00B42A;
+  --color-error: #FA541C;
+  --color-warning: #FAAD14;
+
+  /* Text Colors */
+  --color-muted: #8E8E8E;
+  --color-light-gray: #DCDCDC;
+
+  /* === Border Radius === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+  --radius-pill: 50px;
+
+  /* === Font Families === */
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-code: 'Poppins', sans-serif;
+  --font-zh: 'Noto Sans SC', sans-serif;
+}
+
+/* === Base Styles === */
+html {
+  background-color: var(--color-surface);
+  color: var(--color-light-gray);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: white;
+}
+
+/* Scrollbar styling for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-dark-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-secondary-bg);
+  border-radius: var(--radius-pill);
+}
+
+/* Selection color */
+::selection {
+  background-color: color-mix(in srgb, var(--color-lime-primary) 30%, transparent);
+  color: white;
+}
