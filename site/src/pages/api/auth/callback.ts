@@ -6,9 +6,12 @@ export const prerender = false;
 export const GET: APIRoute = async ({ request, locals }) => {
   const { env } = locals.runtime;
   const url = new URL(request.url);
-  const { clientId, clientSecret, siteUrl } = getOAuthConfig(url.hostname, env);
   const code = url.searchParams.get('code');
-  const rawReturnTo = url.searchParams.get('state') || '/';
+  const rawState = url.searchParams.get('state') || '/';
+
+  // Parse preview flag encoded by login.ts
+  const preview = rawState.startsWith('preview:');
+  const rawReturnTo = preview ? rawState.slice(8) : rawState;
 
   // Validate redirect target to prevent open redirect
   const returnTo = isAllowedRedirect(rawReturnTo) ? rawReturnTo : '/';
@@ -16,6 +19,8 @@ export const GET: APIRoute = async ({ request, locals }) => {
   if (!code) {
     return new Response('Missing code parameter', { status: 400 });
   }
+
+  const { clientId, clientSecret, siteUrl } = getOAuthConfig(preview, env);
 
   const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
     method: 'POST',

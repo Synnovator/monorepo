@@ -14,16 +14,17 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 /**
  * Derive cookie Domain attribute for cross-subdomain sharing.
- * On *.pages.dev, returns the registrable domain (e.g. synnovator.pages.dev)
+ * On *.workers.dev or *.pages.dev, returns the registrable domain
  * so cookies are shared across preview subdomains.
  * Returns undefined for custom domains (cookie scoped to exact host).
  */
 export function getCookieDomain(hostname: string): string | undefined {
+  if (hostname.endsWith('.workers.dev')) {
+    // e.g. "abc-synnovator.allenwoods.workers.dev" → "allenwoods.workers.dev"
+    return hostname.split('.').slice(-3).join('.');
+  }
   if (hostname.endsWith('.pages.dev')) {
-    const parts = hostname.split('.');
-    // e.g. "abc123.synnovator.pages.dev" → "synnovator.pages.dev"
-    // e.g. "synnovator.pages.dev" → "synnovator.pages.dev"
-    return parts.slice(-3).join('.');
+    return hostname.split('.').slice(-3).join('.');
   }
   return undefined;
 }
@@ -113,11 +114,12 @@ export async function getSession(request: Request, secret: string): Promise<Sess
 
 /**
  * Validate redirect URLs to prevent open redirect attacks.
- * Allows: relative paths, home.synnovator.space, *.synnovator.pages.dev
+ * Allows: relative paths, home.synnovator.space, *.workers.dev, *.pages.dev
  */
 const ALLOWED_REDIRECT_PATTERNS = [
   /^\/(?!\/)/,  // relative paths (but not protocol-relative //evil.com)
   /^https:\/\/home\.synnovator\.space(\/|$)/,
+  /^https:\/\/([a-z0-9-]+-)?synnovator\.allenwoods\.workers\.dev(\/|$)/,
   /^https:\/\/([a-z0-9-]+\.)?synnovator\.pages\.dev(\/|$)/,
 ];
 
@@ -125,23 +127,35 @@ export function isAllowedRedirect(url: string): boolean {
   return ALLOWED_REDIRECT_PATTERNS.some((p) => p.test(url));
 }
 
-/**
- * Select OAuth credentials based on request hostname.
- * On *.pages.dev (preview), use PREVIEW_* env vars if available.
- * Otherwise use the default (production) env vars.
- */
-export function getOAuthConfig(hostname: string, env: {
+/** Check if hostname is a preview deployment (prefix before "synnovator"). */
+export function isPreviewHost(hostname: string): boolean {
+  // *-synnovator.allenwoods.workers.dev (Workers preview)
+  if (/^[a-z0-9-]+-synnovator\.allenwoods\.workers\.dev$/.test(hostname)) return true;
+  // *.synnovator.pages.dev but NOT synnovator.pages.dev itself (Pages preview)
+  if (hostname.endsWith('.synnovator.pages.dev') && hostname !== 'synnovator.pages.dev') return true;
+  return false;
+}
+
+type OAuthEnv = {
   GITHUB_CLIENT_ID: string;
   GITHUB_CLIENT_SECRET: string;
   PREVIEW_GITHUB_CLIENT_ID?: string;
   PREVIEW_GITHUB_CLIENT_SECRET?: string;
   SITE_URL: string;
   PREVIEW_SITE_URL?: string;
-}): { clientId: string; clientSecret: string; siteUrl: string } {
-  const isPreview = hostname.endsWith('.pages.dev');
+};
+
+/**
+ * Select OAuth credentials.
+ * `preview` flag is passed explicitly (from state parameter) because the
+ * callback always lands on the production hostname, not the preview URL.
+ */
+export function getOAuthConfig(preview: boolean, env: OAuthEnv): {
+  clientId: string; clientSecret: string; siteUrl: string;
+} {
   return {
-    clientId: (isPreview && env.PREVIEW_GITHUB_CLIENT_ID) || env.GITHUB_CLIENT_ID,
-    clientSecret: (isPreview && env.PREVIEW_GITHUB_CLIENT_SECRET) || env.GITHUB_CLIENT_SECRET,
-    siteUrl: (isPreview && env.PREVIEW_SITE_URL) || env.SITE_URL || 'https://synnovator.pages.dev',
+    clientId: (preview && env.PREVIEW_GITHUB_CLIENT_ID) || env.GITHUB_CLIENT_ID,
+    clientSecret: (preview && env.PREVIEW_GITHUB_CLIENT_SECRET) || env.GITHUB_CLIENT_SECRET,
+    siteUrl: (preview && env.PREVIEW_SITE_URL) || env.SITE_URL,
   };
 }
