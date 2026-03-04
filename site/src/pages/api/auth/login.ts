@@ -7,9 +7,18 @@ export const GET: APIRoute = async ({ request, locals }) => {
   const clientId = env.GITHUB_CLIENT_ID;
   const siteUrl = env.SITE_URL || 'https://synnovator.pages.dev';
 
-  const returnTo = new URL(request.url).searchParams.get('returnTo')
+  const requestUrl = new URL(request.url);
+  const requestOrigin = requestUrl.origin;
+  const siteOrigin = new URL(siteUrl).origin;
+
+  let returnTo = requestUrl.searchParams.get('returnTo')
     || request.headers.get('Referer')
     || '/';
+
+  // On preview subdomains, preserve full URL so callback can redirect back
+  if (requestOrigin !== siteOrigin && !returnTo.startsWith('http')) {
+    returnTo = `${requestOrigin}${returnTo}`;
+  }
 
   const params = new URLSearchParams({
     client_id: clientId,
