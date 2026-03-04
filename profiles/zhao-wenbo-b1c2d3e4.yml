@@ -1,0 +1,33 @@
+synnovator_profile: "2.0"
+hacker:
+  github: "zhao-wenbo"
+  name: "Zhao Wenbo"
+  name_zh: "赵文博"
+  bio: "Chief Review Officer at Xinchen FinTech. 18 years of experience in credit risk management and financial technology."
+  bio_zh: "新辰金融科技首席审查官，18年信贷风控经验，专注金融科技与风险管理。"
+  location: "Shanghai"
+  languages:
+    - "zh"
+    - "en"
+  identity:
+    type: "professional"
+    affiliation: "Xinchen FinTech"
+  skills:
+    - category: "Finance"
+      items:
+        - "Credit Risk Management"
+        - "Regulatory Compliance"
+        - "Financial Modeling"
+    - category: "AI/ML"
+      items:
+        - "Risk Scoring Models"
+        - "Anomaly Detection"
+  interests:
+    - "FinTech Innovation"
+    - "AI Risk Management"
+  judge_profile:
+    available: true
+    expertise:
+      - "Credit Risk Control"
+      - "Financial Regulation"
+    conflict_declaration: ""

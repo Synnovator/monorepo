@@ -1,0 +1,33 @@
+synnovator_profile: "2.0"
+hacker:
+  github: "zhang-ruping"
+  name: "Zhang Ruping"
+  name_zh: "张汝萍"
+  bio: "Regulatory Compliance Researcher at Fintech Regulatory Research Institute. 8 years of algorithm compliance experience."
+  bio_zh: "金融科技监管研究院监管合规研究员，8年算法合规经验。"
+  location: "Beijing"
+  languages:
+    - "zh"
+    - "en"
+  identity:
+    type: "professional"
+    affiliation: "Fintech Regulatory Research Institute"
+  skills:
+    - category: "Compliance"
+      items:
+        - "Algorithm Auditing"
+        - "Regulatory Analysis"
+        - "Privacy Protection"
+    - category: "Finance"
+      items:
+        - "Financial Regulation"
+        - "Data Governance"
+  interests:
+    - "AI Governance"
+    - "Algorithm Fairness"
+  judge_profile:
+    available: true
+    expertise:
+      - "Algorithm Compliance"
+      - "Financial Regulation"
+    conflict_declaration: ""

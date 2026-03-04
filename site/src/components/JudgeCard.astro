@@ -13,22 +13,41 @@ interface Props {
     conflict_declaration?: string;
   };
   lang: Lang;
+  profileSlug?: string;
 }
 
-const { judge, lang } = Astro.props;
+const { judge, lang, profileSlug } = Astro.props;
+const profileUrl = profileSlug ? `/hackers/${profileSlug}/` : undefined;
 ---
 
 <div class="flex items-start gap-4 p-4 rounded-lg border border-secondary-bg bg-dark-bg">
-  <img
-    src={`https://github.com/${judge.github}.png`}
-    alt={localize(lang, judge.name, judge.name_zh)}
-    class="w-12 h-12 rounded-full bg-secondary-bg"
-    loading="lazy"
-  />
+  {profileUrl ? (
+    <a href={profileUrl} class="shrink-0 group">
+      <img
+        src={`https://github.com/${judge.github}.png`}
+        alt={localize(lang, judge.name, judge.name_zh)}
+        class="w-12 h-12 rounded-full bg-secondary-bg ring-2 ring-transparent group-hover:ring-lime-primary transition-all"
+        loading="lazy"
+      />
+    </a>
+  ) : (
+    <img
+      src={`https://github.com/${judge.github}.png`}
+      alt={localize(lang, judge.name, judge.name_zh)}
+      class="w-12 h-12 rounded-full bg-secondary-bg shrink-0"
+      loading="lazy"
+    />
+  )}
   <div>
-    <p class="text-white font-medium text-sm">
-      {localize(lang, judge.name, judge.name_zh)}
-    </p>
+    {profileUrl ? (
+      <a href={profileUrl} class="text-white font-medium text-sm hover:text-lime-primary transition-colors">
+        {localize(lang, judge.name, judge.name_zh)}
+      </a>
+    ) : (
+      <p class="text-white font-medium text-sm">
+        {localize(lang, judge.name, judge.name_zh)}
+      </p>
+    )}
     {judge.title && <p class="text-muted text-xs">{judge.title}</p>}
     {judge.affiliation && <p class="text-muted text-xs">{judge.affiliation}</p>}
     {judge.expertise && (

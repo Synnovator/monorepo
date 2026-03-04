@@ -1,0 +1,33 @@
+synnovator_profile: "2.0"
+hacker:
+  github: "qian-shining"
+  name: "Qian Shining"
+  name_zh: "钱世宁"
+  bio: "Product Director at Xinchen FinTech. 5 years of experience in risk control product design and management."
+  bio_zh: "新辰金融科技产品总监，5年风控产品设计与管理经验。"
+  location: "Shanghai"
+  languages:
+    - "zh"
+    - "en"
+  identity:
+    type: "professional"
+    affiliation: "Xinchen FinTech"
+  skills:
+    - category: "Product"
+      items:
+        - "Product Management"
+        - "Risk Control Products"
+        - "User Experience"
+    - category: "Finance"
+      items:
+        - "Credit Products"
+        - "Business Analysis"
+  interests:
+    - "FinTech Product Innovation"
+    - "User-Centered Risk Design"
+  judge_profile:
+    available: true
+    expertise:
+      - "Risk Control Products"
+      - "FinTech Product Management"
+    conflict_declaration: ""
