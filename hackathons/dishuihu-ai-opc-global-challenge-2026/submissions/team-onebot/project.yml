@@ -1,0 +1,32 @@
+synnovator_submission: "2.0"
+
+project:
+  name: "OneBot Studio"
+  name_zh: "一人公司工作室"
+  tagline: "All-in-one AI workspace for OPC founders: from idea to global launch"
+  tagline_zh: "一人公司创始人的AI一站式工作空间：从创意到全球发布"
+  track: "ai-application"
+
+  team:
+    - github: "dave-fullstack"
+      role: "Lead Developer"
+    - github: "eve-ai"
+      role: "AI Engineer"
+
+  deliverables:
+    repo: "https://github.com/team-onebot/onebot-studio"
+    document:
+      local_path: ""
+      r2_url: ""
+    video: ""
+
+  tech_stack: ["TypeScript", "React", "Cloudflare Workers", "D1", "Claude API", "Stripe"]
+
+  description: |
+    OneBot Studio combines AI-powered business planning, website generation, and customer
+    service automation into a single platform. Built specifically for one-person companies,
+    it handles everything from business model canvas generation to multilingual customer
+    support chatbot deployment.
+  description_zh: |
+    OneBot Studio 将AI驱动的商业规划、网站生成和客服自动化整合到一个平台中。
+    专为一人公司设计，从商业模式画布生成到多语言客服聊天机器人部署，一站式完成。
