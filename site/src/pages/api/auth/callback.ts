@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { encrypt, setSessionCookie } from '../../../lib/auth';
+import { encrypt, setSessionCookie, getCookieDomain, isAllowedRedirect } from '../../../lib/auth';
 
 export const prerender = false;
 
@@ -7,7 +7,10 @@ export const GET: APIRoute = async ({ request, locals }) => {
   const { env } = locals.runtime;
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
-  const returnTo = url.searchParams.get('state') || '/';
+  const rawReturnTo = url.searchParams.get('state') || '/';
+
+  // Validate redirect target to prevent open redirect
+  const returnTo = isAllowedRedirect(rawReturnTo) ? rawReturnTo : '/';
 
   if (!code) {
     return new Response('Missing code parameter', { status: 400 });
@@ -28,7 +31,6 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   const tokenData = (await tokenRes.json()) as { access_token?: string; error?: string };
   if (!tokenData.access_token) {
-    // Redirect back to login on failure (e.g. expired code) instead of showing raw error
     const siteUrl = env.SITE_URL || 'https://synnovator.pages.dev';
     const loginUrl = `${siteUrl}/api/auth/login?returnTo=${encodeURIComponent(returnTo)}`;
     return new Response(null, { status: 302, headers: { Location: loginUrl } });
@@ -53,7 +55,8 @@ export const GET: APIRoute = async ({ request, locals }) => {
     env.AUTH_SECRET,
   );
 
+  const cookieDomain = getCookieDomain(url.hostname);
   const headers = new Headers({ Location: returnTo });
-  setSessionCookie(headers, token);
+  setSessionCookie(headers, token, cookieDomain);
   return new Response(null, { status: 302, headers });
 };
