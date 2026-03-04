@@ -9,6 +9,10 @@ import GitHubRedirect from '../../components/GitHubRedirect.astro';
 import ScoreCard from '../../components/ScoreCard';
 import DatasetDownload from '../../components/DatasetDownload';
 import ProjectCard from '../../components/ProjectCard.astro';
+import RegisterForm from '../../components/forms/RegisterForm';
+import NDASignForm from '../../components/forms/NDASignForm';
+import AppealForm from '../../components/forms/AppealForm';
+import TeamFormationForm from '../../components/forms/TeamFormationForm';
 import { getCollection } from 'astro:content';
 import { t, localize, getCurrentStage } from '../../lib/i18n';
 import type { Lang } from '../../lib/i18n';
@@ -45,6 +49,13 @@ if (fs.existsSync(submissionsDir)) {
     }
   }
 }
+
+// Prepare tracks data for form components
+const formTracks = (h.tracks ?? []).map((tr: any) => ({
+  slug: tr.slug,
+  name: tr.name,
+  name_zh: tr.name_zh,
+}));
 ---
 
 <BaseLayout title={localize(lang, h.name, h.name_zh)} description={localize(lang, h.tagline, h.tagline_zh)}>
@@ -72,12 +83,12 @@ if (fs.existsSync(submissionsDir)) {
       {/* Action buttons */}
       <div class="flex flex-wrap gap-3">
         {(stage === 'registration') && (
-          <GitHubRedirect
-            action="register"
-            hackathonSlug={h.slug}
-            label={t(lang, 'hackathon.register')}
-            class="bg-lime-primary text-near-black hover:bg-lime-primary/80"
-          />
+          <a
+            href="#register-section"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors"
+          >
+            {t(lang, 'hackathon.register')}
+          </a>
         )}
         {(stage === 'submission') && (
           <GitHubRedirect
@@ -96,12 +107,12 @@ if (fs.existsSync(submissionsDir)) {
           </a>
         )}
         {(stage === 'announcement') && (
-          <GitHubRedirect
-            action="appeal"
-            hackathonSlug={h.slug}
-            label={t(lang, 'hackathon.appeal')}
-            class="bg-secondary-bg text-white hover:bg-secondary-bg/80"
-          />
+          <a
+            href="#appeal-section"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary-bg text-white text-sm font-medium hover:bg-secondary-bg/80 transition-colors"
+          >
+            {t(lang, 'hackathon.appeal')}
+          </a>
         )}
         {h.legal?.nda?.required && (
           <span class="inline-flex items-center text-xs text-warning px-3 py-2 rounded-lg bg-warning/10">
@@ -195,49 +206,63 @@ if (fs.existsSync(submissionsDir)) {
           </section>
         )}
 
-        {/* NDA Information */}
+        {/* NDA Information — Smart Form */}
         {h.legal?.nda?.required && (
           <section>
             <h2 class="text-xl font-heading font-bold text-white mb-4">
               {t(lang, 'hackathon.nda_sign')}
             </h2>
-            <div class="rounded-lg border border-warning/30 bg-warning/5 p-6 space-y-4">
-              <p class="text-sm text-warning font-medium">
-                {t(lang, 'hackathon.nda_required_msg')}
-              </p>
-              {h.legal.nda.summary && (
-                <div>
-                  <p class="text-xs text-muted mb-1">{t(lang, 'hackathon.nda_summary')}</p>
-                  <p class="text-sm text-light-gray">{h.legal.nda.summary}</p>
-                </div>
-              )}
-              <div class="flex flex-wrap gap-3">
-                {h.legal.nda.document_url && (
-                  <a
-                    href={h.legal.nda.document_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary-bg text-white text-sm hover:bg-secondary-bg/80 transition-colors"
-                  >
-                    {t(lang, 'hackathon.nda_download')}
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </a>
-                )}
-                <a
-                  href={`https://github.com/Synnovator/monorepo/issues/new?template=nda-sign.yml&title=${encodeURIComponent(`[NDA] --- — ${h.slug}`)}&labels=nda-sign`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary/20 text-lime-primary text-sm hover:bg-lime-primary/30 transition-colors"
-                >
-                  {t(lang, 'hackathon.nda_sign')}
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </a>
-              </div>
-            </div>
+            <NDASignForm
+              client:visible
+              hackathonSlug={h.slug}
+              ndaDocumentUrl={h.legal.nda.document_url}
+              ndaSummary={h.legal.nda.summary}
+              lang={lang}
+            />
+          </section>
+        )}
+
+        {/* Register Form (during registration stage) */}
+        {stage === 'registration' && (
+          <section id="register-section">
+            <h2 class="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.register')}</h2>
+            <RegisterForm
+              client:visible
+              hackathonSlug={h.slug}
+              hackathonName={localize(lang, h.name, h.name_zh)}
+              tracks={formTracks}
+              ndaRequired={!!h.legal?.nda?.required}
+              lang={lang}
+            />
+          </section>
+        )}
+
+        {/* Team Formation (during registration/development stages) */}
+        {(['registration', 'development'].includes(stage)) && (
+          <section id="team-formation-section">
+            <h2 class="text-xl font-heading font-bold text-white mb-4">
+              {lang === 'zh' ? '组队 / 寻找队友' : 'Team Formation'}
+            </h2>
+            <TeamFormationForm
+              client:visible
+              hackathonSlug={h.slug}
+              tracks={formTracks}
+              lang={lang}
+            />
+          </section>
+        )}
+
+        {/* Appeal Form (during announcement stage) */}
+        {stage === 'announcement' && (
+          <section id="appeal-section">
+            <h2 class="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.appeal')}</h2>
+            <AppealForm
+              client:visible
+              hackathonSlug={h.slug}
+              tracks={formTracks}
+              teams={[]}
+              lang={lang}
+            />
           </section>
         )}
 
