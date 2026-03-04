@@ -12,6 +12,22 @@ export interface Session {
 const COOKIE_NAME = 'session';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
+/**
+ * Derive cookie Domain attribute for cross-subdomain sharing.
+ * On *.pages.dev, returns the registrable domain (e.g. synnovator.pages.dev)
+ * so cookies are shared across preview subdomains.
+ * Returns undefined for custom domains (cookie scoped to exact host).
+ */
+export function getCookieDomain(hostname: string): string | undefined {
+  if (hostname.endsWith('.pages.dev')) {
+    const parts = hostname.split('.');
+    // e.g. "abc123.synnovator.pages.dev" → "synnovator.pages.dev"
+    // e.g. "synnovator.pages.dev" → "synnovator.pages.dev"
+    return parts.slice(-3).join('.');
+  }
+  return undefined;
+}
+
 async function deriveKey(secret: string): Promise<CryptoKey> {
   const encoder = new TextEncoder();
   const keyMaterial = await crypto.subtle.importKey(
@@ -67,18 +83,20 @@ export async function decrypt(token: string, secret: string): Promise<Session | 
   }
 }
 
-export function setSessionCookie(headers: Headers, token: string): void {
-  headers.append(
-    'Set-Cookie',
-    `${COOKIE_NAME}=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}`,
-  );
+export function setSessionCookie(headers: Headers, token: string, cookieDomain?: string): void {
+  let cookie = `${COOKIE_NAME}=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}`;
+  if (cookieDomain) {
+    cookie += `; Domain=${cookieDomain}`;
+  }
+  headers.append('Set-Cookie', cookie);
 }
 
-export function clearSessionCookie(headers: Headers): void {
-  headers.append(
-    'Set-Cookie',
-    `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`,
-  );
+export function clearSessionCookie(headers: Headers, cookieDomain?: string): void {
+  let cookie = `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+  if (cookieDomain) {
+    cookie += `; Domain=${cookieDomain}`;
+  }
+  headers.append('Set-Cookie', cookie);
 }
 
 export function getSessionCookie(request: Request): string | null {
