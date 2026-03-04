@@ -1,0 +1,36 @@
+synnovator_submission: "2.0"
+
+project:
+  name: "GlobalBridge"
+  name_zh: "全球桥"
+  tagline: "AI-powered cross-border compliance and localization platform"
+  tagline_zh: "AI驱动的跨境合规与本地化平台"
+  track: "ai-application"
+
+  team:
+    - github: "frank-law"
+      role: "Lead Developer"
+    - github: "grace-nlp"
+      role: "NLP Engineer"
+    - github: "henry-backend"
+      role: "Backend Engineer"
+    - github: "iris-frontend"
+      role: "Frontend Developer"
+
+  deliverables:
+    repo: "https://github.com/team-global-bridge/global-bridge"
+    document:
+      local_path: ""
+      r2_url: ""
+    video: "https://example.com/global-bridge-demo"
+
+  tech_stack: ["Python", "FastAPI", "Vue.js", "PostgreSQL", "GPT-4", "AWS Lambda"]
+
+  description: |
+    GlobalBridge helps small businesses navigate international regulations and localize
+    their products for new markets. It uses AI to analyze regulatory requirements across
+    jurisdictions, automatically translate and culturally adapt marketing materials, and
+    generate compliance checklists specific to each target market.
+  description_zh: |
+    GlobalBridge 帮助中小企业应对国际法规并为新市场本地化产品。利用AI分析各司法管辖区的
+    法规要求，自动翻译和文化适配营销材料，并生成针对每个目标市场的合规清单。

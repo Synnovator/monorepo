@@ -50,6 +50,15 @@ if (fs.existsSync(submissionsDir)) {
   }
 }
 
+// Build github → profile slug map for judge links
+const profiles = await getCollection('profiles');
+const githubToProfile = new Map<string, string>();
+for (const p of profiles) {
+  if (p.data.hacker.github) {
+    githubToProfile.set(p.data.hacker.github, p.id);
+  }
+}
+
 // Prepare tracks data for form components
 const formTracks = (h.tracks ?? []).map((tr: any) => ({
   slug: tr.slug,
@@ -330,7 +339,7 @@ const formTracks = (h.tracks ?? []).map((tr: any) => ({
             <h2 class="text-lg font-heading font-bold text-white mb-4">{t(lang, 'hackathon.judges')}</h2>
             <div class="space-y-3">
               {h.judges.map(judge => (
-                <JudgeCard judge={judge} lang={lang} />
+                <JudgeCard judge={judge} lang={lang} profileSlug={githubToProfile.get(judge.github)} />
               ))}
             </div>
           </section>

@@ -1,0 +1,34 @@
+synnovator_profile: "2.0"
+hacker:
+  github: "lin-xiaohui"
+  name: "Lin Xiaohui"
+  name_zh: "林晓慧"
+  bio: "Algorithm Lead at Xinchen FinTech. 7 years of machine learning experience in financial applications."
+  bio_zh: "新辰金融科技算法负责人，7年金融领域机器学习经验。"
+  location: "Beijing"
+  languages:
+    - "zh"
+    - "en"
+  identity:
+    type: "professional"
+    affiliation: "Xinchen FinTech"
+  skills:
+    - category: "AI/ML"
+      items:
+        - "Machine Learning"
+        - "Deep Learning"
+        - "NLP"
+        - "PyTorch"
+    - category: "Finance"
+      items:
+        - "Quantitative Analysis"
+        - "Credit Scoring"
+  interests:
+    - "ML in Finance"
+    - "Explainable AI"
+  judge_profile:
+    available: true
+    expertise:
+      - "Machine Learning"
+      - "Financial AI"
+    conflict_declaration: ""

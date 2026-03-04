@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { buildPRUrl, openGitHubUrl } from '@/lib/github-url';
 import { formatYaml } from './form-utils';
+import { TimelineEditor, DEFAULT_STAGES, type Stage } from './TimelineEditor';
 
 interface CreateHackathonFormProps {
   templates: Record<string, unknown>;
@@ -35,15 +36,6 @@ const TYPE_OPTIONS = [
   { value: 'youth-league', zh: '青年联赛', en: 'Youth League', desc_zh: '面向青年开发者的竞赛', desc_en: 'Competition for young developers' },
 ];
 
-const TIMELINE_STAGES = ['registration', 'development', 'submission', 'judging', 'announcement'] as const;
-const TIMELINE_LABELS: Record<string, { zh: string; en: string }> = {
-  registration: { zh: '报名', en: 'Registration' },
-  development: { zh: '开发', en: 'Development' },
-  submission: { zh: '提交', en: 'Submission' },
-  judging: { zh: '评审', en: 'Judging' },
-  announcement: { zh: '公告', en: 'Announcement' },
-};
-
 const STEP_LABELS_ZH = ['类型', '基本信息', '组织者', '时间线', '赛道', '法律', '设置', '预览'];
 const STEP_LABELS_EN = ['Type', 'Basic Info', 'Organizers', 'Timeline', 'Tracks', 'Legal', 'Settings', 'Preview'];
 const TOTAL_STEPS = 8;
@@ -71,9 +63,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
   const [organizers, setOrganizers] = useState<Organizer[]>([{ name: '', name_zh: '', role: 'organizer' }]);
 
   // Step 3: Timeline
-  const [timeline, setTimeline] = useState<Record<string, { start: string; end: string }>>(
-    Object.fromEntries(TIMELINE_STAGES.map(s => [s, { start: '', end: '' }]))
-  );
+  const [timelineStages, setTimelineStages] = useState<Stage[]>(DEFAULT_STAGES);
 
   // Step 4: Tracks
   const [tracks, setTracks] = useState<TrackData[]>([{
@@ -113,11 +103,6 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
   }
   function updateOrganizer(idx: number, field: keyof Organizer, value: string) {
     setOrganizers(prev => { const n = [...prev]; n[idx] = { ...n[idx], [field]: value }; return n; });
-  }
-
-  // Timeline helpers
-  function updateTimeline(stage: string, field: 'start' | 'end', value: string) {
-    setTimeline(prev => ({ ...prev, [stage]: { ...prev[stage], [field]: value } }));
   }
 
   // Track helpers
@@ -162,10 +147,9 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
   // Build YAML
   const yamlContent = useMemo(() => {
     const timelineObj: Record<string, unknown> = {};
-    for (const stage of TIMELINE_STAGES) {
-      const s = timeline[stage];
-      if (s.start || s.end) {
-        timelineObj[stage] = { start: s.start || undefined, end: s.end || undefined };
+    for (const stage of timelineStages) {
+      if (stage.start || stage.end) {
+        timelineObj[stage.key] = { start: stage.start || undefined, end: stage.end || undefined };
       }
     }
 
@@ -230,7 +214,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
       },
     };
     return formatYaml(data);
-  }, [name, nameZh, slug, tagline, taglineZh, hackathonType, organizers, timeline, tracks, license, ipOwnership, ndaRequired, ndaDocUrl, ndaSummary, langOptions, publicVote, eligibilityOpen, teamMin, teamMax, allowSolo]);
+  }, [name, nameZh, slug, tagline, taglineZh, hackathonType, organizers, timelineStages, tracks, license, ipOwnership, ndaRequired, ndaDocUrl, ndaSummary, langOptions, publicVote, eligibilityOpen, teamMin, teamMax, allowSolo]);
 
   function handleSubmit() {
     const finalSlug = slug || toSlug(name);
@@ -389,29 +373,13 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {step === 3 && (
           <>
             <p className="text-sm text-muted mb-2">
-              {t('设置各阶段的时间范围（ISO 8601 格式）', 'Set date ranges for each stage (ISO 8601)')}
+              {t('点击阶段块设置日期，可以添加或删除阶段', 'Click stage blocks to set dates. Add or remove stages as needed.')}
             </p>
-            <div className="space-y-4">
-              {TIMELINE_STAGES.map(stage => (
-                <div key={stage} className="space-y-2">
-                  <p className="text-sm text-white font-medium">{TIMELINE_LABELS[stage][lang]}</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-xs text-muted mb-1">{t('开始', 'Start')}</label>
-                      <input type="datetime-local" value={timeline[stage].start.replace('Z', '')}
-                        onChange={e => updateTimeline(stage, 'start', e.target.value ? e.target.value + 'Z' : '')}
-                        className={inputClass} />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-muted mb-1">{t('结束', 'End')}</label>
-                      <input type="datetime-local" value={timeline[stage].end.replace('Z', '')}
-                        onChange={e => updateTimeline(stage, 'end', e.target.value ? e.target.value + 'Z' : '')}
-                        className={inputClass} />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <TimelineEditor
+              lang={lang}
+              value={timelineStages}
+              onChange={setTimelineStages}
+            />
           </>
         )}
 
@@ -449,27 +417,62 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
                     </div>
 
                     <div>
-                      <div className="flex justify-between items-center mb-2">
+                      <div className="flex justify-between items-center mb-3">
                         <label className="text-xs text-muted">{t('评审标准', 'Judging Criteria')}</label>
-                        <span className={`text-xs ${weightOk ? 'text-lime-primary' : 'text-warning'}`}>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${weightOk ? 'bg-lime-primary/20 text-lime-primary' : 'bg-warning/20 text-warning'}`}>
                           {t('权重总和', 'Weight total')}: {weightSum.toFixed(2)} {weightOk ? '\u2713' : t('(应为 1.0)', '(should be 1.0)')}
                         </span>
                       </div>
-                      <div className="space-y-2">
+
+                      {/* Criteria cards */}
+                      <div className="space-y-3">
                         {tr.criteria.map((c, cIdx) => (
-                          <div key={cIdx} className="flex gap-2 items-center">
-                            <input type="text" value={c.name} onChange={e => updateCriterion(tIdx, cIdx, 'name', e.target.value)}
-                              placeholder={t('标准名称', 'Criterion name')} className={`${inputClass} flex-1`} />
-                            <input type="number" step="0.05" min="0" max="1" value={c.weight}
-                              onChange={e => updateCriterion(tIdx, cIdx, 'weight', e.target.value)}
-                              className={`${inputClass} w-20`} />
-                            {tr.criteria.length > 1 && (
-                              <button type="button" onClick={() => removeCriterion(tIdx, cIdx)} className={btnRemove}>{'\u2715'}</button>
-                            )}
+                          <div key={cIdx} className="p-3 rounded-lg border border-secondary-bg bg-surface/30 space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs text-muted">
+                                {t('标准', 'Criterion')} {cIdx + 1}
+                              </span>
+                              {tr.criteria.length > 1 && (
+                                <button type="button" onClick={() => removeCriterion(tIdx, cIdx)}
+                                  className="text-xs text-muted hover:text-error transition-colors">
+                                  {t('删除', 'Remove')}
+                                </button>
+                              )}
+                            </div>
+                            <input type="text" value={c.name}
+                              onChange={e => updateCriterion(tIdx, cIdx, 'name', e.target.value)}
+                              placeholder={t('标准名称（如"创新性"）', 'Criterion name (e.g. "Innovation")')}
+                              className={inputClass} />
+                            <div className="flex items-center gap-3">
+                              <label className="text-xs text-muted whitespace-nowrap">{t('权重', 'Weight')}:</label>
+                              <input type="range" min="0" max="1" step="0.05"
+                                value={c.weight}
+                                onChange={e => updateCriterion(tIdx, cIdx, 'weight', e.target.value)}
+                                className="flex-1 accent-lime-primary" />
+                              <input type="number" step="0.05" min="0" max="1"
+                                value={c.weight}
+                                onChange={e => updateCriterion(tIdx, cIdx, 'weight', e.target.value)}
+                                className={`${inputClass} w-20 text-center`} />
+                            </div>
                           </div>
                         ))}
                       </div>
-                      <button type="button" onClick={() => addCriterion(tIdx)} className={`${btnAdd} mt-2`}>
+
+                      {/* Weight distribution bar */}
+                      {tr.criteria.length > 0 && (
+                        <div className="mt-3 h-2 rounded-full bg-secondary-bg overflow-hidden flex">
+                          {tr.criteria.map((c, cIdx) => {
+                            const w = parseFloat(c.weight) || 0;
+                            const colors = ['bg-lime-primary', 'bg-cyan', 'bg-orange', 'bg-neon-blue', 'bg-pink', 'bg-mint'];
+                            return w > 0 ? (
+                              <div key={cIdx} className={`${colors[cIdx % colors.length]} transition-all`}
+                                style={{ width: `${w * 100}%` }} />
+                            ) : null;
+                          })}
+                        </div>
+                      )}
+
+                      <button type="button" onClick={() => addCriterion(tIdx)} className={`${btnAdd} mt-3`}>
                         + {t('添加标准', 'Add criterion')}
                       </button>
                     </div>
@@ -612,7 +615,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               {t('下一步', 'Next')}
             </button>
           ) : (
-            <button type="button" onClick={handleSubmit} disabled={!isLoggedIn || !slug && !name}
+            <button type="button" onClick={handleSubmit} disabled={!isLoggedIn || (!slug && !name)}
               className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {t('前往 GitHub 提交 PR', 'Submit PR on GitHub')} {'\u2192'}
             </button>

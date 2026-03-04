@@ -1,0 +1,34 @@
+synnovator_submission: "2.0"
+
+project:
+  name: "AI Voyager"
+  name_zh: "AI 旅行者"
+  tagline: "AI-powered cross-border market research assistant for one-person companies"
+  tagline_zh: "面向一人公司的AI跨境市场研究助手"
+  track: "ai-application"
+
+  team:
+    - github: "alice-dev"
+      role: "Lead Developer"
+    - github: "bob-ml"
+      role: "ML Engineer"
+    - github: "carol-design"
+      role: "Product Designer"
+
+  deliverables:
+    repo: "https://github.com/team-ai-voyager/ai-voyager"
+    document:
+      local_path: ""
+      r2_url: ""
+    video: "https://example.com/ai-voyager-demo"
+
+  tech_stack: ["Python", "LangChain", "Next.js", "Tailwind CSS", "OpenAI API", "Supabase"]
+
+  description: |
+    AI Voyager is an intelligent market research assistant designed for solo entrepreneurs
+    and one-person companies looking to expand globally. It automates competitor analysis,
+    market sizing, and regulatory compliance research across 50+ countries using multi-agent
+    AI architecture.
+  description_zh: |
+    AI Voyager 是一款面向独立创业者和一人公司的智能市场研究助手。通过多智能体AI架构，
+    自动完成50+国家/地区的竞品分析、市场规模评估和法规合规研究，帮助创业者快速进入全球市场。

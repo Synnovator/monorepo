@@ -22,18 +22,16 @@ hackathon:
       name_zh: "AAA"
       slug: "a"
       rewards:
-      - type: "prize"
-      rank: "1st"
-      amount: "$1,000"
+        - type: "prize"
+          rank: "1st"
+          amount: "$1,000"
       judging:
-      mode: "weighted"
-      criteria:
-      - name: "送三新鲜度nnovation"
-      weight: 0.3
-      score_range:
-      - name: "cccc"
-      weight: 0.1
-      score_range:
+        mode: "weighted"
+        criteria:
+          - name: "Innovation"
+            weight: 0.3
+          - name: "cccc"
+            weight: 0.1
   settings:
     language:
       - "zh"

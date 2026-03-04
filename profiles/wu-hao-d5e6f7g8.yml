@@ -1,0 +1,33 @@
+synnovator_profile: "2.0"
+hacker:
+  github: "wu-hao"
+  name: "Wu Hao"
+  name_zh: "吴昊"
+  bio: "Former Chief Risk Scientist with 14 years of experience in risk control algorithms and financial technology."
+  bio_zh: "前首席风控科学家，14年风控算法经验，现为独立顾问。"
+  location: "Shenzhen"
+  languages:
+    - "zh"
+    - "en"
+  identity:
+    type: "professional"
+    affiliation: "Independent Consultant"
+  skills:
+    - category: "AI/ML"
+      items:
+        - "Risk Algorithms"
+        - "Statistical Modeling"
+        - "Graph Neural Networks"
+    - category: "Finance"
+      items:
+        - "Risk Management"
+        - "Anti-Fraud Systems"
+  interests:
+    - "Risk Intelligence"
+    - "Graph-based Fraud Detection"
+  judge_profile:
+    available: true
+    expertise:
+      - "Risk Control Algorithms"
+      - "Anti-Fraud Technology"
+    conflict_declaration: ""

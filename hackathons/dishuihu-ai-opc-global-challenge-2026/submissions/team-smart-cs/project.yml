@@ -1,0 +1,33 @@
+synnovator_submission: "2.0"
+
+project:
+  name: "SmartCS Agent"
+  name_zh: "智能客服智能体"
+  tagline: "Intent recognition system achieving 94.2% accuracy on Zhihai benchmark dataset"
+  tagline_zh: "在智海基准数据集上达到94.2%准确率的意图识别系统"
+  track: "zhihai-customer-service"
+
+  team:
+    - github: "jack-nlp"
+      role: "Lead Developer"
+    - github: "kate-ml"
+      role: "ML Researcher"
+
+  deliverables:
+    repo: "https://github.com/team-smart-cs/smart-cs-agent"
+    document:
+      local_path: ""
+      r2_url: ""
+    video: ""
+
+  tech_stack: ["Python", "PyTorch", "Transformers", "BERT", "FastAPI", "Redis"]
+
+  description: |
+    SmartCS Agent implements a hybrid intent recognition system combining fine-tuned BERT
+    with a retrieval-augmented generation (RAG) pipeline. Achieves 94.2% accuracy on the
+    Zhihai customer service benchmark, a 12.3% improvement over the baseline. Features
+    real-time inference under 100ms and graceful fallback to human agents.
+  description_zh: |
+    SmartCS Agent 实现了一个混合意图识别系统，结合微调BERT和检索增强生成(RAG)管道。
+    在智海客服基准数据集上达到94.2%准确率，比基线提升12.3%。支持100ms以内的实时推理，
+    并在低置信度时优雅地转接人工客服。

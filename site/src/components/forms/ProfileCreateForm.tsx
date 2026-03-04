@@ -120,10 +120,16 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
     return formatYaml(profile);
   }, [user, name, nameZh, bio, location, languages, identityType, affiliation, degree, major, gradYear, skills, interests, lookingForRoles, teamSize, collaborationStyle, twitter, linkedin, website]);
 
+  function generateUUID8(): string {
+    const bytes = crypto.getRandomValues(new Uint8Array(4));
+    return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
   function handleSubmit() {
     if (!user) return;
+    const uuid = generateUUID8();
     const url = buildPRUrl({
-      filename: `profiles/${user.login}.yml`,
+      filename: `profiles/${user.login}-${uuid}.yml`,
       value: yamlContent,
       message: `feat(profiles): create profile for ${user.login}`,
     });
@@ -462,7 +468,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                 '点击提交后将在 GitHub 上创建 PR，文件路径为 ',
                 'Clicking submit will create a PR on GitHub with file path '
               )}
-              <code className="text-lime-primary">profiles/{user?.login ?? '{username}'}.yml</code>
+              <code className="text-lime-primary">profiles/{user?.login ?? '{username}'}-{'<uuid>'}.yml</code>
             </p>
           </>
         )}
