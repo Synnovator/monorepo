@@ -417,27 +417,62 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
                     </div>
 
                     <div>
-                      <div className="flex justify-between items-center mb-2">
+                      <div className="flex justify-between items-center mb-3">
                         <label className="text-xs text-muted">{t('评审标准', 'Judging Criteria')}</label>
-                        <span className={`text-xs ${weightOk ? 'text-lime-primary' : 'text-warning'}`}>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${weightOk ? 'bg-lime-primary/20 text-lime-primary' : 'bg-warning/20 text-warning'}`}>
                           {t('权重总和', 'Weight total')}: {weightSum.toFixed(2)} {weightOk ? '\u2713' : t('(应为 1.0)', '(should be 1.0)')}
                         </span>
                       </div>
-                      <div className="space-y-2">
+
+                      {/* Criteria cards */}
+                      <div className="space-y-3">
                         {tr.criteria.map((c, cIdx) => (
-                          <div key={cIdx} className="flex gap-2 items-center">
-                            <input type="text" value={c.name} onChange={e => updateCriterion(tIdx, cIdx, 'name', e.target.value)}
-                              placeholder={t('标准名称', 'Criterion name')} className={`${inputClass} flex-1`} />
-                            <input type="number" step="0.05" min="0" max="1" value={c.weight}
-                              onChange={e => updateCriterion(tIdx, cIdx, 'weight', e.target.value)}
-                              className={`${inputClass} w-20`} />
-                            {tr.criteria.length > 1 && (
-                              <button type="button" onClick={() => removeCriterion(tIdx, cIdx)} className={btnRemove}>{'\u2715'}</button>
-                            )}
+                          <div key={cIdx} className="p-3 rounded-lg border border-secondary-bg bg-surface/30 space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs text-muted">
+                                {t('标准', 'Criterion')} {cIdx + 1}
+                              </span>
+                              {tr.criteria.length > 1 && (
+                                <button type="button" onClick={() => removeCriterion(tIdx, cIdx)}
+                                  className="text-xs text-muted hover:text-error transition-colors">
+                                  {t('删除', 'Remove')}
+                                </button>
+                              )}
+                            </div>
+                            <input type="text" value={c.name}
+                              onChange={e => updateCriterion(tIdx, cIdx, 'name', e.target.value)}
+                              placeholder={t('标准名称（如"创新性"）', 'Criterion name (e.g. "Innovation")')}
+                              className={inputClass} />
+                            <div className="flex items-center gap-3">
+                              <label className="text-xs text-muted whitespace-nowrap">{t('权重', 'Weight')}:</label>
+                              <input type="range" min="0" max="1" step="0.05"
+                                value={c.weight}
+                                onChange={e => updateCriterion(tIdx, cIdx, 'weight', e.target.value)}
+                                className="flex-1 accent-lime-primary" />
+                              <input type="number" step="0.05" min="0" max="1"
+                                value={c.weight}
+                                onChange={e => updateCriterion(tIdx, cIdx, 'weight', e.target.value)}
+                                className={`${inputClass} w-20 text-center`} />
+                            </div>
                           </div>
                         ))}
                       </div>
-                      <button type="button" onClick={() => addCriterion(tIdx)} className={`${btnAdd} mt-2`}>
+
+                      {/* Weight distribution bar */}
+                      {tr.criteria.length > 0 && (
+                        <div className="mt-3 h-2 rounded-full bg-secondary-bg overflow-hidden flex">
+                          {tr.criteria.map((c, cIdx) => {
+                            const w = parseFloat(c.weight) || 0;
+                            const colors = ['bg-lime-primary', 'bg-cyan', 'bg-orange', 'bg-neon-blue', 'bg-pink', 'bg-mint'];
+                            return w > 0 ? (
+                              <div key={cIdx} className={`${colors[cIdx % colors.length]} transition-all`}
+                                style={{ width: `${w * 100}%` }} />
+                            ) : null;
+                          })}
+                        </div>
+                      )}
+
+                      <button type="button" onClick={() => addCriterion(tIdx)} className={`${btnAdd} mt-3`}>
                         + {t('添加标准', 'Add criterion')}
                       </button>
                     </div>
