@@ -42,6 +42,30 @@
   --font-zh: 'Noto Sans SC', sans-serif;
 }
 
+/* === shadcn/ui CSS Variables (mapped to Neon Forge palette) === */
+:root {
+  --background: var(--color-surface);
+  --foreground: var(--color-light-gray);
+  --card: var(--color-dark-bg);
+  --card-foreground: var(--color-light-gray);
+  --popover: var(--color-dark-bg);
+  --popover-foreground: var(--color-light-gray);
+  --primary: var(--color-lime-primary);
+  --primary-foreground: var(--color-near-black);
+  --secondary: var(--color-secondary-bg);
+  --secondary-foreground: white;
+  --muted: var(--color-secondary-bg);
+  --muted-foreground: var(--color-muted);
+  --accent: var(--color-secondary-bg);
+  --accent-foreground: white;
+  --destructive: var(--color-error);
+  --destructive-foreground: white;
+  --border: var(--color-secondary-bg);
+  --input: var(--color-secondary-bg);
+  --ring: var(--color-lime-primary);
+  --radius: 0.5rem;
+}
+
 /* === Base Styles === */
 html {
   background-color: var(--color-surface);
