@@ -120,8 +120,14 @@ hackathon:
             hard_constraint: false
             constraint_rule: ""
       deliverables:
-        required: []         # List of required deliverable descriptions
-        optional: []         # List of optional deliverable descriptions
+        required:            # Array of deliverable OBJECTS (not strings!)
+          - type: ""         # repo | document | video | demo | model | other
+            format: ""       # github-url | url | pdf | file | etc.
+            description: ""  # Human-readable description
+        optional:            # Same object format as required
+          - type: ""
+            format: ""
+            description: ""
 
   # --- Datasets (optional, common in enterprise) ---
   datasets:

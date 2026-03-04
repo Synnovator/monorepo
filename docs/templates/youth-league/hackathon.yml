@@ -81,11 +81,19 @@ hackathon:
             score_range: [0, 100]
       deliverables:
         required:
-          - "Source code repository"
-          - "Project report (PDF)"
+          - type: "repo"
+            format: "github-url"
+            description: "Source code repository"
+          - type: "document"
+            format: "pdf"
+            description: "Project report"
         optional:
-          - "Demo video"
-          - "Live demo URL"
+          - type: "video"
+            format: "url"
+            description: "Demo video"
+          - type: "demo"
+            format: "url"
+            description: "Live demo URL"
 
   settings:
     language: ["zh", "en"]
