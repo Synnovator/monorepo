@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CreateHackathonForm from '../components/forms/CreateHackathonForm';
+import fs from 'node:fs';
+import path from 'node:path';
+import yaml from 'js-yaml';
+
+// Load templates at build time
+const templateTypes = ['community', 'enterprise', 'youth-league'] as const;
+const templates: Record<string, unknown> = {};
+for (const type of templateTypes) {
+  const templatePath = path.resolve(`docs/templates/${type}/hackathon.yml`);
+  if (fs.existsSync(templatePath)) {
+    try {
+      const raw = fs.readFileSync(templatePath, 'utf8');
+      templates[type] = yaml.load(raw);
+    } catch { /* skip */ }
+  }
+}
+---
+
+<BaseLayout title="Create Hackathon" description="Create a new hackathon on Synnovator">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-3xl font-heading font-bold text-white mb-8">Create a Hackathon</h1>
+    <CreateHackathonForm client:load templates={templates} lang="zh" />
+  </div>
+</BaseLayout>
