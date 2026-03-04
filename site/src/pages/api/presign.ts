@@ -41,6 +41,70 @@ export const POST: APIRoute = async ({ request, locals }) => {
     });
   }
 
+  // NDA check for dataset downloads
+  const datasetMatch = key.match(/^hackathons\/([^/]+)\/datasets\//);
+  if (datasetMatch) {
+    const slug = datasetMatch[1];
+    const owner = env.GITHUB_OWNER || 'Synnovator';
+    const repo = env.GITHUB_REPO || 'monorepo';
+
+    // Fetch hackathon.yml from GitHub Contents API to check NDA requirement
+    const hackathonYmlUrl = `https://api.github.com/repos/${owner}/${repo}/contents/hackathons/${slug}/hackathon.yml`;
+    const ymlRes = await fetch(hackathonYmlUrl, {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        Accept: 'application/vnd.github.v3.raw',
+        'User-Agent': 'Synnovator-Site',
+      },
+    });
+
+    if (ymlRes.ok) {
+      const ymlText = await ymlRes.text();
+      const { default: jsYaml } = await import('js-yaml');
+      const hackathonData = jsYaml.load(ymlText) as Record<string, unknown>;
+      const hackathon = hackathonData?.hackathon as Record<string, unknown> | undefined;
+      const legal = hackathon?.legal as Record<string, unknown> | undefined;
+      const nda = legal?.nda as Record<string, unknown> | undefined;
+
+      if (nda?.required === true) {
+        // Search for user's approved NDA issue
+        const issuesUrl = new URL(`https://api.github.com/repos/${owner}/${repo}/issues`);
+        issuesUrl.searchParams.set('labels', 'nda-sign,nda-approved');
+        issuesUrl.searchParams.set('creator', session.login);
+        issuesUrl.searchParams.set('state', 'all');
+        issuesUrl.searchParams.set('per_page', '100');
+
+        const issuesRes = await fetch(issuesUrl.toString(), {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            Accept: 'application/vnd.github.v3+json',
+            'User-Agent': 'Synnovator-Site',
+          },
+        });
+
+        let ndaApproved = false;
+        if (issuesRes.ok) {
+          const issues = (await issuesRes.json()) as Array<{ title: string }>;
+          ndaApproved = issues.some((issue) => issue.title.includes(slug));
+        }
+
+        if (!ndaApproved) {
+          return new Response(
+            JSON.stringify({
+              error: 'nda_required',
+              message: '请先签署 NDA / Please sign the NDA first',
+              hackathon: slug,
+            }),
+            {
+              status: 403,
+              headers: { 'Content-Type': 'application/json' },
+            },
+          );
+        }
+      }
+    }
+  }
+
   const s3 = new S3Client({
     region: 'auto',
     endpoint: env.R2_ENDPOINT,

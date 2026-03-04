@@ -1,0 +1,125 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { t, localize, getCurrentStage } from '../../lib/i18n';
+import type { Lang } from '../../lib/i18n';
+import fs from 'node:fs';
+import path from 'node:path';
+
+export async function getStaticPaths() {
+  const hackathons = await getCollection('hackathons');
+  return hackathons.map(entry => ({
+    params: { slug: entry.data.hackathon.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const h = entry.data.hackathon;
+const lang: Lang = 'zh';
+const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
+const showResults = ['announcement', 'award', 'ended'].includes(stage);
+
+// Load results JSON files
+const resultsDir = path.resolve(`hackathons/${h.slug}/results`);
+let trackResults: Array<{ track: string; data: any }> = [];
+if (showResults && fs.existsSync(resultsDir)) {
+  const files = fs.readdirSync(resultsDir).filter(f => f.endsWith('.json'));
+  for (const file of files) {
+    try {
+      const raw = fs.readFileSync(path.join(resultsDir, file), 'utf8');
+      const data = JSON.parse(raw);
+      trackResults.push({ track: file.replace('.json', ''), data });
+    } catch { /* skip invalid */ }
+  }
+}
+
+// Map track slugs to track names
+const trackNameMap: Record<string, { name: string; name_zh?: string }> = {};
+for (const track of (h.tracks || [])) {
+  trackNameMap[track.slug] = { name: track.name, name_zh: track.name_zh };
+}
+---
+
+<BaseLayout
+  title={`${localize(lang, h.name, h.name_zh)} — ${t(lang, 'result.title')}`}
+  description={t(lang, 'result.title')}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    {/* Back link */}
+    <a href={`/hackathons/${h.slug}`} class="text-sm text-muted hover:text-white mb-6 inline-block">
+      ← {localize(lang, h.name, h.name_zh)}
+    </a>
+
+    <h1 class="text-3xl font-heading font-bold text-white mb-8">
+      {t(lang, 'result.title')}
+    </h1>
+
+    {!showResults ? (
+      <div class="rounded-lg border border-secondary-bg bg-dark-bg p-12 text-center">
+        <p class="text-muted text-lg">{t(lang, 'result.pending')}</p>
+      </div>
+    ) : trackResults.length === 0 ? (
+      <div class="rounded-lg border border-secondary-bg bg-dark-bg p-12 text-center">
+        <p class="text-muted text-lg">{t(lang, 'result.no_results')}</p>
+      </div>
+    ) : (
+      <div class="space-y-12">
+        {trackResults.map(({ track, data }) => {
+          const trackInfo = trackNameMap[track];
+          return (
+            <section>
+              <h2 class="text-xl font-heading font-bold text-white mb-4">
+                {trackInfo ? localize(lang, trackInfo.name, trackInfo.name_zh) : track}
+              </h2>
+              <div class="text-xs text-muted mb-4">
+                {lang === 'zh' ? '计算时间' : 'Calculated'}: {new Date(data.calculated_at).toLocaleString()} ·
+                {data.total_judges} {lang === 'zh' ? '位评委' : 'judges'} ·
+                {data.total_teams} {lang === 'zh' ? '支队伍' : 'teams'}
+              </div>
+
+              {/* Rankings table */}
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="border-b border-secondary-bg text-muted">
+                      <th class="text-left py-3 px-2">{t(lang, 'result.rank')}</th>
+                      <th class="text-left py-3 px-2">{t(lang, 'result.team')}</th>
+                      <th class="text-right py-3 px-2">{t(lang, 'result.final_score')}</th>
+                      {data.rankings[0]?.criteria_breakdown?.map(c => (
+                        <th class="text-right py-3 px-2 text-xs">
+                          {c.criterion}<br/>
+                          <span class="text-muted font-normal">({c.weight}%)</span>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.rankings.map(r => (
+                      <tr class="border-b border-secondary-bg/50 hover:bg-secondary-bg/20">
+                        <td class="py-3 px-2">
+                          <span class={`font-code font-bold ${r.rank <= 3 ? 'text-lime-primary' : 'text-white'}`}>
+                            #{r.rank}
+                          </span>
+                        </td>
+                        <td class="py-3 px-2 text-white font-medium">{r.team}</td>
+                        <td class="py-3 px-2 text-right font-code text-lime-primary font-bold">
+                          {r.final_score.toFixed(1)}
+                        </td>
+                        {r.criteria_breakdown?.map(c => (
+                          <td class="py-3 px-2 text-right font-code text-light-gray">
+                            {c.average.toFixed(1)}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          );
+        })}
+      </div>
+    )}
+  </div>
+</BaseLayout>

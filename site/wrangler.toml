@@ -10,3 +10,5 @@ directory = "./dist"
 [vars]
 SITE_URL = "https://home.synnovator.space"
 GITHUB_CLIENT_ID = "Iv23liQaa34mwXMU912V"
+GITHUB_OWNER = "Synnovator"
+GITHUB_REPO = "monorepo"

@@ -1,0 +1,150 @@
+name: Validate Appeal
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  validate:
+    if: contains(github.event.issue.labels.*.name, 'appeal')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install js-yaml
+
+      - name: Validate appeal
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const yaml = require('./node_modules/js-yaml');
+            const issue = context.payload.issue;
+            const title = issue.title;
+            const author = issue.user.login;
+            const body = issue.body || '';
+            const errors = [];
+
+            // 1. Parse title: [Appeal] team-name — hackathon-slug
+            // Also support: [Appeal] team-name — hackathon-slug/track
+            const titleMatch = title.match(/\[Appeal\]\s*(.*?)\s*—\s*([^/\s]+)(?:\s*\/\s*(.*))?/);
+            if (!titleMatch) {
+              errors.push('Issue title must match: `[Appeal] team-name — hackathon-slug` or `[Appeal] team-name — hackathon-slug/track`');
+            }
+            const [, teamName, slug, trackSlug] = titleMatch || [null, '', '', ''];
+            const trimmedSlug = slug ? slug.trim() : '';
+            const trimmedTeam = teamName ? teamName.trim() : '';
+
+            if (trimmedSlug) {
+              const hackathonPath = `hackathons/${trimmedSlug}/hackathon.yml`;
+              if (!fs.existsSync(hackathonPath)) {
+                errors.push(`Hackathon not found: \`${trimmedSlug}\``);
+              } else {
+                const data = yaml.load(fs.readFileSync(hackathonPath, 'utf8'));
+                const h = data.hackathon;
+
+                // 2. Window check: must be in announcement stage
+                if (h.timeline?.announcement) {
+                  const start = new Date(h.timeline.announcement.start);
+                  const end = new Date(h.timeline.announcement.end);
+                  const now = new Date();
+                  if (now < start) {
+                    errors.push(`Appeal window has not opened yet. Announcement period: ${h.timeline.announcement.start} — ${h.timeline.announcement.end}`);
+                  } else if (now > end) {
+                    // Close the issue if window expired
+                    await github.rest.issues.update({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      state: 'closed',
+                    });
+                    await github.rest.issues.addLabels({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      labels: ['appeal:expired'],
+                    });
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      body: `❌ **Appeal window has closed.** Announcement period: ${h.timeline.announcement.start} — ${h.timeline.announcement.end}`,
+                    });
+                    return;
+                  }
+                }
+
+                // 3. Verify author is a team member
+                if (trimmedTeam) {
+                  const projectPath = path.join('hackathons', trimmedSlug, 'submissions', trimmedTeam, 'project.yml');
+                  if (fs.existsSync(projectPath)) {
+                    const projData = yaml.load(fs.readFileSync(projectPath, 'utf8'));
+                    const members = (projData?.project?.team?.members || []).map(m => m.github);
+                    if (!members.includes(author)) {
+                      errors.push(`@${author} is not listed as a member of team \`${trimmedTeam}\`. Only team members can submit appeals.`);
+                    }
+                  } else {
+                    errors.push(`No submission found for team \`${trimmedTeam}\` in hackathon \`${trimmedSlug}\`.`);
+                  }
+                }
+
+                // 4. Check acknowledgment checkbox
+                const unchecked = (body.match(/- \[ \]/g) || []).length;
+                if (unchecked > 0) {
+                  errors.push('Please check the acknowledgment checkbox confirming the organizer\'s decision is binding.');
+                }
+
+                // 5. Auto-assign to organizers if validation passes
+                if (errors.length === 0 && h.organizers) {
+                  const orgGithubs = h.organizers
+                    .map(o => o.github)
+                    .filter(Boolean);
+                  if (orgGithubs.length > 0) {
+                    try {
+                      await github.rest.issues.addAssignees({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: issue.number,
+                        assignees: orgGithubs,
+                      });
+                    } catch (e) {
+                      core.warning(`Failed to assign organizers: ${e.message}`);
+                    }
+                  }
+                }
+              }
+            }
+
+            // Result
+            if (errors.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `❌ **Appeal validation failed:**\n\n${errors.map(e => `- ${e}`).join('\n')}`,
+              });
+            } else {
+              // Add structured labels
+              const labels = ['appeal:pending', `hackathon:${trimmedSlug}`];
+              if (trackSlug?.trim()) labels.push(`track:${trackSlug.trim()}`);
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels,
+              });
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `✅ **Appeal received.** The organizing team has been notified and will respond during the announcement period.\n\nTeam: \`${trimmedTeam}\`\nHackathon: \`${trimmedSlug}\``,
+              });
+            }

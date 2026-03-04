@@ -14,6 +14,8 @@ type Runtime = import('@astrojs/cloudflare').Runtime<{
   R2_ENDPOINT: string;
   R2_BUCKET_NAME: string;
   SITE_URL: string;
+  GITHUB_OWNER: string;
+  GITHUB_REPO: string;
 }>;
 
 declare namespace App {
