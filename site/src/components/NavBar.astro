@@ -1,31 +1,26 @@
 ---
-import OAuthButton from './OAuthButton.astro';
+import OAuthButton from './OAuthButton';
 ---
 
 <nav class="fixed top-0 left-0 right-0 z-50 bg-near-black/80 backdrop-blur-md border-b border-secondary-bg">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-    <!-- Logo -->
     <a href="/" class="flex items-center gap-2 text-lime-primary font-heading font-bold text-xl hover:opacity-80 transition-opacity">
       Synnovator
     </a>
 
-    <!-- Navigation Links -->
     <div class="hidden md:flex items-center gap-8">
       <a href="/" class="text-light-gray hover:text-white transition-colors text-sm">活动</a>
       <a href="/guides/hacker" class="text-muted hover:text-white transition-colors text-sm">指南</a>
+      <a href="/create-hackathon" class="text-muted hover:text-white transition-colors text-sm">创建活动</a>
     </div>
 
-    <!-- Right side -->
     <div class="flex items-center gap-4">
-      <!-- Language switcher placeholder -->
       <button id="lang-switch" class="text-muted hover:text-white text-sm transition-colors">
         EN / 中
       </button>
 
-      <!-- Auth button -->
-      <OAuthButton />
+      <OAuthButton client:load />
 
-      <!-- GitHub link -->
       <a
         href="https://github.com/Synnovator/monorepo"
         target="_blank"
