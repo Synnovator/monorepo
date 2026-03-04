@@ -110,3 +110,17 @@ export async function getSession(request: Request, secret: string): Promise<Sess
   if (!token) return null;
   return decrypt(token, secret);
 }
+
+/**
+ * Validate redirect URLs to prevent open redirect attacks.
+ * Allows: relative paths, home.synnovator.space, *.synnovator.pages.dev
+ */
+const ALLOWED_REDIRECT_PATTERNS = [
+  /^\/(?!\/)/,  // relative paths (but not protocol-relative //evil.com)
+  /^https:\/\/home\.synnovator\.space(\/|$)/,
+  /^https:\/\/([a-z0-9-]+\.)?synnovator\.pages\.dev(\/|$)/,
+];
+
+export function isAllowedRedirect(url: string): boolean {
+  return ALLOWED_REDIRECT_PATTERNS.some((p) => p.test(url));
+}
