@@ -34,7 +34,7 @@ const lang: Lang = 'zh';
 const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
 
 // Load submissions for this hackathon
-const submissionsDir = path.resolve(`hackathons/${h.slug}/submissions`);
+const submissionsDir = path.resolve(`../hackathons/${h.slug}/submissions`);
 let submissions: any[] = [];
 if (fs.existsSync(submissionsDir)) {
   const teamDirs = fs.readdirSync(submissionsDir);
