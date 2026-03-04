@@ -615,7 +615,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               {t('下一步', 'Next')}
             </button>
           ) : (
-            <button type="button" onClick={handleSubmit} disabled={!isLoggedIn || !slug && !name}
+            <button type="button" onClick={handleSubmit} disabled={!isLoggedIn || (!slug && !name)}
               className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {t('前往 GitHub 提交 PR', 'Submit PR on GitHub')} {'\u2192'}
             </button>

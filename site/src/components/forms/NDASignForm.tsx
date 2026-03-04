@@ -9,6 +9,10 @@ interface NDASignFormProps {
   lang: 'zh' | 'en';
 }
 
+function escapeYamlValue(val: string): string {
+  return val.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+}
+
 export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }: NDASignFormProps) {
   const { user, loading, isLoggedIn } = useAuth();
   const [checks, setChecks] = useState([false, false, false]);
@@ -54,23 +58,36 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
 
       let profileContent = await ghRes.text();
 
+      // Check for duplicate NDA signing
+      const safeSlug = escapeYamlValue(hackathonSlug);
+      if (profileContent.includes(`hackathon: "${safeSlug}"`) &&
+          profileContent.includes('nda_signed:')) {
+        setError(t(
+          `您已签署过 ${hackathonSlug} 的 NDA`,
+          `You have already signed the NDA for ${hackathonSlug}`
+        ));
+        setSubmitting(false);
+        return;
+      }
+
       // Append nda_signed entry
+      const timestamp = new Date().toISOString();
       const ndaEntry = [
         '',
         '  nda_signed:',
-        `    - hackathon: "${hackathonSlug}"`,
-        `      signed_at: "${new Date().toISOString()}"`,
+        `    - hackathon: "${safeSlug}"`,
+        `      signed_at: "${timestamp}"`,
       ].join('\n');
 
-      // Check if nda_signed already exists in the profile
+      // Check if nda_signed section already exists in the profile
       if (profileContent.includes('nda_signed:')) {
         // Append to existing nda_signed array
         const insertEntry = [
-          `    - hackathon: "${hackathonSlug}"`,
-          `      signed_at: "${new Date().toISOString()}"`,
+          `    - hackathon: "${safeSlug}"`,
+          `      signed_at: "${timestamp}"`,
         ].join('\n');
         profileContent = profileContent.replace(
-          /nda_signed:\n/,
+          /nda_signed:[ \t]*\n/,
           `nda_signed:\n${insertEntry}\n`
         );
       } else {

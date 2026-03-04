@@ -39,6 +39,9 @@ export function buildIssueUrl(params: IssueUrlParams): string {
 
 /**
  * Build a GitHub "create file" URL (for PR-based creation).
+ * NOTE: GitHub's /new/ endpoint shows a warning when the file already exists.
+ * For NDA/registration flows that edit existing profiles, consider adding
+ * a /edit/ URL builder or server-side PR creation via GitHub API.
  */
 export function buildPRUrl(params: PRUrlParams): string {
   const branch = params.branch || 'main';

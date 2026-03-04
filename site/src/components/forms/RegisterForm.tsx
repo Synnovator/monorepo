@@ -11,6 +11,10 @@ interface RegisterFormProps {
   lang: 'zh' | 'en';
 }
 
+function escapeYamlValue(val: string): string {
+  return val.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+}
+
 const ROLES = [
   { value: 'participant', zh: '个人参赛', en: 'Participant (Solo)' },
   { value: 'team-lead', zh: '队长', en: 'Team Lead' },
@@ -58,19 +62,36 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
 
       let profileContent = await ghRes.text();
 
+      // Escape user-controlled values
+      const safeSlug = escapeYamlValue(hackathonSlug);
+      const safeTrack = escapeYamlValue(track);
+      const safeRole = escapeYamlValue(role);
+      const safeTeam = teamName ? escapeYamlValue(teamName) : '';
+
+      // Check for duplicate registration
+      if (profileContent.includes(`hackathon: "${safeSlug}"`) &&
+          profileContent.includes('registrations:')) {
+        setError(t(
+          `您已报名参加 ${hackathonSlug}`,
+          `You have already registered for ${hackathonSlug}`
+        ));
+        setSubmitting(false);
+        return;
+      }
+
       // Build registration entry
       const regLines = [
-        `    - hackathon: "${hackathonSlug}"`,
-        `      track: "${track}"`,
-        `      role: "${role}"`,
-        ...(isSolo ? [] : [`      team: "${teamName}"`]),
+        `    - hackathon: "${safeSlug}"`,
+        `      track: "${safeTrack}"`,
+        `      role: "${safeRole}"`,
+        ...(isSolo ? [] : [`      team: "${safeTeam}"`]),
         `      registered_at: "${new Date().toISOString()}"`,
       ];
 
-      // Check if registrations already exists
+      // Check if registrations section already exists
       if (profileContent.includes('registrations:')) {
         profileContent = profileContent.replace(
-          /registrations:\n/,
+          /registrations:[ \t]*\n/,
           `registrations:\n${regLines.join('\n')}\n`
         );
       } else {
