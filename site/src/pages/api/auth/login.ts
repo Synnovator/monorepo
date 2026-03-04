@@ -1,13 +1,13 @@
 import type { APIRoute } from 'astro';
+import { getOAuthConfig } from '../../../lib/auth';
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ request, locals }) => {
   const { env } = locals.runtime;
-  const clientId = env.GITHUB_CLIENT_ID;
-  const siteUrl = env.SITE_URL || 'https://synnovator.pages.dev';
-
   const requestUrl = new URL(request.url);
+  const { clientId, siteUrl } = getOAuthConfig(requestUrl.hostname, env);
+
   const requestOrigin = requestUrl.origin;
   const siteOrigin = new URL(siteUrl).origin;
 

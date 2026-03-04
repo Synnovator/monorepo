@@ -124,3 +124,24 @@ const ALLOWED_REDIRECT_PATTERNS = [
 export function isAllowedRedirect(url: string): boolean {
   return ALLOWED_REDIRECT_PATTERNS.some((p) => p.test(url));
 }
+
+/**
+ * Select OAuth credentials based on request hostname.
+ * On *.pages.dev (preview), use PREVIEW_* env vars if available.
+ * Otherwise use the default (production) env vars.
+ */
+export function getOAuthConfig(hostname: string, env: {
+  GITHUB_CLIENT_ID: string;
+  GITHUB_CLIENT_SECRET: string;
+  PREVIEW_GITHUB_CLIENT_ID?: string;
+  PREVIEW_GITHUB_CLIENT_SECRET?: string;
+  SITE_URL: string;
+  PREVIEW_SITE_URL?: string;
+}): { clientId: string; clientSecret: string; siteUrl: string } {
+  const isPreview = hostname.endsWith('.pages.dev');
+  return {
+    clientId: (isPreview && env.PREVIEW_GITHUB_CLIENT_ID) || env.GITHUB_CLIENT_ID,
+    clientSecret: (isPreview && env.PREVIEW_GITHUB_CLIENT_SECRET) || env.GITHUB_CLIENT_SECRET,
+    siteUrl: (isPreview && env.PREVIEW_SITE_URL) || env.SITE_URL || 'https://synnovator.pages.dev',
+  };
+}
