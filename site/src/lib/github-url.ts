@@ -41,7 +41,8 @@ export function buildIssueUrl(params: IssueUrlParams): string {
  * Build a GitHub "create file" URL (for PR-based creation).
  */
 export function buildPRUrl(params: PRUrlParams): string {
-  const url = new URL(`${BASE_URL}/new/main`);
+  const branch = params.branch || 'main';
+  const url = new URL(`${BASE_URL}/new/${branch}`);
   url.searchParams.set('filename', params.filename);
   url.searchParams.set('value', params.value);
   if (params.message) url.searchParams.set('message', params.message);
