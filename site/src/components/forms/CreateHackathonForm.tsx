@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { buildPRUrl, openGitHubUrl } from '@/lib/github-url';
 import { formatYaml } from './form-utils';
+import { TimelineEditor, DEFAULT_STAGES, type Stage } from './TimelineEditor';
 
 interface CreateHackathonFormProps {
   templates: Record<string, unknown>;
@@ -35,15 +36,6 @@ const TYPE_OPTIONS = [
   { value: 'youth-league', zh: '青年联赛', en: 'Youth League', desc_zh: '面向青年开发者的竞赛', desc_en: 'Competition for young developers' },
 ];
 
-const TIMELINE_STAGES = ['registration', 'development', 'submission', 'judging', 'announcement'] as const;
-const TIMELINE_LABELS: Record<string, { zh: string; en: string }> = {
-  registration: { zh: '报名', en: 'Registration' },
-  development: { zh: '开发', en: 'Development' },
-  submission: { zh: '提交', en: 'Submission' },
-  judging: { zh: '评审', en: 'Judging' },
-  announcement: { zh: '公告', en: 'Announcement' },
-};
-
 const STEP_LABELS_ZH = ['类型', '基本信息', '组织者', '时间线', '赛道', '法律', '设置', '预览'];
 const STEP_LABELS_EN = ['Type', 'Basic Info', 'Organizers', 'Timeline', 'Tracks', 'Legal', 'Settings', 'Preview'];
 const TOTAL_STEPS = 8;
@@ -71,9 +63,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
   const [organizers, setOrganizers] = useState<Organizer[]>([{ name: '', name_zh: '', role: 'organizer' }]);
 
   // Step 3: Timeline
-  const [timeline, setTimeline] = useState<Record<string, { start: string; end: string }>>(
-    Object.fromEntries(TIMELINE_STAGES.map(s => [s, { start: '', end: '' }]))
-  );
+  const [timelineStages, setTimelineStages] = useState<Stage[]>(DEFAULT_STAGES);
 
   // Step 4: Tracks
   const [tracks, setTracks] = useState<TrackData[]>([{
@@ -113,11 +103,6 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
   }
   function updateOrganizer(idx: number, field: keyof Organizer, value: string) {
     setOrganizers(prev => { const n = [...prev]; n[idx] = { ...n[idx], [field]: value }; return n; });
-  }
-
-  // Timeline helpers
-  function updateTimeline(stage: string, field: 'start' | 'end', value: string) {
-    setTimeline(prev => ({ ...prev, [stage]: { ...prev[stage], [field]: value } }));
   }
 
   // Track helpers
@@ -162,10 +147,9 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
   // Build YAML
   const yamlContent = useMemo(() => {
     const timelineObj: Record<string, unknown> = {};
-    for (const stage of TIMELINE_STAGES) {
-      const s = timeline[stage];
-      if (s.start || s.end) {
-        timelineObj[stage] = { start: s.start || undefined, end: s.end || undefined };
+    for (const stage of timelineStages) {
+      if (stage.start || stage.end) {
+        timelineObj[stage.key] = { start: stage.start || undefined, end: stage.end || undefined };
       }
     }
 
@@ -230,7 +214,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
       },
     };
     return formatYaml(data);
-  }, [name, nameZh, slug, tagline, taglineZh, hackathonType, organizers, timeline, tracks, license, ipOwnership, ndaRequired, ndaDocUrl, ndaSummary, langOptions, publicVote, eligibilityOpen, teamMin, teamMax, allowSolo]);
+  }, [name, nameZh, slug, tagline, taglineZh, hackathonType, organizers, timelineStages, tracks, license, ipOwnership, ndaRequired, ndaDocUrl, ndaSummary, langOptions, publicVote, eligibilityOpen, teamMin, teamMax, allowSolo]);
 
   function handleSubmit() {
     const finalSlug = slug || toSlug(name);
@@ -389,29 +373,13 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {step === 3 && (
           <>
             <p className="text-sm text-muted mb-2">
-              {t('设置各阶段的时间范围（ISO 8601 格式）', 'Set date ranges for each stage (ISO 8601)')}
+              {t('点击阶段块设置日期，可以添加或删除阶段', 'Click stage blocks to set dates. Add or remove stages as needed.')}
             </p>
-            <div className="space-y-4">
-              {TIMELINE_STAGES.map(stage => (
-                <div key={stage} className="space-y-2">
-                  <p className="text-sm text-white font-medium">{TIMELINE_LABELS[stage][lang]}</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-xs text-muted mb-1">{t('开始', 'Start')}</label>
-                      <input type="datetime-local" value={timeline[stage].start.replace('Z', '')}
-                        onChange={e => updateTimeline(stage, 'start', e.target.value ? e.target.value + 'Z' : '')}
-                        className={inputClass} />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-muted mb-1">{t('结束', 'End')}</label>
-                      <input type="datetime-local" value={timeline[stage].end.replace('Z', '')}
-                        onChange={e => updateTimeline(stage, 'end', e.target.value ? e.target.value + 'Z' : '')}
-                        className={inputClass} />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <TimelineEditor
+              lang={lang}
+              value={timelineStages}
+              onChange={setTimelineStages}
+            />
           </>
         )}
 
