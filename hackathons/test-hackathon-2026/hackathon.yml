@@ -1,0 +1,41 @@
+synnovator_version: "2.0"
+hackathon:
+  name: "Test Hackathon 2026"
+  name_zh: "2026 测试黑客松"
+  slug: "test-hackathon-2026"
+  type: "community"
+  organizers:
+    - name: "OneSyn.ai"
+      name_zh: "智道元生"
+      role: "organizer"
+  eligibility:
+    open_to: "all"
+    team_size:
+      min: 3
+      max: 5
+    allow_solo: true
+  legal:
+    license: "Apache-2.0"
+    ip_ownership: "participant"
+  tracks:
+    - name: "AAA"
+      name_zh: "AAA"
+      slug: "a"
+      rewards:
+      - type: "prize"
+      rank: "1st"
+      amount: "$1,000"
+      judging:
+      mode: "weighted"
+      criteria:
+      - name: "送三新鲜度nnovation"
+      weight: 0.3
+      score_range:
+      - name: "cccc"
+      weight: 0.1
+      score_range:
+  settings:
+    language:
+      - "zh"
+      - "en"
+    public_vote: "reactions"
