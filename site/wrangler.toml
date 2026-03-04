@@ -8,7 +8,7 @@ binding = "ASSETS"
 directory = "./dist"
 
 [vars]
-SITE_URL = "https://home.synnovator.space"
+SITE_URL = "http://localhost:4321"
 GITHUB_CLIENT_ID = "Iv23liQaa34mwXMU912V"
 GITHUB_OWNER = "Synnovator"
 GITHUB_REPO = "monorepo"
