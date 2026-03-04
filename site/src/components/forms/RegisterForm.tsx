@@ -58,7 +58,18 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
         { headers: { Accept: 'application/vnd.github.v3.raw' } }
       );
 
-      if (!ghRes.ok) throw new Error('Failed to fetch profile');
+      if (!ghRes.ok) {
+        if (ghRes.status === 404) {
+          throw new Error(t(
+            `GitHub 上未找到 Profile 文件 (${profilePath})，请确认 PR 已合并`,
+            `Profile file not found on GitHub (${profilePath}). Make sure your profile PR is merged.`
+          ));
+        }
+        throw new Error(t(
+          `GitHub API 请求失败 (${ghRes.status})`,
+          `GitHub API request failed (${ghRes.status})`
+        ));
+      }
 
       let profileContent = await ghRes.text();
 
@@ -104,8 +115,9 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
         message: `feat(profiles): ${user.login} registers for ${hackathonSlug}`,
       });
       openGitHubUrl(url);
-    } catch {
-      setError(t('操作失败，请重试', 'Operation failed, please try again'));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : t('操作失败，请重试', 'Operation failed, please try again');
+      setError(msg);
     }
     setSubmitting(false);
   }

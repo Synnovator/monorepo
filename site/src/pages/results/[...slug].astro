@@ -21,7 +21,7 @@ const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
 const showResults = ['announcement', 'award', 'ended'].includes(stage);
 
 // Load results JSON files
-const resultsDir = path.resolve(`hackathons/${h.slug}/results`);
+const resultsDir = path.resolve(`../hackathons/${h.slug}/results`);
 let trackResults: Array<{ track: string; data: any }> = [];
 if (showResults && fs.existsSync(resultsDir)) {
   const files = fs.readdirSync(resultsDir).filter(f => f.endsWith('.json'));
