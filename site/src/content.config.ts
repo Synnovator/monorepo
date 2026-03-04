@@ -234,6 +234,17 @@ const profiles = defineCollection({
         expertise: z.array(z.string()).optional(),
         conflict_declaration: z.string().optional(),
       }).optional(),
+      nda_signed: z.array(z.object({
+        hackathon: z.string(),
+        signed_at: z.string(),
+      })).optional(),
+      registrations: z.array(z.object({
+        hackathon: z.string(),
+        track: z.string(),
+        role: z.string(),
+        team: z.string().optional(),
+        registered_at: z.string(),
+      })).optional(),
     }),
   }),
 });
