@@ -1,0 +1,28 @@
+synnovator_profile: "2.0"
+hacker:
+  github: "allenwoods"
+  name: "Allen Woods"
+  name_zh: "林大猫"
+  location: "北京"
+  languages:
+    - "zh"
+    - "en"
+  identity:
+    type: "professional"
+    affiliation: "智道元生"
+  skills:
+    - category: "AI"
+      items:
+      - "Python"
+      - "C++"
+      - "Rust"
+      - "VibeCoding"
+    - category: "Finance"
+      items:
+      - "花钱"
+  interests:
+    - "AI Agent Developement"
+  looking_for:
+    roles:
+      - "Tech Leader"
+    team_size: "3"
