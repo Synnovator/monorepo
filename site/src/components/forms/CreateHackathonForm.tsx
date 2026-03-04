@@ -53,7 +53,7 @@ function toSlug(name: string): string {
 }
 
 export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
-  const { user, loading, isLoggedIn } = useAuth();
+  const { loading, isLoggedIn } = useAuth();
   const [step, setStep] = useState(0);
 
   // Step 0: Type
