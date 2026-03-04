@@ -1,9 +1,10 @@
 import { useAuth } from '@/hooks/useAuth';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
 export function OAuthButton() {
   const { user, loading, isLoggedIn } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [navigating, setNavigating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -15,6 +16,23 @@ export function OAuthButton() {
     document.addEventListener('click', handleClick);
     return () => document.removeEventListener('click', handleClick);
   }, []);
+
+  const handleMyProfile = useCallback(async () => {
+    if (!user || navigating) return;
+    setNavigating(true);
+    try {
+      const res = await fetch(`/api/check-profile?username=${encodeURIComponent(user.login)}`);
+      const data: { exists: boolean; slug: string | null } = await res.json();
+      if (data.exists && data.slug) {
+        window.location.href = `/hackers/${data.slug}/`;
+      } else {
+        window.location.href = `/create-profile?github=${encodeURIComponent(user.login)}`;
+      }
+    } catch {
+      // Fallback to create-profile on error
+      window.location.href = `/create-profile?github=${encodeURIComponent(user!.login)}`;
+    }
+  }, [user, navigating]);
 
   if (loading) {
     return <div className="w-8 h-8 rounded-full bg-secondary-bg animate-pulse" />;
@@ -39,8 +57,13 @@ export function OAuthButton() {
       </button>
       {dropdownOpen && (
         <div className="absolute right-0 top-full mt-2 w-48 rounded-lg border border-secondary-bg bg-dark-bg shadow-xl py-1 z-50">
-          <a href={`/hackers/${user!.login}`} className="block px-4 py-2 text-sm text-light-gray hover:bg-secondary-bg hover:text-white transition-colors">My Profile</a>
-          <a href="/create-profile" className="block px-4 py-2 text-sm text-light-gray hover:bg-secondary-bg hover:text-white transition-colors">Create Profile</a>
+          <button
+            onClick={handleMyProfile}
+            disabled={navigating}
+            className="block w-full text-left px-4 py-2 text-sm text-light-gray hover:bg-secondary-bg hover:text-white transition-colors disabled:opacity-50"
+          >
+            {navigating ? 'Loading...' : 'My Profile'}
+          </button>
           <a href="/api/auth/logout" className="block px-4 py-2 text-sm text-light-gray hover:bg-secondary-bg hover:text-white transition-colors">Sign Out</a>
         </div>
       )}
