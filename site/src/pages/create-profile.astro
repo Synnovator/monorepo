@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProfileCreateForm from '../components/forms/ProfileCreateForm';
+---
+
+<BaseLayout title="Create Profile" description="Create your Synnovator hacker profile">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-3xl font-heading font-bold text-white mb-8">Create Your Profile</h1>
+    <ProfileCreateForm client:load lang="zh" />
+  </div>
+</BaseLayout>
