@@ -3,11 +3,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Timeline from '../../components/Timeline.astro';
 import TrackSection from '../../components/TrackSection.astro';
 import JudgeCard from '../../components/JudgeCard.astro';
-import FAQAccordion from '../../components/FAQAccordion.astro';
+import FAQAccordion from '../../components/FAQAccordion';
 import EventCalendar from '../../components/EventCalendar.astro';
 import GitHubRedirect from '../../components/GitHubRedirect.astro';
-import ScoreCard from '../../components/ScoreCard.astro';
-import DatasetDownload from '../../components/DatasetDownload.astro';
+import ScoreCard from '../../components/ScoreCard';
+import DatasetDownload from '../../components/DatasetDownload';
 import ProjectCard from '../../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 import { t, localize, getCurrentStage } from '../../lib/i18n';
@@ -176,7 +176,7 @@ if (fs.existsSync(submissionsDir)) {
         {h.datasets && h.datasets.length > 0 && (
           <section>
             <h2 class="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.datasets')}</h2>
-            <DatasetDownload datasets={h.datasets} hackathonSlug={h.slug} lang={lang} />
+            <DatasetDownload client:visible datasets={h.datasets} hackathonSlug={h.slug} lang={lang} />
           </section>
         )}
 
@@ -245,7 +245,7 @@ if (fs.existsSync(submissionsDir)) {
         {h.faq && h.faq.length > 0 && (
           <section>
             <h2 class="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.faq')}</h2>
-            <FAQAccordion items={h.faq} lang={lang} />
+            <FAQAccordion client:visible items={h.faq} lang={lang} />
           </section>
         )}
 
@@ -257,6 +257,7 @@ if (fs.existsSync(submissionsDir)) {
                 {t(lang, 'score.title')} — {localize(lang, track.name, track.name_zh)}
               </h2>
               <ScoreCard
+                client:visible
                 hackathonSlug={h.slug}
                 trackSlug={track.slug}
                 criteria={track.judging.criteria}
