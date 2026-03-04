@@ -12,6 +12,23 @@ export interface Session {
 const COOKIE_NAME = 'session';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
+/**
+ * Derive cookie Domain attribute for cross-subdomain sharing.
+ * On *.workers.dev or *.pages.dev, returns the registrable domain
+ * so cookies are shared across preview subdomains.
+ * Returns undefined for custom domains (cookie scoped to exact host).
+ */
+export function getCookieDomain(hostname: string): string | undefined {
+  if (hostname.endsWith('.workers.dev')) {
+    // e.g. "abc-synnovator.allenwoods.workers.dev" → "allenwoods.workers.dev"
+    return hostname.split('.').slice(-3).join('.');
+  }
+  if (hostname.endsWith('.pages.dev')) {
+    return hostname.split('.').slice(-3).join('.');
+  }
+  return undefined;
+}
+
 async function deriveKey(secret: string): Promise<CryptoKey> {
   const encoder = new TextEncoder();
   const keyMaterial = await crypto.subtle.importKey(
@@ -67,18 +84,20 @@ export async function decrypt(token: string, secret: string): Promise<Session | 
   }
 }
 
-export function setSessionCookie(headers: Headers, token: string): void {
-  headers.append(
-    'Set-Cookie',
-    `${COOKIE_NAME}=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}`,
-  );
+export function setSessionCookie(headers: Headers, token: string, cookieDomain?: string): void {
+  let cookie = `${COOKIE_NAME}=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}`;
+  if (cookieDomain) {
+    cookie += `; Domain=${cookieDomain}`;
+  }
+  headers.append('Set-Cookie', cookie);
 }
 
-export function clearSessionCookie(headers: Headers): void {
-  headers.append(
-    'Set-Cookie',
-    `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`,
-  );
+export function clearSessionCookie(headers: Headers, cookieDomain?: string): void {
+  let cookie = `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+  if (cookieDomain) {
+    cookie += `; Domain=${cookieDomain}`;
+  }
+  headers.append('Set-Cookie', cookie);
 }
 
 export function getSessionCookie(request: Request): string | null {
@@ -91,4 +110,52 @@ export async function getSession(request: Request, secret: string): Promise<Sess
   const token = getSessionCookie(request);
   if (!token) return null;
   return decrypt(token, secret);
+}
+
+/**
+ * Validate redirect URLs to prevent open redirect attacks.
+ * Allows: relative paths, home.synnovator.space, *.workers.dev, *.pages.dev
+ */
+const ALLOWED_REDIRECT_PATTERNS = [
+  /^\/(?!\/)/,  // relative paths (but not protocol-relative //evil.com)
+  /^https:\/\/home\.synnovator\.space(\/|$)/,
+  /^https:\/\/([a-z0-9-]+-)?synnovator\.allenwoods\.workers\.dev(\/|$)/,
+  /^https:\/\/([a-z0-9-]+\.)?synnovator\.pages\.dev(\/|$)/,
+];
+
+export function isAllowedRedirect(url: string): boolean {
+  return ALLOWED_REDIRECT_PATTERNS.some((p) => p.test(url));
+}
+
+/** Check if hostname is a preview deployment (prefix before "synnovator"). */
+export function isPreviewHost(hostname: string): boolean {
+  // *-synnovator.allenwoods.workers.dev (Workers preview)
+  if (/^[a-z0-9-]+-synnovator\.allenwoods\.workers\.dev$/.test(hostname)) return true;
+  // *.synnovator.pages.dev but NOT synnovator.pages.dev itself (Pages preview)
+  if (hostname.endsWith('.synnovator.pages.dev') && hostname !== 'synnovator.pages.dev') return true;
+  return false;
+}
+
+type OAuthEnv = {
+  GITHUB_CLIENT_ID: string;
+  GITHUB_CLIENT_SECRET: string;
+  PREVIEW_GITHUB_CLIENT_ID?: string;
+  PREVIEW_GITHUB_CLIENT_SECRET?: string;
+  SITE_URL: string;
+  PREVIEW_SITE_URL?: string;
+};
+
+/**
+ * Select OAuth credentials.
+ * `preview` flag is passed explicitly (from state parameter) because the
+ * callback always lands on the production hostname, not the preview URL.
+ */
+export function getOAuthConfig(preview: boolean, env: OAuthEnv): {
+  clientId: string; clientSecret: string; siteUrl: string;
+} {
+  return {
+    clientId: (preview && env.PREVIEW_GITHUB_CLIENT_ID) || env.GITHUB_CLIENT_ID,
+    clientSecret: (preview && env.PREVIEW_GITHUB_CLIENT_SECRET) || env.GITHUB_CLIENT_SECRET,
+    siteUrl: (preview && env.PREVIEW_SITE_URL) || env.SITE_URL,
+  };
 }

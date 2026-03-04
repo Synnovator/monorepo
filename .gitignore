@@ -22,5 +22,8 @@ node_modules/
 dist/
 .astro/
 
+# Cloudflare local dev secrets
+.dev.vars
+
 # Logs
 *.log

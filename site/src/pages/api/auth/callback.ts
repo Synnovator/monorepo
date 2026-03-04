@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { encrypt, setSessionCookie } from '../../../lib/auth';
+import { encrypt, setSessionCookie, getCookieDomain, isAllowedRedirect, getOAuthConfig } from '../../../lib/auth';
 
 export const prerender = false;
 
@@ -7,11 +7,20 @@ export const GET: APIRoute = async ({ request, locals }) => {
   const { env } = locals.runtime;
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
-  const returnTo = url.searchParams.get('state') || '/';
+  const rawState = url.searchParams.get('state') || '/';
+
+  // Parse preview flag encoded by login.ts
+  const preview = rawState.startsWith('preview:');
+  const rawReturnTo = preview ? rawState.slice(8) : rawState;
+
+  // Validate redirect target to prevent open redirect
+  const returnTo = isAllowedRedirect(rawReturnTo) ? rawReturnTo : '/';
 
   if (!code) {
     return new Response('Missing code parameter', { status: 400 });
   }
+
+  const { clientId, clientSecret, siteUrl } = getOAuthConfig(preview, env);
 
   const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
     method: 'POST',
@@ -20,16 +29,14 @@ export const GET: APIRoute = async ({ request, locals }) => {
       Accept: 'application/json',
     },
     body: JSON.stringify({
-      client_id: env.GITHUB_CLIENT_ID,
-      client_secret: env.GITHUB_CLIENT_SECRET,
+      client_id: clientId,
+      client_secret: clientSecret,
       code,
     }),
   });
 
   const tokenData = (await tokenRes.json()) as { access_token?: string; error?: string };
   if (!tokenData.access_token) {
-    // Redirect back to login on failure (e.g. expired code) instead of showing raw error
-    const siteUrl = env.SITE_URL || 'https://synnovator.pages.dev';
     const loginUrl = `${siteUrl}/api/auth/login?returnTo=${encodeURIComponent(returnTo)}`;
     return new Response(null, { status: 302, headers: { Location: loginUrl } });
   }
@@ -53,7 +60,8 @@ export const GET: APIRoute = async ({ request, locals }) => {
     env.AUTH_SECRET,
   );
 
+  const cookieDomain = getCookieDomain(url.hostname);
   const headers = new Headers({ Location: returnTo });
-  setSessionCookie(headers, token);
+  setSessionCookie(headers, token, cookieDomain);
   return new Response(null, { status: 302, headers });
 };

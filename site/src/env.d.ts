@@ -8,6 +8,9 @@ declare module '*.yml' {
 type Runtime = import('@astrojs/cloudflare').Runtime<{
   GITHUB_CLIENT_ID: string;
   GITHUB_CLIENT_SECRET: string;
+  PREVIEW_GITHUB_CLIENT_ID?: string;
+  PREVIEW_GITHUB_CLIENT_SECRET?: string;
+  PREVIEW_SITE_URL?: string;
   AUTH_SECRET: string;
   R2_ACCESS_KEY_ID: string;
   R2_SECRET_ACCESS_KEY: string;
