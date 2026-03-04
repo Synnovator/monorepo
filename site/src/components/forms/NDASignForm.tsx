@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { buildIssueUrl, openGitHubUrl } from '@/lib/github-url';
+import { buildPRUrl, openGitHubUrl, GITHUB_ORG, GITHUB_REPO } from '@/lib/github-url';
 
 interface NDASignFormProps {
   hackathonSlug: string;
@@ -12,6 +12,8 @@ interface NDASignFormProps {
 export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }: NDASignFormProps) {
   const { user, loading, isLoggedIn } = useAuth();
   const [checks, setChecks] = useState([false, false, false]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const t = (zh: string, en: string) => lang === 'zh' ? zh : en;
   const allChecked = checks.every(Boolean);
@@ -20,18 +22,72 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
     setChecks(prev => { const next = [...prev]; next[idx] = !next[idx]; return next; });
   }
 
-  function handleSubmit() {
-    if (!user || !allChecked) return;
-    const url = buildIssueUrl({
-      template: 'nda-sign.yml',
-      title: `[NDA] ${user.login} — ${hackathonSlug}`,
-      labels: ['nda-sign'],
-      fields: {
-        hackathon: hackathonSlug,
-        github: user.login,
-      },
-    });
-    openGitHubUrl(url);
+  async function handleSubmit() {
+    if (!user || !allChecked || submitting) return;
+    setSubmitting(true);
+    setError('');
+
+    try {
+      // Check profile exists
+      const res = await fetch(`/api/check-profile?username=${encodeURIComponent(user.login)}`);
+      const profileCheck = await res.json();
+
+      if (!profileCheck.exists || !profileCheck.slug) {
+        setError(t(
+          '请先创建 Profile，然后再签署 NDA',
+          'Please create your profile first before signing NDA'
+        ));
+        setSubmitting(false);
+        return;
+      }
+
+      // Fetch current profile content from GitHub API (public raw)
+      const profilePath = `profiles/${profileCheck.slug}.yml`;
+      const ghRes = await fetch(
+        `https://api.github.com/repos/${GITHUB_ORG}/${GITHUB_REPO}/contents/${profilePath}`,
+        { headers: { Accept: 'application/vnd.github.v3.raw' } }
+      );
+
+      if (!ghRes.ok) {
+        throw new Error('Failed to fetch profile');
+      }
+
+      let profileContent = await ghRes.text();
+
+      // Append nda_signed entry
+      const ndaEntry = [
+        '',
+        '  nda_signed:',
+        `    - hackathon: "${hackathonSlug}"`,
+        `      signed_at: "${new Date().toISOString()}"`,
+      ].join('\n');
+
+      // Check if nda_signed already exists in the profile
+      if (profileContent.includes('nda_signed:')) {
+        // Append to existing nda_signed array
+        const insertEntry = [
+          `    - hackathon: "${hackathonSlug}"`,
+          `      signed_at: "${new Date().toISOString()}"`,
+        ].join('\n');
+        profileContent = profileContent.replace(
+          /nda_signed:\n/,
+          `nda_signed:\n${insertEntry}\n`
+        );
+      } else {
+        // Add nda_signed section at the end
+        profileContent = profileContent.trimEnd() + '\n' + ndaEntry + '\n';
+      }
+
+      const url = buildPRUrl({
+        filename: profilePath,
+        value: profileContent,
+        message: `feat(profiles): ${user.login} signs NDA for ${hackathonSlug}`,
+      });
+      openGitHubUrl(url);
+    } catch {
+      setError(t('操作失败，请重试', 'Operation failed, please try again'));
+    }
+    setSubmitting(false);
   }
 
   const checkboxLabels = [
@@ -64,10 +120,20 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
         </a>
       )}
 
-      {/* Login prompt */}
       {!loading && !isLoggedIn && (
         <div className="p-3 rounded-lg bg-secondary-bg text-muted text-sm">
           {t('请先登录后再签署 NDA', 'Please sign in to sign the NDA')}
+        </div>
+      )}
+
+      {error && (
+        <div className="p-3 rounded-lg bg-error/10 border border-error/30 text-error text-sm">
+          {error}
+          {error.includes('Profile') && (
+            <a href="/create-profile" className="ml-2 text-lime-primary hover:underline">
+              {t('创建 Profile', 'Create Profile')}
+            </a>
+          )}
         </div>
       )}
 
@@ -88,10 +154,12 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
 
         <button
           onClick={handleSubmit}
-          disabled={!allChecked}
+          disabled={!allChecked || submitting}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary/20 text-lime-primary text-sm hover:bg-lime-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {t('前往 GitHub 签署 NDA', 'Sign NDA on GitHub')} →
+          {submitting
+            ? t('处理中...', 'Processing...')
+            : t('签署 NDA 并创建 PR', 'Sign NDA & Create PR')} →
         </button>
       </fieldset>
     </div>
