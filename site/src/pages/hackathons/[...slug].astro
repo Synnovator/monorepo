@@ -1,4 +1,5 @@
 ---
+export const prerender = false;
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Timeline from '../../components/Timeline.astro';
 import TrackSection from '../../components/TrackSection.astro';
@@ -16,7 +17,7 @@ import AppealForm from '../../components/forms/AppealForm';
 import TeamFormationForm from '../../components/forms/TeamFormationForm';
 import { RocketIcon, ClipboardListIcon, ShieldCheckIcon } from '../../components/icons';
 import { getCollection } from 'astro:content';
-import { t, localize, getCurrentStage } from '../../lib/i18n';
+import { t, localize, getCurrentStage, getLangFromUrl } from '../../lib/i18n';
 import type { Lang } from '../../lib/i18n';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -31,7 +32,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const h = entry.data.hackathon;
-const lang: Lang = 'zh';
+const lang: Lang = getLangFromUrl(Astro.url);
 const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
 
 // Load submissions from content collection
@@ -90,7 +91,7 @@ const formTracks = (h.tracks ?? []).map((tr: any) => ({
 }));
 ---
 
-<BaseLayout title={localize(lang, h.name, h.name_zh)} description={localize(lang, h.tagline, h.tagline_zh)}>
+<BaseLayout title={localize(lang, h.name, h.name_zh)} description={localize(lang, h.tagline, h.tagline_zh)} lang={lang}>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
     {/* --- Hero --- */}
@@ -289,7 +290,7 @@ const formTracks = (h.tracks ?? []).map((tr: any) => ({
               {(['registration', 'development'].includes(stage)) && (
                 <section id="team-formation-section">
                   <h2 class="text-xl font-heading font-bold text-white mb-4">
-                    {lang === 'zh' ? '组队 / 寻找队友' : 'Team Formation'}
+                    {t(lang, 'hackathon.team_formation')}
                   </h2>
                   <TeamFormationForm
                     client:visible
@@ -398,9 +399,9 @@ const formTracks = (h.tracks ?? []).map((tr: any) => ({
                         {trackInfo ? localize(lang, trackInfo.name, trackInfo.name_zh) : track}
                       </h2>
                       <div class="text-xs text-muted mb-4">
-                        {lang === 'zh' ? '计算时间' : 'Calculated'}: {new Date(data.calculated_at).toLocaleString()} ·
-                        {data.total_judges} {lang === 'zh' ? '位评委' : 'judges'} ·
-                        {data.total_teams} {lang === 'zh' ? '支队伍' : 'teams'}
+                        {t(lang, 'result.calculated')}: {new Date(data.calculated_at).toLocaleString()} ·
+                        {data.total_judges} {t(lang, 'result.judges_count')} ·
+                        {data.total_teams} {t(lang, 'result.teams_count')}
                       </div>
                       <div class="overflow-x-auto">
                         <table class="w-full text-sm">

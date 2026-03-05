@@ -3,6 +3,14 @@ import enData from '../i18n/en.yml';
 
 export type Lang = 'zh' | 'en';
 
+/**
+ * Get language from URL search params. Defaults to 'zh' when missing or not 'en'.
+ */
+export function getLangFromUrl(url: URL): Lang {
+  const lang = url.searchParams.get('lang');
+  return lang === 'en' ? 'en' : 'zh';
+}
+
 const translations: Record<Lang, Record<string, unknown>> = {
   zh: zhData as Record<string, unknown>,
   en: enData as Record<string, unknown>,

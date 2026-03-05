@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { buildIssueUrl, openGitHubUrl } from '@/lib/github-url';
+import { t } from '@/lib/i18n';
+import type { Lang } from '@/lib/i18n';
 import type { Track } from './form-utils';
 
 interface TeamFormationFormProps {
   hackathonSlug: string;
   tracks: Track[];
-  lang: 'zh' | 'en';
+  lang: Lang;
 }
 
 interface Member {
@@ -27,8 +29,6 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
   const [members, setMembers] = useState<Member[]>([{ github: '', role: '' }]);
   const [lookingFor, setLookingFor] = useState('');
   const [projectIdea, setProjectIdea] = useState('');
-
-  const t = (zh: string, en: string) => lang === 'zh' ? zh : en;
 
   function addMember() {
     setMembers(prev => [...prev, { github: '', role: '' }]);
@@ -72,19 +72,19 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
   return (
     <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6">
       <h3 className="text-lg font-heading font-bold text-white mb-6">
-        {t('组队 / 寻找队友', 'Team Formation')}
+        {t(lang, 'form.team.title')}
       </h3>
 
       {!loading && !isLoggedIn && (
         <div className="mb-6 p-4 rounded-lg bg-warning/10 border border-warning/30">
-          <p className="text-warning text-sm">{t('请先登录', 'Please sign in first')}</p>
+          <p className="text-warning text-sm">{t(lang, 'form.team.sign_in_first')}</p>
         </div>
       )}
 
       <fieldset disabled={!isLoggedIn || loading} className="space-y-5">
         {/* Team name */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t('队伍名称', 'Team Name')}</label>
+          <label className="block text-sm text-muted mb-2">{t(lang, 'form.team.team_name')}</label>
           <input type="text" value={teamNameVal} onChange={e => setTeamNameVal(e.target.value)}
             placeholder="team-alpha"
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none" />
@@ -92,10 +92,10 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
 
         {/* Track */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t('赛道', 'Track')}</label>
+          <label className="block text-sm text-muted mb-2">{t(lang, 'form.team.track')}</label>
           <select value={track} onChange={e => setTrack(e.target.value)}
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
-            <option value="">{t('请选择赛道', 'Select a track')}</option>
+            <option value="">{t(lang, 'form.team.select_track')}</option>
             {tracks.map(tr => (
               <option key={tr.slug} value={tr.slug}>
                 {lang === 'zh' && tr.name_zh ? tr.name_zh : tr.name}
@@ -106,10 +106,10 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
 
         {/* Purpose */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t('目的', 'Purpose')}</label>
+          <label className="block text-sm text-muted mb-2">{t(lang, 'form.team.purpose')}</label>
           <select value={purpose} onChange={e => setPurpose(e.target.value)}
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
-            <option value="">{t('请选择', 'Select purpose')}</option>
+            <option value="">{t(lang, 'form.team.select_purpose')}</option>
             {PURPOSES.map(p => (
               <option key={p.value} value={p.value}>
                 {lang === 'zh' ? p.zh : p.en}
@@ -120,7 +120,7 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
 
         {/* Members */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t('成员', 'Members')}</label>
+          <label className="block text-sm text-muted mb-2">{t(lang, 'form.team.members')}</label>
           <div className="space-y-2">
             {members.map((m, idx) => (
               <div key={idx} className="flex gap-2">
@@ -128,7 +128,7 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
                   placeholder="GitHub username"
                   className="flex-1 bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none" />
                 <input type="text" value={m.role} onChange={e => updateMember(idx, 'role', e.target.value)}
-                  placeholder={t('角色', 'Role')}
+                  placeholder={t(lang, 'form.team.role')}
                   className="w-32 bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none" />
                 {members.length > 1 && (
                   <button type="button" onClick={() => removeMember(idx)}
@@ -139,32 +139,32 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
           </div>
           <button type="button" onClick={addMember}
             className="mt-2 text-sm text-lime-primary hover:text-lime-primary/80 transition-colors">
-            + {t('添加成员', 'Add member')}
+            + {t(lang, 'form.team.add_member')}
           </button>
         </div>
 
         {/* Looking for */}
         {purpose === 'looking' && (
           <div>
-            <label className="block text-sm text-muted mb-2">{t('期望技能/角色', 'Looking for (skills/roles)')}</label>
+            <label className="block text-sm text-muted mb-2">{t(lang, 'form.team.looking_for')}</label>
             <textarea value={lookingFor} onChange={e => setLookingFor(e.target.value)}
-              placeholder={t('例如：前端开发、ML 工程师...', 'e.g. Frontend developer, ML engineer...')}
+              placeholder={t(lang, 'form.team.looking_for_placeholder')}
               className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm resize-none h-20 focus:border-lime-primary focus:outline-none" />
           </div>
         )}
 
         {/* Project idea */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t('项目想法', 'Project Idea')} ({t('可选', 'optional')})</label>
+          <label className="block text-sm text-muted mb-2">{t(lang, 'form.team.project_idea')} ({t(lang, 'form.team.optional')})</label>
           <textarea value={projectIdea} onChange={e => setProjectIdea(e.target.value)}
-            placeholder={t('简要描述你的项目想法...', 'Briefly describe your project idea...')}
+            placeholder={t(lang, 'form.team.project_idea_placeholder')}
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm resize-none h-20 focus:border-lime-primary focus:outline-none" />
         </div>
 
         {/* Submit */}
         <button onClick={handleSubmit} disabled={!canSubmit}
           className="w-full bg-lime-primary text-near-black px-6 py-3 rounded-lg font-medium text-sm hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-          {t('前往 GitHub 提交', 'Submit on GitHub')} →
+          {t(lang, 'form.team.submit_github')} →
         </button>
       </fieldset>
     </div>

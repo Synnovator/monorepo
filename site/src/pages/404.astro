@@ -1,12 +1,13 @@
 ---
+export const prerender = false;
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { t } from '../lib/i18n';
+import { t, getLangFromUrl } from '../lib/i18n';
 import type { Lang } from '../lib/i18n';
 
-const lang: Lang = 'zh';
+const lang = getLangFromUrl(Astro.url);
 ---
 
-<BaseLayout title={t(lang, 'common.not_found')}>
+<BaseLayout title={t(lang, 'common.not_found')} lang={lang}>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
     <h1 class="text-6xl font-heading font-bold text-lime-primary mb-4">404</h1>
     <p class="text-xl text-white mb-2">{t(lang, 'common.not_found')}</p>

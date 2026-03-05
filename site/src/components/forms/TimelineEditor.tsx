@@ -1,4 +1,6 @@
 import { useState, useCallback } from 'react';
+import { t } from '@/lib/i18n';
+import type { Lang } from '@/lib/i18n';
 
 interface Stage {
   key: string;
@@ -11,7 +13,7 @@ interface Stage {
 }
 
 interface TimelineEditorProps {
-  lang: 'zh' | 'en';
+  lang: Lang;
   value: Stage[];
   onChange: (stages: Stage[]) => void;
 }
@@ -42,7 +44,6 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [customStageName, setCustomStageName] = useState('');
 
-  const t = (zh: string, en: string) => lang === 'zh' ? zh : en;
   const stages = value.length > 0 ? value : DEFAULT_STAGES;
 
   const updateStage = useCallback((idx: number, field: 'start' | 'end', val: string) => {
@@ -100,7 +101,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
     <div className="space-y-4">
       {/* Preset buttons */}
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-xs text-muted">{t('快捷设置:', 'Presets:')}</span>
+        <span className="text-xs text-muted">{t(lang, 'form.timeline.presets')}</span>
         {PRESETS.map((p, idx) => (
           <button key={idx} type="button" onClick={() => applyPreset(idx)}
             className="text-xs px-3 py-1 rounded-full border border-secondary-bg text-muted hover:border-lime-primary hover:text-lime-primary transition-colors">
@@ -151,12 +152,12 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
               {lang === 'zh' ? stages[editingIdx].labelZh : stages[editingIdx].label}
             </span>
             <button type="button" onClick={() => setEditingIdx(null)} className="text-xs text-muted hover:text-white">
-              {t('关闭', 'Close')}
+              {t(lang, 'form.timeline.close')}
             </button>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-muted mb-1">{t('开始', 'Start')}</label>
+              <label className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.start')}</label>
               <input
                 type="datetime-local"
                 value={stages[editingIdx].start.replace('Z', '')}
@@ -165,7 +166,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
               />
             </div>
             <div>
-              <label className="block text-xs text-muted mb-1">{t('结束', 'End')}</label>
+              <label className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.end')}</label>
               <input
                 type="datetime-local"
                 value={stages[editingIdx].end.replace('Z', '')}
@@ -183,7 +184,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
           type="text"
           value={customStageName}
           onChange={e => setCustomStageName(e.target.value)}
-          placeholder={t('自定义阶段名称', 'Custom stage name')}
+          placeholder={t(lang, 'form.timeline.custom_stage')}
           className="flex-1 bg-surface border border-secondary-bg rounded-md px-3 py-1.5 text-white text-sm focus:border-lime-primary focus:outline-none"
         />
         <button
@@ -192,7 +193,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
           disabled={!customStageName.trim()}
           className="text-sm text-lime-primary hover:text-lime-primary/80 transition-colors disabled:opacity-50"
         >
-          + {t('添加阶段', 'Add stage')}
+          + {t(lang, 'form.timeline.add_stage')}
         </button>
       </div>
     </div>
