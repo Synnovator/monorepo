@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import { t, localize, getLangFromUrl } from '../../../lib/i18n';
 import type { Lang } from '../../../lib/i18n';
 const { hackathon, team } = Astro.params;
@@ -19,7 +19,7 @@ const allReadmes = await getCollection('readmes');
 const readmeEntry = allReadmes.find(r => r.id.startsWith(`${hackathon}/submissions/${team}/`));
 let ReadmeContent: any = null;
 if (readmeEntry) {
-  const rendered = await readmeEntry.render();
+  const rendered = await render(readmeEntry);
   ReadmeContent = rendered.Content;
 }
 
