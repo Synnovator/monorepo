@@ -105,16 +105,16 @@
 
 ---
 
-### Tier 3: Schema 与代码对齐（Backlog）
+### Tier 3: Schema 与代码对齐（进行中）
 
 涉及代码修改，需要单独测试。
 
 #### 3.1 PRD ↔ Zod Schema 对齐
 
-**需决策的问题**:
-- `weight` 字段：统一为 0-1 小数还是 0-100 整数？（推荐小数，与现有数据一致）
-- `judge.expertise`：统一为数组还是字符串？（推荐数组，与 profile schema 一致）
-- `sponsors` 结构：使用 `tier` 还是 `role`？（需确认设计意图）
+**设计决策（已确认）**:
+- `weight` 字段：**小数 0-1**（sum=1.0），与 dishuihu 现有数据一致，enterprise 模板需迁移
+- `judge.expertise`：**统一为数组** `z.array(z.string())`，与 profile schema 一致
+- `sponsors` 结构：**用 `role` 替代 `tier`**，更灵活，支持 `platinum-sponsor`、`enterprise-challenge-partner` 等值
 
 **代码修改**:
 - 为 8 个字段添加 enum 校验（`open_to`、`ip_ownership`、`license`、`judging.mode`、`access_control`、`event.type`、`public_vote`、`multi_track_rule`）
