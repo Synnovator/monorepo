@@ -21,3 +21,11 @@ type Runtime = import('@astrojs/cloudflare').Runtime<{
 declare namespace App {
   interface Locals extends Runtime {}
 }
+
+declare module '*.svg?react' {
+  import type { FunctionComponent, ComponentProps } from 'react';
+  const ReactComponent: FunctionComponent<
+    ComponentProps<'svg'> & { title?: string }
+  >;
+  export default ReactComponent;
+}
