@@ -1,12 +1,13 @@
 import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 import react from '@astrojs/react';
+import mdx from '@astrojs/mdx';
 import tailwindcss from '@tailwindcss/vite';
 import yaml from '@modyfi/vite-plugin-yaml';
 
 export default defineConfig({
   site: 'https://home.synnovator.space',
-  integrations: [react()],
+  integrations: [react(), mdx()],
   adapter: cloudflare({
     platformProxy: { enabled: true },
   }),
