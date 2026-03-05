@@ -119,26 +119,26 @@ hackathon:
         criteria:
           - name: "FRR_metric"
             name_zh: "误拒率指标"
-            weight: 35
+            weight: 0.35
             description: "是否达到<8%目标；距离基线的改善幅度"
             score_range: [0, 100]
             hard_constraint: false
           - name: "Bad_debt_constraint"
             name_zh: "坏账率约束"
-            weight: 25
+            weight: 0.25
             description: "坏账率变化是否在±0.2pp约束内"
             score_range: [0, 100]
             hard_constraint: true
             constraint_rule: "坏账率变化须在 ±0.2pp 以内，超出则本项 0 分"
           - name: "Feasibility"
             name_zh: "技术可行性"
-            weight: 25
+            weight: 0.25
             description: "代码质量、可复现性、部署复杂度"
             score_range: [0, 100]
             hard_constraint: false
           - name: "Completeness"
             name_zh: "完整度"
-            weight: 15
+            weight: 0.15
             description: "文档、视频、说明清晰程度"
             score_range: [0, 100]
             hard_constraint: false
@@ -181,25 +181,25 @@ hackathon:
         criteria:
           - name: "Explanation_quality"
             name_zh: "解释质量"
-            weight: 40
+            weight: 0.40
             description: "语言准确性、业务可读性、Top-3因素完整"
             score_range: [0, 100]
             hard_constraint: false
           - name: "Regulatory_format"
             name_zh: "监管格式适配"
-            weight: 30
+            weight: 0.30
             description: "与《商业银行算法治理指引》对标程度"
             score_range: [0, 100]
             hard_constraint: false
           - name: "Technical_implementation"
             name_zh: "技术实现"
-            weight: 20
+            weight: 0.20
             description: "代码可运行、输出稳定、推理效率"
             score_range: [0, 100]
             hard_constraint: false
           - name: "Completeness"
             name_zh: "完整度"
-            weight: 10
+            weight: 0.10
             description: "文档与交付物完整"
             score_range: [0, 100]
             hard_constraint: false
@@ -222,35 +222,35 @@ hackathon:
       name_zh: "赵文博"
       title: "Chief Review Officer"
       affiliation: "Xinchen FinTech"
-      expertise: "信贷风控，18年"
+      expertise: ["信贷风控"]
       conflict_declaration: ""
     - github: "lin-xiaohui"
       name: "Lin Xiaohui"
       name_zh: "林晓慧"
       title: "Algorithm Lead"
       affiliation: "Xinchen FinTech"
-      expertise: "机器学习，7年"
+      expertise: ["机器学习"]
       conflict_declaration: ""
     - github: "wu-hao"
       name: "Wu Hao"
       name_zh: "吴昊"
       title: "Former Chief Risk Scientist"
       affiliation: "External Expert"
-      expertise: "风控算法，14年"
+      expertise: ["风控算法"]
       conflict_declaration: ""
     - github: "zhang-ruping"
       name: "Zhang Ruping"
       name_zh: "张汝萍"
       title: "Regulatory Compliance Researcher"
       affiliation: "Fintech Regulatory Research Institute"
-      expertise: "算法合规，8年"
+      expertise: ["算法合规"]
       conflict_declaration: ""
     - github: "qian-shining"
       name: "Qian Shining"
       name_zh: "钱世宁"
       title: "Product Director"
       affiliation: "Xinchen FinTech"
-      expertise: "风控产品，5年"
+      expertise: ["风控产品"]
       conflict_declaration: ""
 
   datasets:
