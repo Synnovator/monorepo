@@ -14,6 +14,7 @@ import RegisterForm from '../../components/forms/RegisterForm';
 import NDASignForm from '../../components/forms/NDASignForm';
 import AppealForm from '../../components/forms/AppealForm';
 import TeamFormationForm from '../../components/forms/TeamFormationForm';
+import { RocketIcon, ClipboardListIcon, ShieldCheckIcon } from '../../components/icons';
 import { getCollection } from 'astro:content';
 import { t, localize, getCurrentStage } from '../../lib/i18n';
 import type { Lang } from '../../lib/i18n';
@@ -206,7 +207,10 @@ const formTracks = (h.tracks ?? []).map((tr: any) => ({
               {/* Eligibility */}
               {h.eligibility && (
                 <section>
-                  <h2 class="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.eligibility')}</h2>
+                  <h2 class="text-xl font-heading font-bold text-white mb-4 flex items-center gap-2">
+                    <ClipboardListIcon size={22} className="shrink-0" />
+                    {t(lang, 'hackathon.eligibility')}
+                  </h2>
                   <div class="rounded-lg border border-secondary-bg bg-dark-bg p-6 space-y-3">
                     {h.eligibility.team_size && (
                       <p class="text-sm text-light-gray">
@@ -235,7 +239,10 @@ const formTracks = (h.tracks ?? []).map((tr: any) => ({
               {/* Legal / Compliance */}
               {h.legal && (
                 <section>
-                  <h2 class="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.legal')}</h2>
+                  <h2 class="text-xl font-heading font-bold text-white mb-4 flex items-center gap-2">
+                    <ShieldCheckIcon size={22} className="shrink-0" />
+                    {t(lang, 'hackathon.legal')}
+                  </h2>
                   <div class="rounded-lg border border-secondary-bg bg-dark-bg p-6 space-y-3">
                     {h.legal.license && <p class="text-sm text-light-gray">License: {h.legal.license}</p>}
                     {h.legal.ip_ownership && <p class="text-sm text-light-gray">IP: {h.legal.ip_ownership}</p>}
