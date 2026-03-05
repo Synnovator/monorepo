@@ -4,9 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import CreateProposalForm from '../components/forms/CreateProposalForm';
 import { getLangFromUrl } from '../lib/i18n';
 import type { Lang } from '../lib/i18n';
-import fs from 'node:fs';
-import path from 'node:path';
-import yaml from 'js-yaml';
+import { getCollection } from 'astro:content';
 
 const lang: Lang = getLangFromUrl(Astro.url);
 
@@ -23,34 +21,17 @@ interface HackathonInfo {
   tracks: TrackInfo[];
 }
 
-const hackathonsDir = path.resolve('hackathons');
-const hackathons: HackathonInfo[] = [];
-
-if (fs.existsSync(hackathonsDir)) {
-  const dirs = fs.readdirSync(hackathonsDir, { withFileTypes: true })
-    .filter(d => d.isDirectory());
-
-  for (const dir of dirs) {
-    const ymlPath = path.join(hackathonsDir, dir.name, 'hackathon.yml');
-    if (!fs.existsSync(ymlPath)) continue;
-    try {
-      const raw = fs.readFileSync(ymlPath, 'utf8');
-      const data = yaml.load(raw) as { hackathon?: { slug?: string; name?: string; name_zh?: string; tracks?: TrackInfo[] } };
-      if (data?.hackathon?.slug && data?.hackathon?.name) {
-        hackathons.push({
-          slug: data.hackathon.slug,
-          name: data.hackathon.name,
-          name_zh: data.hackathon.name_zh,
-          tracks: (data.hackathon.tracks || []).map(t => ({
-            name: t.name,
-            name_zh: t.name_zh,
-            slug: t.slug,
-          })),
-        });
-      }
-    } catch { /* skip invalid */ }
-  }
-}
+const allHackathons = await getCollection('hackathons');
+const hackathons: HackathonInfo[] = allHackathons.map(e => ({
+  slug: e.data.hackathon.slug,
+  name: e.data.hackathon.name,
+  name_zh: e.data.hackathon.name_zh,
+  tracks: (e.data.hackathon.tracks || []).map(t => ({
+    name: t.name,
+    name_zh: t.name_zh,
+    slug: t.slug,
+  })),
+}));
 ---
 
 <BaseLayout title="Create Proposal" description="Submit a project proposal to a hackathon" lang={lang}>

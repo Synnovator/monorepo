@@ -4,22 +4,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import CreateHackathonForm from '../components/forms/CreateHackathonForm';
 import { getLangFromUrl } from '../lib/i18n';
 import type { Lang } from '../lib/i18n';
-import fs from 'node:fs';
-import path from 'node:path';
-import yaml from 'js-yaml';
 
 const lang: Lang = getLangFromUrl(Astro.url);
 
-// Load templates at build time
-const templateTypes = ['community', 'enterprise', 'youth-league'] as const;
+// Load templates via Vite static import (resolved at build time, works on Cloudflare)
+const templateModules = import.meta.glob('../../../docs/templates/*/hackathon.yml', { eager: true });
 const templates: Record<string, unknown> = {};
-for (const type of templateTypes) {
-  const templatePath = path.resolve(`docs/templates/${type}/hackathon.yml`);
-  if (fs.existsSync(templatePath)) {
-    try {
-      const raw = fs.readFileSync(templatePath, 'utf8');
-      templates[type] = yaml.load(raw);
-    } catch { /* skip */ }
+for (const [filepath, mod] of Object.entries(templateModules)) {
+  const match = filepath.match(/\/templates\/([^/]+)\/hackathon\.yml$/);
+  if (match) {
+    templates[match[1]] = (mod as any).default;
   }
 }
 ---
