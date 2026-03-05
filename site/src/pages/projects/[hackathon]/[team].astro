@@ -1,7 +1,8 @@
 ---
+export const prerender = false;
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { t, localize } from '../../../lib/i18n';
+import { t, localize, getLangFromUrl } from '../../../lib/i18n';
 import type { Lang } from '../../../lib/i18n';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -23,7 +24,7 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { hackathon, team } = Astro.params;
 const project = entry.data.project;
-const lang: Lang = 'zh';
+const lang: Lang = getLangFromUrl(Astro.url);
 
 // Try to read README.mdx or README.md for rich content
 const readmeMdxPath = path.resolve(`../hackathons/${hackathon}/submissions/${team}/README.mdx`);
@@ -49,6 +50,7 @@ const trackName = hackathonEntry?.data.hackathon.tracks?.find(tr => tr.slug === 
 <BaseLayout
   title={`${localize(lang, project.name, project.name_zh)} — ${hackathonName}`}
   description={localize(lang, project.tagline, project.tagline_zh) || localize(lang, project.name, project.name_zh)}
+  lang={lang}
 >
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { buildIssueUrl } from '@/lib/github-url';
+import { t } from '@/lib/i18n';
+import type { Lang } from '@/lib/i18n';
 
 interface Dataset {
   name: string;
@@ -16,7 +18,7 @@ interface Dataset {
 interface DatasetDownloadProps {
   datasets: Dataset[];
   hackathonSlug: string;
-  lang: 'zh' | 'en';
+  lang: Lang;
 }
 
 function loc(lang: 'zh' | 'en', en?: string, zh?: string): string {
@@ -34,7 +36,7 @@ export function DatasetDownload({ datasets, hackathonSlug, lang }: DatasetDownlo
   );
 }
 
-function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; hackathonSlug: string; lang: 'zh' | 'en' }) {
+function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; hackathonSlug: string; lang: Lang }) {
   const { isLoggedIn } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +61,7 @@ function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; h
         const err = await res.json();
         if (err.error === 'nda_required') {
           setNdaUrl(buildIssueUrl({ template: 'nda-sign.yml', title: `[NDA] --- — ${hackathonSlug}`, labels: ['nda-sign'] }));
-          setError(err.message || (lang === 'zh' ? '请先签署 NDA' : 'Please sign the NDA first'));
+          setError(err.message || t(lang, 'dataset.nda_first'));
         } else {
           setError(err.error || 'Failed to get download link');
         }
@@ -68,7 +70,7 @@ function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; h
       const { url } = await res.json();
       window.open(url, '_blank');
     } catch {
-      setError(lang === 'zh' ? '网络错误，请重试' : 'Network error. Please try again.');
+      setError(t(lang, 'dataset.network_error'));
     } finally {
       setLoading(false);
     }
@@ -86,25 +88,25 @@ function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; h
         {ds.size && <span>Size: {ds.size}</span>}
         {ds.access_control && (
           <span className={isNdaRequired ? 'px-2 py-0.5 rounded bg-warning/20 text-warning' : 'px-2 py-0.5 rounded bg-lime-primary/20 text-lime-primary'}>
-            {isNdaRequired ? (lang === 'zh' ? '需 NDA' : 'NDA Required') : (lang === 'zh' ? '公开' : 'Public')}
+            {isNdaRequired ? t(lang, 'dataset.nda_required') : t(lang, 'dataset.public')}
           </span>
         )}
       </div>
       {ds.download_url ? (
         <a href={ds.download_url} target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg bg-secondary-bg text-white text-sm hover:bg-secondary-bg/80 transition-colors">
-          {lang === 'zh' ? '下载' : 'Download'}
+          {t(lang, 'dataset.download')}
         </a>
       ) : isNdaRequired ? (
         <button onClick={handlePresign} disabled={loading}
           className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg bg-lime-primary/20 text-lime-primary text-sm hover:bg-lime-primary/30 transition-colors cursor-pointer disabled:opacity-50">
-          {loading ? '...' : (lang === 'zh' ? '获取下载链接' : 'Get Download Link')}
+          {loading ? '...' : t(lang, 'dataset.get_download_link')}
         </button>
       ) : null}
       {error && (
         <div className="mt-3 p-3 rounded-lg bg-warning/10 border border-warning/30 text-warning text-sm">
           {error}
-          {ndaUrl && <a href={ndaUrl} target="_blank" rel="noopener" className="underline ml-2 font-medium hover:text-white">{lang === 'zh' ? '→ 签署 NDA' : '→ Sign NDA'}</a>}
+          {ndaUrl && <a href={ndaUrl} target="_blank" rel="noopener" className="underline ml-2 font-medium hover:text-white">{t(lang, 'dataset.sign_nda_link')}</a>}
         </div>
       )}
     </div>

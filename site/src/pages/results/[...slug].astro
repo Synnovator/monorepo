@@ -1,7 +1,8 @@
 ---
+export const prerender = false;
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { t, localize, getCurrentStage } from '../../lib/i18n';
+import { t, localize, getCurrentStage, getLangFromUrl } from '../../lib/i18n';
 import type { Lang } from '../../lib/i18n';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -16,7 +17,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const h = entry.data.hackathon;
-const lang: Lang = 'zh';
+const lang: Lang = getLangFromUrl(Astro.url);
 const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
 const showResults = ['announcement', 'award', 'ended'].includes(stage);
 
@@ -44,6 +45,7 @@ for (const track of (h.tracks || [])) {
 <BaseLayout
   title={`${localize(lang, h.name, h.name_zh)} — ${t(lang, 'result.title')}`}
   description={t(lang, 'result.title')}
+  lang={lang}
 >
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     {/* Back link */}
@@ -73,9 +75,9 @@ for (const track of (h.tracks || [])) {
                 {trackInfo ? localize(lang, trackInfo.name, trackInfo.name_zh) : track}
               </h2>
               <div class="text-xs text-muted mb-4">
-                {lang === 'zh' ? '计算时间' : 'Calculated'}: {new Date(data.calculated_at).toLocaleString()} ·
-                {data.total_judges} {lang === 'zh' ? '位评委' : 'judges'} ·
-                {data.total_teams} {lang === 'zh' ? '支队伍' : 'teams'}
+                {t(lang, 'result.calculated')}: {new Date(data.calculated_at).toLocaleString()} ·
+                {data.total_judges} {t(lang, 'result.judges_count')} ·
+                {data.total_teams} {t(lang, 'result.teams_count')}
               </div>
 
               {/* Rankings table */}
