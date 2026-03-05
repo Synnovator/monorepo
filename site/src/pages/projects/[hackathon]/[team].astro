@@ -32,6 +32,15 @@ const hackathonName = hackathonEntry
 
 // Track name lookup
 const trackName = hackathonEntry?.data.hackathon.tracks?.find(tr => tr.slug === project.track);
+
+// Build github → profile slug map for member links
+const profiles = await getCollection('profiles');
+const githubToProfile = new Map<string, string>();
+for (const p of profiles) {
+  if (p.data.hacker.github) {
+    githubToProfile.set(p.data.hacker.github, p.id);
+  }
+}
 ---
 
 <BaseLayout
@@ -90,25 +99,35 @@ const trackName = hackathonEntry?.data.hackathon.tracks?.find(tr => tr.slug === 
         <section>
           <h3 class="text-sm font-medium text-muted mb-3">{t(lang, 'project.team_members')}</h3>
           <div class="space-y-2">
-            {project.team.map(member => (
-              <a
-                href={`https://github.com/${member.github}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary-bg/50 transition-colors"
-              >
-                <img
-                  src={`https://github.com/${member.github}.png?size=40`}
-                  alt={member.github}
-                  class="w-8 h-8 rounded-full"
-                  loading="lazy"
-                />
-                <div>
-                  <p class="text-white text-sm">{member.github}</p>
-                  {member.role && <p class="text-muted text-xs">{member.role}</p>}
-                </div>
-              </a>
-            ))}
+            {project.team.map(member => {
+              const profileId = githubToProfile.get(member.github);
+              const inner = (
+                <>
+                  <img
+                    src={`https://github.com/${member.github}.png?size=40`}
+                    alt={member.github}
+                    class="w-8 h-8 rounded-full"
+                    loading="lazy"
+                  />
+                  <div>
+                    <p class="text-white text-sm">{member.github}</p>
+                    {member.role && <p class="text-muted text-xs">{member.role}</p>}
+                  </div>
+                </>
+              );
+              return profileId ? (
+                <a
+                  href={`/hackers/${profileId}/`}
+                  class="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary-bg/50 transition-colors"
+                >
+                  {inner}
+                </a>
+              ) : (
+                <span class="flex items-center gap-3 p-2 rounded-lg text-muted/70">
+                  {inner}
+                </span>
+              );
+            })}
           </div>
         </section>
 
