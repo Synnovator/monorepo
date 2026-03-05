@@ -27,6 +27,7 @@
   /* Text Colors */
   --color-muted: #8E8E8E;
   --color-light-gray: #DCDCDC;
+  --color-white: #FFFFFF;
 
   /* === Border Radius === */
   --radius-sm: 4px;
@@ -40,6 +41,27 @@
   --font-body: 'Inter', sans-serif;
   --font-code: 'Poppins', sans-serif;
   --font-zh: 'Noto Sans SC', sans-serif;
+
+  /* === Spacing Tokens === */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 36px;
+
+  /* === Layout Dimensions === */
+  --layout-page-width: 1440px;
+  --layout-search-height: 60px;
+  --layout-nav-width: 168px;
+  --layout-content-width: 856px;
+  --layout-sidebar-width: 328px;
+  --layout-sidebar-height: 720px;
+  --layout-gap-nav-content: 20px;
+  --layout-gap-search-content: 24px;
+  --layout-gap-content-sidebar: 32px;
+  --layout-gap-search-sidebar: 84px;
+  --layout-sidebar-margin: 36px;
 }
 
 /* === shadcn/ui CSS Variables (mapped to Neon Forge palette) === */
@@ -53,13 +75,13 @@
   --primary: var(--color-lime-primary);
   --primary-foreground: var(--color-near-black);
   --secondary: var(--color-secondary-bg);
-  --secondary-foreground: white;
+  --secondary-foreground: var(--color-white);
   --muted: var(--color-secondary-bg);
   --muted-foreground: var(--color-muted);
   --accent: var(--color-secondary-bg);
-  --accent-foreground: white;
+  --accent-foreground: var(--color-white);
   --destructive: var(--color-error);
-  --destructive-foreground: white;
+  --destructive-foreground: var(--color-white);
   --border: var(--color-secondary-bg);
   --input: var(--color-secondary-bg);
   --ring: var(--color-lime-primary);
