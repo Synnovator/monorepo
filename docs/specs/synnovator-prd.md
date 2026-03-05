@@ -219,7 +219,7 @@ hackathon:
       github: "synnovator"
       logo: "./assets/organizer-logo.png"
       website: "https://home.synnovator.space"
-      role: "host"                       # host | co-host
+      role: "host"                       # host | co-host | co-organizer
     - name: "Pengcheng Laboratory"
       name_zh: "鹏城实验室"
       role: "co-host"
@@ -228,7 +228,7 @@ hackathon:
     - name: "BYD Energy Storage"
       name_zh: "比亚迪储能事业部"
       logo: "./assets/byd-logo.png"
-      tier: "gold"                       # platinum | gold | silver
+      role: "gold-sponsor"               # e.g. platinum-sponsor | gold-sponsor | enterprise-challenge-partner
 
   partners:                              # 协办/合作方
     - name: "Shenzhen New Energy Association"
@@ -269,8 +269,8 @@ hackathon:
     # 开源场景: Apache-2.0 | MIT | GPL-3.0 | ...
     # 企业场景: proprietary
 
-    ip_ownership: "creator"
-    # enum: creator (参赛者保留) | organizer (转让给主办方) | shared
+    ip_ownership: "participant"
+    # enum: participant (参赛者保留) | organizer (转让给主办方) | shared
 
     nda:
       required: false
@@ -379,23 +379,23 @@ hackathon:
         criteria:
           - name: "Innovation"
             name_zh: "创新性"
-            weight: 30
+            weight: 0.30
             description: "方法是否有新意，是否超越已有公开方案"
             score_range: [0, 100]
             hard_constraint: false
           - name: "Technical Depth"
             name_zh: "技术实现"
-            weight: 30
+            weight: 0.30
             description: "代码质量、可运行性、指标达成"
             score_range: [0, 100]
             hard_constraint: false
           - name: "Usability"
             name_zh: "完整度"
-            weight: 20
+            weight: 0.20
             score_range: [0, 100]
           - name: "Presentation"
             name_zh: "展示"
-            weight: 20
+            weight: 0.20
             score_range: [0, 100]
 
       # [P0 Gap 8] 提交物规范
@@ -436,19 +436,19 @@ hackathon:
         criteria:
           - name: "FRR_metric"
             name_zh: "误拒率指标"
-            weight: 35
+            weight: 0.35
             hard_constraint: false
           - name: "Bad_debt_constraint"
             name_zh: "坏账率约束"
-            weight: 25
+            weight: 0.25
             hard_constraint: true        # 超限则该维度 0 分
             constraint_rule: "坏账率变化须在 ±0.2pp 以内，超出则本项 0 分"
           - name: "Feasibility"
             name_zh: "技术可行性"
-            weight: 25
+            weight: 0.25
           - name: "Completeness"
             name_zh: "完整度"
-            weight: 15
+            weight: 0.15
 
       deliverables:
         required:
