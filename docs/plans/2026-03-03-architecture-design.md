@@ -121,12 +121,19 @@ PR Preview：
 // site/astro.config.mjs
 import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
-import tailwind from '@astrojs/tailwind';
+import react from '@astrojs/react';
+import mdx from '@astrojs/mdx';
+import tailwindcss from '@tailwindcss/vite';
+import yaml from '@modyfi/vite-plugin-yaml';
+import svgr from 'vite-plugin-svgr';
 
 export default defineConfig({
   output: 'hybrid',           // 默认静态，按需动态
-  adapter: cloudflare(),
-  integrations: [tailwind()],
+  adapter: cloudflare({ platformProxy: { enabled: true } }),
+  integrations: [react(), mdx()],
+  vite: {
+    plugins: [tailwindcss(), yaml(), svgr()],
+  },
   site: 'https://home.synnovator.space',
 });
 ```
