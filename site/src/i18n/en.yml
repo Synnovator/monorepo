@@ -5,6 +5,7 @@ nav:
   hackathons: "Events"
   hackers: "Hackers"
   guides: "Guides"
+  proposals: "Proposals"
 home:
   title: "Discover AI Hackathons"
   subtitle: "Browse events, register your profile, and join a team"
@@ -130,3 +131,10 @@ guide:
   judge_subtitle: "Judging process and how to use the Score Card"
   step: "Step"
   back_to_guides: "Back to Guides"
+proposals:
+  title: "Proposals"
+  subtitle: "Browse all hackathon proposals"
+  sort_hot: "Sort by Hot"
+  sort_activity: "Group by Activity"
+  empty: "No proposals yet"
+  likes: "likes"
