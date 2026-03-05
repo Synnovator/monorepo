@@ -1,6 +1,7 @@
 ---
 export const prerender = false;
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import GuideTabBar from '../../components/GuideTabBar.astro';
 import { t, getLangFromUrl } from '../../lib/i18n';
 import type { Lang } from '../../lib/i18n';
 
@@ -41,6 +42,7 @@ const steps = [
 ---
 
 <BaseLayout title={t(lang, 'guide.judge_title')} lang={lang}>
+  <GuideTabBar activeRole="judge" lang={lang} />
   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="mb-10">
       <h1 class="text-3xl md:text-4xl font-heading font-bold text-white mb-3">
@@ -66,8 +68,8 @@ const steps = [
     </div>
 
     <div class="mt-12 pt-8 border-t border-secondary-bg">
-      <a href="/" class="text-lime-primary hover:underline text-sm">
-        &larr; {t(lang, 'common.back_home')}
+      <a href="/guides" class="text-lime-primary hover:underline text-sm">
+        &larr; {t(lang, 'guide.back_to_guides')}
       </a>
     </div>
   </div>
