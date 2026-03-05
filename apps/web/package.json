@@ -1,0 +1,31 @@
+{
+  "name": "@synnovator/web",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "pnpm opennextjs-cloudflare build",
+    "start": "next start",
+    "deploy": "pnpm opennextjs-cloudflare build && wrangler deploy",
+    "deploy:preview": "pnpm opennextjs-cloudflare build && wrangler versions upload"
+  },
+  "dependencies": {
+    "@opennextjs/cloudflare": "^1",
+    "@synnovator/shared": "workspace:*",
+    "@synnovator/ui": "workspace:*",
+    "next": "^15",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4",
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^25.3.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.69.0"
+  }
+}
