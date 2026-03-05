@@ -1,0 +1,31 @@
+{
+  "name": "@synnovator/shared",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schemas": "./src/schemas/index.ts",
+    "./schemas/*": "./src/schemas/*.ts",
+    "./data": "./src/data/index.ts",
+    "./data/*": "./src/data/*.ts",
+    "./i18n": "./src/i18n/index.ts",
+    "./auth": "./src/auth/index.ts",
+    "./types": "./src/types/index.ts"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.1",
+    "octokit": "^4",
+    "zod": "^3"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^25.3.3",
+    "typescript": "^5.9.3",
+    "vitest": "^3"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  }
+}
