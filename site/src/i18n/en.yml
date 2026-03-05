@@ -6,7 +6,9 @@ nav:
   hackers: "Hackers"
   guides: "Guides"
   proposals: "Proposals"
+  create_btn: "+ Create"
   create_hackathon: "Create Hackathon"
+  create_proposal: "Create Proposal"
   lang_switch: "中 / EN"
 footer:
   platform: "Platform"
