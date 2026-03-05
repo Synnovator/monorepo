@@ -6,7 +6,9 @@ nav:
   hackers: "参赛者"
   guides: "指南"
   proposals: "提案"
+  create_btn: "+ 创建"
   create_hackathon: "创建活动"
+  create_proposal: "创建提案"
   lang_switch: "EN / 中"
 footer:
   platform: "平台"
