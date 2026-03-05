@@ -1,0 +1,162 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+import { t, localize } from '../lib/i18n';
+import type { Lang } from '../lib/i18n';
+
+const lang: Lang = 'zh';
+
+const allSubmissions = await getCollection('submissions');
+const allHackathons = await getCollection('hackathons');
+
+// Build hackathon name lookup: slug -> { name, name_zh }
+const hackathonMap = new Map<string, { name: string; name_zh?: string; slug: string }>();
+for (const h of allHackathons) {
+  hackathonMap.set(h.data.hackathon.slug, {
+    name: h.data.hackathon.name,
+    name_zh: h.data.hackathon.name_zh,
+    slug: h.data.hackathon.slug,
+  });
+}
+
+// Extract hackathon slug and team slug from submission id
+// ID format: {hackathon-slug}/submissions/{team-slug}/project
+function parseSubmissionId(id: string) {
+  const parts = id.split('/');
+  return { hackathonSlug: parts[0], teamSlug: parts[2] };
+}
+
+// Enrich submissions with hackathon info
+const submissions = allSubmissions.map(sub => {
+  const { hackathonSlug, teamSlug } = parseSubmissionId(sub.id);
+  const hackathon = hackathonMap.get(hackathonSlug);
+  return {
+    ...sub,
+    hackathonSlug,
+    teamSlug,
+    hackathonName: hackathon?.name || hackathonSlug,
+    hackathonNameZh: hackathon?.name_zh,
+    likes: sub.data.project.likes || 0,
+  };
+});
+
+// Sort by likes descending for hot view
+const hotSorted = [...submissions].sort((a, b) => b.likes - a.likes);
+
+// Group by hackathon for activity view
+const grouped = new Map<string, typeof submissions>();
+for (const sub of submissions) {
+  const key = sub.hackathonSlug;
+  if (!grouped.has(key)) grouped.set(key, []);
+  grouped.get(key)!.push(sub);
+}
+---
+
+<BaseLayout title={t(lang, 'proposals.title')}>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Hero -->
+    <div class="mb-12">
+      <h1 class="text-4xl md:text-5xl font-heading font-bold text-white mb-4">
+        {t(lang, 'proposals.title')}
+      </h1>
+      <p class="text-lg text-muted max-w-2xl">
+        {t(lang, 'proposals.subtitle')}
+      </p>
+    </div>
+
+    <!-- View toggle -->
+    <div class="mb-8">
+      <div class="flex flex-wrap gap-2" id="view-tabs">
+        <button class="view-tab active text-sm px-4 py-1.5 rounded-full border transition-colors" data-view="hot">
+          {t(lang, 'proposals.sort_hot')}
+        </button>
+        <button class="view-tab text-sm px-4 py-1.5 rounded-full border transition-colors" data-view="activity">
+          {t(lang, 'proposals.sort_activity')}
+        </button>
+      </div>
+    </div>
+
+    {submissions.length === 0 ? (
+      <div class="text-center py-24">
+        <p class="text-muted text-lg">{t(lang, 'proposals.empty')}</p>
+      </div>
+    ) : (
+      <>
+        <!-- Hot view (default) -->
+        <div id="view-hot">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {hotSorted.map(sub => (
+              <ProjectCard
+                project={sub.data.project}
+                hackathonSlug={sub.hackathonSlug}
+                teamSlug={sub.teamSlug}
+                lang={lang}
+              />
+            ))}
+          </div>
+        </div>
+
+        <!-- Activity grouped view (hidden by default) -->
+        <div id="view-activity" style="display:none">
+          {[...grouped.entries()].map(([slug, subs]) => {
+            const hackathon = hackathonMap.get(slug);
+            const name = hackathon ? localize(lang, hackathon.name, hackathon.name_zh) : slug;
+            return (
+              <div class="mb-10">
+                <h2 class="text-xl font-heading font-bold text-white mb-4 flex items-center gap-3">
+                  <span class="w-1 h-6 bg-lime-primary rounded-full inline-block"></span>
+                  <a href={`/hackathons/${slug}`} class="hover:text-lime-primary transition-colors">{name}</a>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {subs.map(sub => (
+                    <ProjectCard
+                      project={sub.data.project}
+                      hackathonSlug={sub.hackathonSlug}
+                      teamSlug={sub.teamSlug}
+                      lang={lang}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .view-tab {
+    border-color: var(--color-secondary-bg, #2a2a2a);
+    color: var(--color-muted, #888);
+    background: transparent;
+    cursor: pointer;
+  }
+  .view-tab:hover {
+    border-color: var(--color-lime-primary, #BBFD3B);
+    color: var(--color-white, #fff);
+  }
+  .view-tab.active {
+    border-color: var(--color-lime-primary, #BBFD3B);
+    background-color: color-mix(in srgb, var(--color-lime-primary, #BBFD3B) 20%, transparent);
+    color: var(--color-lime-primary, #BBFD3B);
+  }
+</style>
+
+<script>
+  const viewTabs = document.querySelectorAll('.view-tab');
+  const hotView = document.getElementById('view-hot');
+  const activityView = document.getElementById('view-activity');
+
+  viewTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      viewTabs.forEach((t) => t.classList.remove('active'));
+      tab.classList.add('active');
+      const view = (tab as HTMLElement).dataset.view;
+      if (hotView) hotView.style.display = view === 'hot' ? '' : 'none';
+      if (activityView) activityView.style.display = view === 'activity' ? '' : 'none';
+    });
+  });
+</script>
