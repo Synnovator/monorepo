@@ -1,0 +1,181 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { t, localize } from '../../../lib/i18n';
+import type { Lang } from '../../../lib/i18n';
+import fs from 'node:fs';
+import path from 'node:path';
+
+export async function getStaticPaths() {
+  const allSubmissions = await getCollection('submissions');
+  return allSubmissions.map(entry => {
+    // ID format: {hackathon}/submissions/{team}/project
+    const parts = entry.id.split('/');
+    const hackathon = parts[0];
+    const team = parts[2];
+    return {
+      params: { hackathon, team },
+      props: { entry },
+    };
+  });
+}
+
+const { entry } = Astro.props;
+const { hackathon, team } = Astro.params;
+const project = entry.data.project;
+const lang: Lang = 'zh';
+
+// Try to read README.mdx or README.md for rich content
+const readmeMdxPath = path.resolve(`../hackathons/${hackathon}/submissions/${team}/README.mdx`);
+const readmeMdPath = path.resolve(`../hackathons/${hackathon}/submissions/${team}/README.md`);
+let readmeContent: string | null = null;
+if (fs.existsSync(readmeMdxPath)) {
+  readmeContent = fs.readFileSync(readmeMdxPath, 'utf8');
+} else if (fs.existsSync(readmeMdPath)) {
+  readmeContent = fs.readFileSync(readmeMdPath, 'utf8');
+}
+
+// Get hackathon name for breadcrumb
+const hackathons = await getCollection('hackathons');
+const hackathonEntry = hackathons.find(h => h.data.hackathon.slug === hackathon);
+const hackathonName = hackathonEntry
+  ? localize(lang, hackathonEntry.data.hackathon.name, hackathonEntry.data.hackathon.name_zh)
+  : hackathon;
+
+// Track name lookup
+const trackName = hackathonEntry?.data.hackathon.tracks?.find(tr => tr.slug === project.track);
+---
+
+<BaseLayout
+  title={`${localize(lang, project.name, project.name_zh)} — ${hackathonName}`}
+  description={localize(lang, project.tagline, project.tagline_zh) || localize(lang, project.name, project.name_zh)}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    {/* Breadcrumb */}
+    <a href={`/hackathons/${hackathon}#submissions`} class="text-sm text-muted hover:text-white mb-6 inline-block">
+      ← {hackathonName}
+    </a>
+
+    {/* Header */}
+    <div class="flex items-start justify-between mb-8">
+      <div>
+        <h1 class="text-3xl font-heading font-bold text-white mb-2">
+          {localize(lang, project.name, project.name_zh)}
+        </h1>
+        {project.tagline && (
+          <p class="text-lg text-muted">
+            {localize(lang, project.tagline, project.tagline_zh)}
+          </p>
+        )}
+      </div>
+      {trackName && (
+        <span class="text-xs px-3 py-1.5 rounded-full bg-secondary-bg text-muted whitespace-nowrap">
+          {localize(lang, trackName.name, trackName.name_zh)}
+        </span>
+      )}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Main content (2/3) */}
+      <div class="lg:col-span-2">
+        {readmeContent ? (
+          <div class="prose prose-invert prose-sm max-w-none text-light-gray">
+            <Fragment set:html={readmeContent} />
+          </div>
+        ) : project.description ? (
+          <div class="prose prose-invert prose-sm max-w-none text-light-gray">
+            <p>{localize(lang, project.description, project.description_zh)}</p>
+          </div>
+        ) : (
+          <div class="rounded-lg border border-secondary-bg bg-dark-bg p-12 text-center">
+            <p class="text-muted">{t(lang, 'project.no_readme')}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Sidebar (1/3) */}
+      <aside class="space-y-6">
+
+        {/* Team Members */}
+        <section>
+          <h3 class="text-sm font-medium text-muted mb-3">{t(lang, 'project.team_members')}</h3>
+          <div class="space-y-2">
+            {project.team.map(member => (
+              <a
+                href={`https://github.com/${member.github}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary-bg/50 transition-colors"
+              >
+                <img
+                  src={`https://github.com/${member.github}.png?size=40`}
+                  alt={member.github}
+                  class="w-8 h-8 rounded-full"
+                  loading="lazy"
+                />
+                <div>
+                  <p class="text-white text-sm">{member.github}</p>
+                  {member.role && <p class="text-muted text-xs">{member.role}</p>}
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        {/* Tech Stack */}
+        {project.tech_stack && project.tech_stack.length > 0 && (
+          <section>
+            <h3 class="text-sm font-medium text-muted mb-3">{t(lang, 'project.tech_stack')}</h3>
+            <div class="flex flex-wrap gap-1.5">
+              {project.tech_stack.map(tech => (
+                <span class="text-xs px-2 py-1 rounded-full bg-neon-blue/10 text-neon-blue">
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Deliverables */}
+        {project.deliverables && (
+          <section>
+            <h3 class="text-sm font-medium text-muted mb-3">{t(lang, 'project.deliverables')}</h3>
+            <div class="space-y-2">
+              {project.deliverables.repo && (
+                <a
+                  href={project.deliverables.repo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center gap-2 p-2 rounded-lg border border-secondary-bg hover:border-lime-primary/30 transition-colors text-sm text-white"
+                >
+                  <span class="text-lime-primary">→</span> {t(lang, 'project.view_repo')}
+                </a>
+              )}
+              {project.deliverables.demo && (
+                <a
+                  href={project.deliverables.demo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center gap-2 p-2 rounded-lg border border-secondary-bg hover:border-neon-blue/30 transition-colors text-sm text-white"
+                >
+                  <span class="text-neon-blue">→</span> Demo
+                </a>
+              )}
+              {project.deliverables.video && (
+                <a
+                  href={project.deliverables.video}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center gap-2 p-2 rounded-lg border border-secondary-bg hover:border-neon-purple/30 transition-colors text-sm text-white"
+                >
+                  <span class="text-neon-purple">→</span> Video
+                </a>
+              )}
+            </div>
+          </section>
+        )}
+      </aside>
+    </div>
+  </div>
+</BaseLayout>

@@ -55,6 +55,10 @@ stage:
   announcement: "Announcement"
   award: "Award"
   ended: "Ended"
+tab:
+  details: "Details"
+  submissions: "Submissions"
+  leaderboard: "Leaderboard"
 profile:
   skills: "Skills"
   interests: "Interests"
@@ -109,6 +113,14 @@ project:
   tech_stack: "Tech Stack"
   vote: "Vote on GitHub"
   view_repo: "View Code"
+  back_to_hackathon: "Back to Hackathon"
+  team_members: "Team Members"
+  deliverables: "Deliverables"
+  references: "References"
+  description: "About"
+  no_readme: "Detailed description not yet provided"
+  leaderboard_pending: "Judging results have not been published yet"
+  filter_all: "All"
 guide:
   hacker_title: "Hacker Guide"
   hacker_subtitle: "From registration to submission — the complete flow"

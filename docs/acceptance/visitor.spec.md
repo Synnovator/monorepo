@@ -92,6 +92,55 @@
   - 提交物链接（repo、demo、video、slides）
   - 代码参考声明（references）
 
+### SC-V-004.2a: 活动详情页 Tab 布局
+
+- **Given** 访客访问活动详情页 `/hackathons/{slug}`
+- **When** 页面加载完成
+- **Then** 页面展示三个 Tab："详情"、"提案"、"排行榜"
+- **And** "详情" Tab 默认激活
+- **And** 侧边栏（时间线、运营事件、评委列表）在所有 Tab 下始终可见
+
+### SC-V-004.2b: 切换到提案 Tab
+
+- **Given** 访客在活动详情页
+- **When** 点击 "提案" Tab
+- **Then** 页面展示提交卡片，采用 2 列网格布局
+- **And** 每张卡片显示：项目名称、tagline、赛道徽章、团队头像、技术栈
+- **And** 点击卡片导航至 `/projects/{hackathon}/{team}`
+
+### SC-V-004.2c: 查看提交详情页（有 README.mdx）
+
+- **Given** 某提交包含 README.mdx 文件
+- **When** 访客导航至 `/projects/{hackathon}/{team}`
+- **Then** 主区域渲染 README.mdx 的 MDX 内容
+- **And** 侧边栏展示团队成员、技术栈、提交物链接
+- **And** 面包屑导航链接回活动的提案 Tab
+
+### SC-V-004.2d: 查看提交详情页（无 README.mdx 回退）
+
+- **Given** 某提交不包含 README.mdx 文件
+- **When** 访客导航至 `/projects/{hackathon}/{team}`
+- **Then** 页面展示 project.yml 中的 description/description_zh 内容
+
+### SC-V-004.2e: 查看排行榜 Tab（结果已公布）
+
+- **Given** 活动处于 announcement/award/ended 阶段
+- **When** 访客点击 "排行榜" Tab
+- **Then** 页面按赛道展示排名，包含分数及评分维度明细
+
+### SC-V-004.2f: 查看排行榜 Tab（结果未公布）
+
+- **Given** 活动处于 registration/development/submission/judging 阶段
+- **When** 访客点击 "排行榜" Tab
+- **Then** 页面展示 "评审结果尚未公布" 提示信息
+
+### SC-V-004.2g: Tab 状态通过 URL hash 持久化
+
+- **Given** 访客点击 "提案" Tab
+- **When** URL hash 变更为 `#submissions`
+- **And** 访客刷新页面
+- **Then** "提案" Tab 仍为激活状态
+
 ---
 
 ## US-V-005: 参与公众投票 [P1]

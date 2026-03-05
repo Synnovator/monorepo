@@ -55,6 +55,10 @@ stage:
   announcement: "公示中"
   award: "颁奖"
   ended: "已结束"
+tab:
+  details: "详情"
+  submissions: "提案"
+  leaderboard: "排行榜"
 profile:
   skills: "技能"
   interests: "兴趣方向"
@@ -109,6 +113,14 @@ project:
   tech_stack: "技术栈"
   vote: "去投票"
   view_repo: "查看代码"
+  back_to_hackathon: "返回活动"
+  team_members: "团队成员"
+  deliverables: "交付物"
+  references: "参考资料"
+  description: "项目介绍"
+  no_readme: "详细介绍暂未提供"
+  leaderboard_pending: "评审结果尚未公布"
+  filter_all: "全部"
 guide:
   hacker_title: "参赛者指南"
   hacker_subtitle: "从注册到提交，完整参赛流程"
