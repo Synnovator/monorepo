@@ -363,6 +363,11 @@ guide:
   judge_subtitle: "评审流程与评分卡使用说明"
   step: "步骤"
   back_to_guides: "返回指南"
+  index_title: "指南"
+  index_subtitle: "选择你的角色，了解完整流程"
+  hacker_bullets: "注册 Profile|浏览并报名活动|组建团队|提交项目"
+  organizer_bullets: "创建活动仓库|配置赛道与时间线|管理报名与提交|配置评委与评审"
+  judge_bullets: "设置评委 Profile|查看提交作品|使用评分卡评分|声明利益冲突"
 proposals:
   title: "提案"
   subtitle: "浏览所有活动的参赛提案"

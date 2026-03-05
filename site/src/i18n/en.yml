@@ -364,6 +364,11 @@ guide:
   judge_subtitle: "Judging process and how to use the Score Card"
   step: "Step"
   back_to_guides: "Back to Guides"
+  index_title: "Guides"
+  index_subtitle: "Choose your role and learn the complete workflow"
+  hacker_bullets: "Register your Profile|Browse & join events|Form a team|Submit your project"
+  organizer_bullets: "Create event repo|Configure tracks & timeline|Manage registrations|Set up judges & review"
+  judge_bullets: "Set up Judge Profile|Review submissions|Score with Score Card|Declare conflicts of interest"
 proposals:
   title: "Proposals"
   subtitle: "Browse all hackathon proposals"
