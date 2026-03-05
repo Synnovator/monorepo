@@ -279,6 +279,7 @@ const submissionSchema = z.object({
     tech_stack: z.array(z.string()).optional(),
     description: z.string().optional(),
     description_zh: z.string().optional(),
+    likes: z.number().optional(),
   }),
 });
 

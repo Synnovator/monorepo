@@ -5,6 +5,7 @@ nav:
   hackathons: "Events"
   hackers: "Hackers"
   guides: "Guides"
+  proposals: "Proposals"
   create_hackathon: "Create Hackathon"
   lang_switch: "中 / EN"
 footer:
@@ -361,3 +362,10 @@ guide:
   judge_subtitle: "Judging process and how to use the Score Card"
   step: "Step"
   back_to_guides: "Back to Guides"
+proposals:
+  title: "Proposals"
+  subtitle: "Browse all hackathon proposals"
+  sort_hot: "Sort by Hot"
+  sort_activity: "Group by Activity"
+  empty: "No proposals yet"
+  likes: "likes"

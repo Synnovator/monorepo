@@ -5,6 +5,7 @@ nav:
   hackathons: "活动"
   hackers: "参赛者"
   guides: "指南"
+  proposals: "提案"
   create_hackathon: "创建活动"
   lang_switch: "EN / 中"
 footer:
@@ -360,3 +361,10 @@ guide:
   judge_subtitle: "评审流程与评分卡使用说明"
   step: "步骤"
   back_to_guides: "返回指南"
+proposals:
+  title: "提案"
+  subtitle: "浏览所有活动的参赛提案"
+  sort_hot: "按热门排序"
+  sort_activity: "按活动分组"
+  empty: "暂无提案"
+  likes: "赞"

@@ -40,3 +40,4 @@ project:
   description_zh: |
     双阶段信贷评分模型：粗筛XGBoost + 精筛LightGBM。误拒率达7.1%，坏账率仅+0.09pp，
     远在±0.2pp约束范围内。方案工程化程度高，可直接交接给落地团队。
+  likes: 8
