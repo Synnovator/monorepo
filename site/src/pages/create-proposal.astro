@@ -1,0 +1,63 @@
+---
+export const prerender = false;
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CreateProposalForm from '../components/forms/CreateProposalForm';
+import { getLangFromUrl } from '../lib/i18n';
+import type { Lang } from '../lib/i18n';
+import fs from 'node:fs';
+import path from 'node:path';
+import yaml from 'js-yaml';
+
+const lang: Lang = getLangFromUrl(Astro.url);
+
+interface TrackInfo {
+  name: string;
+  name_zh?: string;
+  slug: string;
+}
+
+interface HackathonInfo {
+  slug: string;
+  name: string;
+  name_zh?: string;
+  tracks: TrackInfo[];
+}
+
+const hackathonsDir = path.resolve('hackathons');
+const hackathons: HackathonInfo[] = [];
+
+if (fs.existsSync(hackathonsDir)) {
+  const dirs = fs.readdirSync(hackathonsDir, { withFileTypes: true })
+    .filter(d => d.isDirectory());
+
+  for (const dir of dirs) {
+    const ymlPath = path.join(hackathonsDir, dir.name, 'hackathon.yml');
+    if (!fs.existsSync(ymlPath)) continue;
+    try {
+      const raw = fs.readFileSync(ymlPath, 'utf8');
+      const data = yaml.load(raw) as { hackathon?: { slug?: string; name?: string; name_zh?: string; tracks?: TrackInfo[] } };
+      if (data?.hackathon?.slug && data?.hackathon?.name) {
+        hackathons.push({
+          slug: data.hackathon.slug,
+          name: data.hackathon.name,
+          name_zh: data.hackathon.name_zh,
+          tracks: (data.hackathon.tracks || []).map(t => ({
+            name: t.name,
+            name_zh: t.name_zh,
+            slug: t.slug,
+          })),
+        });
+      }
+    } catch { /* skip invalid */ }
+  }
+}
+---
+
+<BaseLayout title="Create Proposal" description="Submit a project proposal to a hackathon" lang={lang}>
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-3xl font-heading font-bold text-white mb-8">
+      {lang === 'zh' ? '提交项目提案' : 'Submit Project Proposal'}
+    </h1>
+    <CreateProposalForm client:load hackathons={hackathons} lang={lang} />
+  </div>
+</BaseLayout>

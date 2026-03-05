@@ -1,12 +1,14 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { buildPRUrl, openGitHubUrl } from '@/lib/github-url';
+import { t } from '@/lib/i18n';
+import type { Lang } from '@/lib/i18n';
 import { formatYaml } from './form-utils';
 import { TimelineEditor, DEFAULT_STAGES, type Stage } from './TimelineEditor';
 
 interface CreateHackathonFormProps {
   templates: Record<string, unknown>;
-  lang: 'zh' | 'en';
+  lang: Lang;
 }
 
 interface Organizer {
@@ -85,7 +87,6 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
   const [teamMax, setTeamMax] = useState('5');
   const [allowSolo, setAllowSolo] = useState(true);
 
-  const t = (zh: string, en: string) => lang === 'zh' ? zh : en;
   const stepLabels = lang === 'zh' ? STEP_LABELS_ZH : STEP_LABELS_EN;
 
   // Auto-slug from name
@@ -261,13 +262,13 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
       {!loading && !isLoggedIn && (
         <div className="mb-6 p-4 rounded-lg bg-warning/10 border border-warning/30">
           <p className="text-warning text-sm mb-3">
-            {t('请先登录 GitHub', 'Please sign in with GitHub first')}
+            {t(lang, 'form.create_hackathon.sign_in_first')}
           </p>
           <a
             href={`/api/auth/login?returnTo=${typeof window !== 'undefined' ? encodeURIComponent(window.location.pathname) : ''}`}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors"
           >
-            {t('登录 GitHub', 'Sign in with GitHub')}
+            {t(lang, 'form.create_hackathon.sign_in_github')}
           </a>
         </div>
       )}
@@ -277,7 +278,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {step === 0 && (
           <>
             <p className="text-sm text-muted mb-4">
-              {t('选择 Hackathon 类型', 'Choose a hackathon type')}
+              {t(lang, 'form.create_hackathon.choose_type')}
             </p>
             <div className="grid gap-3">
               {TYPE_OPTIONS.map(opt => (
@@ -307,12 +308,12 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {step === 1 && (
           <>
             <div>
-              <label className={labelClass}>{t('Hackathon 名称 (英文) *', 'Hackathon Name (English) *')}</label>
+              <label className={labelClass}>{t(lang, 'form.create_hackathon.name_en')}</label>
               <input type="text" value={name} onChange={e => handleNameChange(e.target.value)}
                 placeholder="Community Hackathon 2026" className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{t('Hackathon 名称 (中文)', 'Hackathon Name (Chinese)')}</label>
+              <label className={labelClass}>{t(lang, 'form.create_hackathon.name_zh')}</label>
               <input type="text" value={nameZh} onChange={e => setNameZh(e.target.value)}
                 placeholder="2026 社区 Hackathon" className={inputClass} />
             </div>
@@ -323,18 +324,18 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
                 placeholder={toSlug(name) || 'community-hackathon-2026'}
                 className={inputClass} />
               <p className="text-xs text-muted mt-1">
-                {t('自动根据名称生成，也可手动修改', 'Auto-generated from name, or edit manually')}
+                {t(lang, 'form.create_hackathon.slug_hint')}
               </p>
             </div>
             <div>
-              <label className={labelClass}>{t('标语 (英文)', 'Tagline (English)')}</label>
+              <label className={labelClass}>{t(lang, 'form.create_hackathon.tagline_en')}</label>
               <input type="text" value={tagline} onChange={e => setTagline(e.target.value)}
                 placeholder="Build something amazing with AI" className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{t('标语 (中文)', 'Tagline (Chinese)')}</label>
+              <label className={labelClass}>{t(lang, 'form.create_hackathon.tagline_zh')}</label>
               <input type="text" value={taglineZh} onChange={e => setTaglineZh(e.target.value)}
-                placeholder={t('用 AI 构建令人惊叹的应用', '')} className={inputClass} />
+                placeholder={t(lang, 'form.create_hackathon.tagline_placeholder_zh')} className={inputClass} />
             </div>
           </>
         )}
@@ -342,19 +343,19 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {/* Step 2: Organizers */}
         {step === 2 && (
           <>
-            <p className="text-sm text-muted">{t('添加组织者信息', 'Add organizer information')}</p>
+            <p className="text-sm text-muted">{t(lang, 'form.create_hackathon.add_organizers')}</p>
             <div className="space-y-4">
               {organizers.map((org, idx) => (
                 <div key={idx} className="flex gap-2 items-start">
                   <div className="flex-1 space-y-2">
                     <input type="text" value={org.name} onChange={e => updateOrganizer(idx, 'name', e.target.value)}
-                      placeholder={t('组织名称 (英文)', 'Organization Name')} className={inputClass} />
+                      placeholder={t(lang, 'form.create_hackathon.org_name_en')} className={inputClass} />
                     <input type="text" value={org.name_zh} onChange={e => updateOrganizer(idx, 'name_zh', e.target.value)}
-                      placeholder={t('组织名称 (中文)', 'Organization Name (Chinese)')} className={inputClass} />
+                      placeholder={t(lang, 'form.create_hackathon.org_name_zh')} className={inputClass} />
                     <select value={org.role} onChange={e => updateOrganizer(idx, 'role', e.target.value)} className={selectClass}>
-                      <option value="organizer">{t('主办方', 'Organizer')}</option>
-                      <option value="co-organizer">{t('联合主办', 'Co-organizer')}</option>
-                      <option value="sponsor">{t('赞助商', 'Sponsor')}</option>
+                      <option value="organizer">{t(lang, 'form.create_hackathon.organizer')}</option>
+                      <option value="co-organizer">{t(lang, 'form.create_hackathon.co_organizer')}</option>
+                      <option value="sponsor">{t(lang, 'form.create_hackathon.sponsor')}</option>
                     </select>
                   </div>
                   {organizers.length > 1 && (
@@ -364,7 +365,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               ))}
             </div>
             <button type="button" onClick={addOrganizer} className={btnAdd}>
-              + {t('添加组织者', 'Add organizer')}
+              + {t(lang, 'form.create_hackathon.add_organizer')}
             </button>
           </>
         )}
@@ -373,7 +374,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {step === 3 && (
           <>
             <p className="text-sm text-muted mb-2">
-              {t('点击阶段块设置日期，可以添加或删除阶段', 'Click stage blocks to set dates. Add or remove stages as needed.')}
+              {t(lang, 'form.create_hackathon.timeline_hint')}
             </p>
             <TimelineEditor
               lang={lang}
@@ -386,7 +387,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {/* Step 4: Tracks */}
         {step === 4 && (
           <>
-            <p className="text-sm text-muted">{t('添加比赛赛道', 'Add competition tracks')}</p>
+            <p className="text-sm text-muted">{t(lang, 'form.create_hackathon.add_tracks')}</p>
             <div className="space-y-6">
               {tracks.map((tr, tIdx) => {
                 const weightSum = tr.criteria.reduce((s, c) => s + (parseFloat(c.weight) || 0), 0);
@@ -394,22 +395,22 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
                 return (
                   <div key={tIdx} className="p-4 rounded-lg border border-secondary-bg space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-white font-medium">{t('赛道', 'Track')} {tIdx + 1}</span>
+                      <span className="text-sm text-white font-medium">{t(lang, 'form.create_hackathon.track_n')} {tIdx + 1}</span>
                       {tracks.length > 1 && (
                         <button type="button" onClick={() => removeTrack(tIdx)} className={btnRemove}>{'\u2715'}</button>
                       )}
                     </div>
                     <input type="text" value={tr.name}
                       onChange={e => { updateTrack(tIdx, 'name', e.target.value); if (!tr.slug) updateTrack(tIdx, 'slug', toSlug(e.target.value)); }}
-                      placeholder={t('赛道名称 (英文)', 'Track Name')} className={inputClass} />
+                      placeholder={t(lang, 'form.create_hackathon.track_name_en')} className={inputClass} />
                     <input type="text" value={tr.name_zh} onChange={e => updateTrack(tIdx, 'name_zh', e.target.value)}
-                      placeholder={t('赛道名称 (中文)', 'Track Name (Chinese)')} className={inputClass} />
+                      placeholder={t(lang, 'form.create_hackathon.track_name_zh')} className={inputClass} />
                     <input type="text" value={tr.slug} onChange={e => updateTrack(tIdx, 'slug', e.target.value)}
                       placeholder={toSlug(tr.name) || 'track-slug'} className={inputClass} />
 
                     <div>
                       <label className="block text-xs text-muted mb-1">
-                        {t('奖励（每行一条，格式：名次: 金额）', 'Rewards (one per line, format: rank: amount)')}
+                        {t(lang, 'form.create_hackathon.rewards_hint')}
                       </label>
                       <textarea value={tr.rewards} onChange={e => updateTrack(tIdx, 'rewards', e.target.value)}
                         placeholder={'1st: $1,000\n2nd: $500\n3rd: $250'}
@@ -418,9 +419,9 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
 
                     <div>
                       <div className="flex justify-between items-center mb-3">
-                        <label className="text-xs text-muted">{t('评审标准', 'Judging Criteria')}</label>
+                        <label className="text-xs text-muted">{t(lang, 'form.create_hackathon.judging_criteria')}</label>
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${weightOk ? 'bg-lime-primary/20 text-lime-primary' : 'bg-warning/20 text-warning'}`}>
-                          {t('权重总和', 'Weight total')}: {weightSum.toFixed(2)} {weightOk ? '\u2713' : t('(应为 1.0)', '(should be 1.0)')}
+                          {t(lang, 'form.create_hackathon.weight_total')}: {weightSum.toFixed(2)} {weightOk ? '\u2713' : t(lang, 'form.create_hackathon.should_be_one')}
                         </span>
                       </div>
 
@@ -430,21 +431,21 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
                           <div key={cIdx} className="p-3 rounded-lg border border-secondary-bg bg-surface/30 space-y-2">
                             <div className="flex justify-between items-center">
                               <span className="text-xs text-muted">
-                                {t('标准', 'Criterion')} {cIdx + 1}
+                                {t(lang, 'form.create_hackathon.criterion_n')} {cIdx + 1}
                               </span>
                               {tr.criteria.length > 1 && (
                                 <button type="button" onClick={() => removeCriterion(tIdx, cIdx)}
                                   className="text-xs text-muted hover:text-error transition-colors">
-                                  {t('删除', 'Remove')}
+                                  {t(lang, 'form.create_hackathon.remove')}
                                 </button>
                               )}
                             </div>
                             <input type="text" value={c.name}
                               onChange={e => updateCriterion(tIdx, cIdx, 'name', e.target.value)}
-                              placeholder={t('标准名称（如"创新性"）', 'Criterion name (e.g. "Innovation")')}
+                              placeholder={t(lang, 'form.create_hackathon.criterion_placeholder')}
                               className={inputClass} />
                             <div className="flex items-center gap-3">
-                              <label className="text-xs text-muted whitespace-nowrap">{t('权重', 'Weight')}:</label>
+                              <label className="text-xs text-muted whitespace-nowrap">{t(lang, 'form.create_hackathon.weight')}:</label>
                               <input type="range" min="0" max="1" step="0.05"
                                 value={c.weight}
                                 onChange={e => updateCriterion(tIdx, cIdx, 'weight', e.target.value)}
@@ -473,7 +474,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
                       )}
 
                       <button type="button" onClick={() => addCriterion(tIdx)} className={`${btnAdd} mt-3`}>
-                        + {t('添加标准', 'Add criterion')}
+                        + {t(lang, 'form.create_hackathon.add_criterion')}
                       </button>
                     </div>
                   </div>
@@ -481,7 +482,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               })}
             </div>
             <button type="button" onClick={addTrack} className={btnAdd}>
-              + {t('添加赛道', 'Add track')}
+              + {t(lang, 'form.create_hackathon.add_track')}
             </button>
           </>
         )}
@@ -490,7 +491,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {step === 5 && (
           <>
             <div>
-              <label className={labelClass}>{t('开源协议', 'License')}</label>
+              <label className={labelClass}>{t(lang, 'form.create_hackathon.license')}</label>
               <select value={license} onChange={e => setLicense(e.target.value)} className={selectClass}>
                 <option value="Apache-2.0">Apache-2.0</option>
                 <option value="MIT">MIT</option>
@@ -499,32 +500,32 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               </select>
             </div>
             <div>
-              <label className={labelClass}>{t('知识产权归属', 'IP Ownership')}</label>
+              <label className={labelClass}>{t(lang, 'form.create_hackathon.ip_ownership')}</label>
               <select value={ipOwnership} onChange={e => setIpOwnership(e.target.value)} className={selectClass}>
-                <option value="participant">{t('参赛者', 'Participant')}</option>
-                <option value="organizer">{t('主办方', 'Organizer')}</option>
-                <option value="shared">{t('共有', 'Shared')}</option>
+                <option value="participant">{t(lang, 'form.create_hackathon.participant')}</option>
+                <option value="organizer">{t(lang, 'form.create_hackathon.organizer')}</option>
+                <option value="shared">{t(lang, 'form.create_hackathon.shared')}</option>
               </select>
             </div>
             {hackathonType === 'enterprise' && (
               <div className="border-t border-secondary-bg pt-4 mt-4 space-y-4">
-                <p className="text-sm text-white font-medium">NDA {t('配置', 'Configuration')}</p>
+                <p className="text-sm text-white font-medium">NDA {t(lang, 'form.create_hackathon.nda_config')}</p>
                 <label className="flex items-center gap-2 text-sm text-muted cursor-pointer">
                   <input type="checkbox" checked={ndaRequired} onChange={e => setNdaRequired(e.target.checked)}
                     className="rounded border-secondary-bg bg-surface" />
-                  {t('要求签署 NDA', 'Require NDA')}
+                  {t(lang, 'form.create_hackathon.require_nda')}
                 </label>
                 {ndaRequired && (
                   <>
                     <div>
-                      <label className={labelClass}>{t('NDA 文档 URL', 'NDA Document URL')}</label>
+                      <label className={labelClass}>{t(lang, 'form.create_hackathon.nda_doc_url')}</label>
                       <input type="url" value={ndaDocUrl} onChange={e => setNdaDocUrl(e.target.value)}
                         placeholder="https://..." className={inputClass} />
                     </div>
                     <div>
-                      <label className={labelClass}>{t('NDA 摘要', 'NDA Summary')}</label>
+                      <label className={labelClass}>{t(lang, 'form.create_hackathon.nda_summary')}</label>
                       <textarea value={ndaSummary} onChange={e => setNdaSummary(e.target.value)}
-                        placeholder={t('NDA 关键条款概述...', 'Summary of key NDA terms...')}
+                        placeholder={t(lang, 'form.create_hackathon.nda_summary_placeholder')}
                         className={`${inputClass} resize-none h-20`} />
                     </div>
                   </>
@@ -538,44 +539,44 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {step === 6 && (
           <>
             <div>
-              <label className={labelClass}>{t('参赛资格', 'Eligibility')}</label>
+              <label className={labelClass}>{t(lang, 'form.create_hackathon.eligibility')}</label>
               <select value={eligibilityOpen} onChange={e => setEligibilityOpen(e.target.value)} className={selectClass}>
-                <option value="all">{t('所有人', 'All')}</option>
-                <option value="invite-only">{t('仅邀请', 'Invite Only')}</option>
+                <option value="all">{t(lang, 'form.create_hackathon.all')}</option>
+                <option value="invite-only">{t(lang, 'form.create_hackathon.invite_only')}</option>
               </select>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={labelClass}>{t('最小团队人数', 'Min Team Size')}</label>
+                <label className={labelClass}>{t(lang, 'form.create_hackathon.min_team_size')}</label>
                 <input type="number" min="1" value={teamMin} onChange={e => setTeamMin(e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>{t('最大团队人数', 'Max Team Size')}</label>
+                <label className={labelClass}>{t(lang, 'form.create_hackathon.max_team_size')}</label>
                 <input type="number" min="1" value={teamMax} onChange={e => setTeamMax(e.target.value)} className={inputClass} />
               </div>
             </div>
             <label className="flex items-center gap-2 text-sm text-muted cursor-pointer">
               <input type="checkbox" checked={allowSolo} onChange={e => setAllowSolo(e.target.checked)}
                 className="rounded border-secondary-bg bg-surface" />
-              {t('允许个人参赛', 'Allow solo participation')}
+              {t(lang, 'form.create_hackathon.allow_solo')}
             </label>
             <div>
-              <label className={labelClass}>{t('语言', 'Languages')}</label>
+              <label className={labelClass}>{t(lang, 'form.create_hackathon.languages')}</label>
               <div className="flex gap-3">
                 {['zh', 'en'].map(l => (
                   <label key={l} className="flex items-center gap-2 text-sm text-muted cursor-pointer">
                     <input type="checkbox" checked={langOptions.includes(l)} onChange={() => toggleLang(l)}
                       className="rounded border-secondary-bg bg-surface" />
-                    {l === 'zh' ? t('中文', 'Chinese') : t('英文', 'English')}
+                    {l === 'zh' ? t(lang, 'form.create_hackathon.chinese') : t(lang, 'form.create_hackathon.english')}
                   </label>
                 ))}
               </div>
             </div>
             <div>
-              <label className={labelClass}>{t('公开投票方式', 'Public Voting')}</label>
+              <label className={labelClass}>{t(lang, 'form.create_hackathon.public_voting')}</label>
               <select value={publicVote} onChange={e => setPublicVote(e.target.value)} className={selectClass}>
                 <option value="reactions">Reactions</option>
-                <option value="none">{t('无', 'None')}</option>
+                <option value="none">{t(lang, 'form.create_hackathon.none')}</option>
               </select>
             </div>
           </>
@@ -585,16 +586,13 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {step === 7 && (
           <>
             <div>
-              <label className={labelClass}>{t('预览 YAML', 'Preview YAML')}</label>
+              <label className={labelClass}>{t(lang, 'form.create_hackathon.preview_yaml')}</label>
               <pre className="w-full bg-surface border border-secondary-bg rounded-md px-4 py-3 text-lime-primary text-sm font-mono overflow-x-auto whitespace-pre-wrap">
                 {yamlContent}
               </pre>
             </div>
             <p className="text-xs text-muted">
-              {t(
-                '点击提交后将在 GitHub 上创建 PR，文件路径为 ',
-                'Clicking submit will create a PR on GitHub with file path '
-              )}
+              {t(lang, 'form.create_hackathon.submit_hint')}{' '}
               <code className="text-lime-primary">hackathons/{slug || toSlug(name) || '{slug}'}/hackathon.yml</code>
             </p>
           </>
@@ -605,19 +603,19 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
           {step > 0 ? (
             <button type="button" onClick={() => setStep(s => s - 1)}
               className="px-4 py-2 rounded-lg border border-secondary-bg text-muted text-sm hover:text-white hover:border-light-gray transition-colors">
-              {t('上一步', 'Back')}
+              {t(lang, 'form.create_hackathon.back')}
             </button>
           ) : <div />}
 
           {step < TOTAL_STEPS - 1 ? (
             <button type="button" onClick={() => setStep(s => s + 1)}
               className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors">
-              {t('下一步', 'Next')}
+              {t(lang, 'form.create_hackathon.next')}
             </button>
           ) : (
             <button type="button" onClick={handleSubmit} disabled={!isLoggedIn || (!slug && !name)}
               className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              {t('前往 GitHub 提交 PR', 'Submit PR on GitHub')} {'\u2192'}
+              {t(lang, 'form.create_hackathon.submit_pr')} {'\u2192'}
             </button>
           )}
         </div>
@@ -627,3 +625,6 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
 }
 
 export default CreateHackathonForm;
+honForm;
+Form;
+honForm;

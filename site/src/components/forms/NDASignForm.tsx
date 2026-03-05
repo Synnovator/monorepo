@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { buildPRUrl, openGitHubUrl, GITHUB_ORG, GITHUB_REPO } from '@/lib/github-url';
+import { t } from '@/lib/i18n';
+import type { Lang } from '@/lib/i18n';
 
 interface NDASignFormProps {
   hackathonSlug: string;
   ndaDocumentUrl?: string;
   ndaSummary?: string;
-  lang: 'zh' | 'en';
+  lang: Lang;
 }
 
 function escapeYamlValue(val: string): string {
@@ -19,7 +21,6 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const t = (zh: string, en: string) => lang === 'zh' ? zh : en;
   const allChecked = checks.every(Boolean);
 
   function toggleCheck(idx: number) {
@@ -37,10 +38,7 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
       const profileCheck = await res.json();
 
       if (!profileCheck.exists || !profileCheck.slug) {
-        setError(t(
-          '请先创建 Profile，然后再签署 NDA',
-          'Please create your profile first before signing NDA'
-        ));
+        setError(t(lang, 'form.nda.create_profile_first'));
         setSubmitting(false);
         return;
       }
@@ -55,15 +53,9 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
       if (!ghRes.ok) {
         const profilePath = `profiles/${profileCheck.slug}.yml`;
         if (ghRes.status === 404) {
-          throw new Error(t(
-            `GitHub 上未找到 Profile 文件 (${profilePath})，请确认 PR 已合并`,
-            `Profile file not found on GitHub (${profilePath}). Make sure your profile PR is merged.`
-          ));
+          throw new Error(t(lang, 'form.register.profile_not_found'));
         }
-        throw new Error(t(
-          `GitHub API 请求失败 (${ghRes.status})`,
-          `GitHub API request failed (${ghRes.status})`
-        ));
+        throw new Error(t(lang, 'form.register.github_api_failed'));
       }
 
       let profileContent = await ghRes.text();
@@ -72,10 +64,7 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
       const safeSlug = escapeYamlValue(hackathonSlug);
       if (profileContent.includes(`hackathon: "${safeSlug}"`) &&
           profileContent.includes('nda_signed:')) {
-        setError(t(
-          `您已签署过 ${hackathonSlug} 的 NDA`,
-          `You have already signed the NDA for ${hackathonSlug}`
-        ));
+        setError(t(lang, 'form.nda.already_signed'));
         setSubmitting(false);
         return;
       }
@@ -112,27 +101,27 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
       });
       openGitHubUrl(url);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : t('操作失败，请重试', 'Operation failed, please try again');
+      const msg = err instanceof Error ? err.message : t(lang, 'form.nda.operation_failed');
       setError(msg);
     }
     setSubmitting(false);
   }
 
   const checkboxLabels = [
-    t('我已阅读并同意 NDA 条款', 'I have read and agree to the NDA terms'),
-    t('我了解保密和数据处理要求', 'I understand the confidentiality and data handling requirements'),
-    t('我知晓违反可能导致取消资格和法律后果', 'I acknowledge violations may result in disqualification and legal action'),
+    t(lang, 'form.nda.terms_1'),
+    t(lang, 'form.nda.terms_2'),
+    t(lang, 'form.nda.terms_3'),
   ];
 
   return (
     <div className="rounded-lg border border-warning/30 bg-warning/5 p-6 space-y-4">
       <p className="text-sm text-warning font-medium">
-        {t('此活动要求签署保密协议 (NDA)', 'This hackathon requires NDA signing')}
+        {t(lang, 'form.nda.requires_nda')}
       </p>
 
       {ndaSummary && (
         <div>
-          <p className="text-xs text-muted mb-1">{t('NDA 摘要', 'NDA Summary')}</p>
+          <p className="text-xs text-muted mb-1">{t(lang, 'form.nda.nda_summary')}</p>
           <p className="text-sm text-light-gray">{ndaSummary}</p>
         </div>
       )}
@@ -144,13 +133,13 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary-bg text-white text-sm hover:bg-secondary-bg/80 transition-colors"
         >
-          {t('下载 NDA 文档', 'Download NDA Document')}
+          {t(lang, 'form.nda.download_nda')}
         </a>
       )}
 
       {!loading && !isLoggedIn && (
         <div className="p-3 rounded-lg bg-secondary-bg text-muted text-sm">
-          {t('请先登录后再签署 NDA', 'Please sign in to sign the NDA')}
+          {t(lang, 'form.nda.sign_in_to_sign')}
         </div>
       )}
 
@@ -159,14 +148,14 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
           {error}
           {error.includes('Profile') && (
             <a href="/create-profile" className="ml-2 text-lime-primary hover:underline">
-              {t('创建 Profile', 'Create Profile')}
+              {t(lang, 'form.nda.create_profile')}
             </a>
           )}
         </div>
       )}
 
       <fieldset disabled={!isLoggedIn || loading} className="space-y-3">
-        <p className="text-xs text-muted">{t('签署人', 'Signer')}: {loading ? '...' : (user?.login ?? '—')}</p>
+        <p className="text-xs text-muted">{t(lang, 'form.nda.signer')}: {loading ? '...' : (user?.login ?? '—')}</p>
 
         {checkboxLabels.map((label, idx) => (
           <label key={idx} className="flex items-start gap-3 cursor-pointer">
@@ -186,8 +175,8 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary/20 text-lime-primary text-sm hover:bg-lime-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting
-            ? t('处理中...', 'Processing...')
-            : t('签署 NDA 并创建 PR', 'Sign NDA & Create PR')} →
+            ? t(lang, 'form.nda.processing')
+            : t(lang, 'form.nda.sign_and_pr')} →
         </button>
       </fieldset>
     </div>

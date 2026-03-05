@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { buildPRUrl, openGitHubUrl } from '@/lib/github-url';
+import { t } from '@/lib/i18n';
+import type { Lang } from '@/lib/i18n';
 import { formatYaml } from './form-utils';
 
 interface ProfileCreateFormProps {
-  lang: 'zh' | 'en';
+  lang: Lang;
 }
 
 interface SkillCategory {
@@ -58,7 +60,6 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
   const [linkedin, setLinkedin] = useState('');
   const [website, setWebsite] = useState('');
 
-  const t = (zh: string, en: string) => lang === 'zh' ? zh : en;
   const stepLabels = lang === 'zh' ? STEP_LABELS_ZH : STEP_LABELS_EN;
 
   // Skills helpers
@@ -179,13 +180,13 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
       {!loading && !isLoggedIn && (
         <div className="mb-6 p-4 rounded-lg bg-warning/10 border border-warning/30">
           <p className="text-warning text-sm mb-3">
-            {t('请先登录 GitHub', 'Please sign in with GitHub first')}
+            {t(lang, 'form.profile.sign_in_first')}
           </p>
           <a
             href={`/api/auth/login?returnTo=${typeof window !== 'undefined' ? encodeURIComponent(window.location.pathname) : ''}`}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors"
           >
-            {t('登录 GitHub', 'Sign in with GitHub')}
+            {t(lang, 'form.profile.sign_in_github')}
           </a>
         </div>
       )}
@@ -204,7 +205,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               />
             </div>
             <div>
-              <label className={labelClass}>{t('显示名称 (英文)', 'Display Name (English)')}</label>
+              <label className={labelClass}>{t(lang, 'form.profile.display_name_en')}</label>
               <input
                 type="text"
                 value={name}
@@ -214,36 +215,36 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               />
             </div>
             <div>
-              <label className={labelClass}>{t('显示名称 (中文)', 'Display Name (Chinese)')} ({t('可选', 'optional')})</label>
+              <label className={labelClass}>{t(lang, 'form.profile.display_name_zh')} ({t(lang, 'form.profile.optional')})</label>
               <input
                 type="text"
                 value={nameZh}
                 onChange={e => setNameZh(e.target.value)}
-                placeholder={t('张三', 'Zhang San')}
+                placeholder={t(lang, 'form.profile.name_placeholder')}
                 className={inputClass}
               />
             </div>
             <div>
-              <label className={labelClass}>{t('简介', 'Bio')}</label>
+              <label className={labelClass}>{t(lang, 'form.profile.bio')}</label>
               <textarea
                 value={bio}
                 onChange={e => setBio(e.target.value)}
-                placeholder={t('简要介绍自己...', 'Tell us about yourself...')}
+                placeholder={t(lang, 'form.profile.bio_placeholder')}
                 className={`${inputClass} resize-none h-20`}
               />
             </div>
             <div>
-              <label className={labelClass}>{t('所在地', 'Location')}</label>
+              <label className={labelClass}>{t(lang, 'form.profile.location')}</label>
               <input
                 type="text"
                 value={location}
                 onChange={e => setLocation(e.target.value)}
-                placeholder={t('例如：北京', 'e.g. Beijing')}
+                placeholder={t(lang, 'form.profile.location_placeholder')}
                 className={inputClass}
               />
             </div>
             <div>
-              <label className={labelClass}>{t('语言', 'Languages')} ({t('逗号分隔', 'comma-separated')})</label>
+              <label className={labelClass}>{t(lang, 'form.profile.languages')} ({t(lang, 'form.profile.languages_placeholder')})</label>
               <input
                 type="text"
                 value={languages}
@@ -259,13 +260,13 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
         {step === 1 && (
           <>
             <div>
-              <label className={labelClass}>{t('身份类型', 'Identity Type')}</label>
+              <label className={labelClass}>{t(lang, 'form.profile.identity_type')}</label>
               <select
                 value={identityType}
                 onChange={e => setIdentityType(e.target.value)}
                 className={selectClass}
               >
-                <option value="">{t('请选择', 'Select type')}</option>
+                <option value="">{t(lang, 'form.profile.select_type')}</option>
                 {IDENTITY_TYPES.map(it => (
                   <option key={it.value} value={it.value}>
                     {lang === 'zh' ? it.zh : it.en}
@@ -274,25 +275,25 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               </select>
             </div>
             <div>
-              <label className={labelClass}>{t('所属机构 / 公司', 'Affiliation')}</label>
+              <label className={labelClass}>{t(lang, 'form.profile.affiliation')}</label>
               <input
                 type="text"
                 value={affiliation}
                 onChange={e => setAffiliation(e.target.value)}
-                placeholder={t('例如：清华大学', 'e.g. MIT')}
+                placeholder={t(lang, 'form.profile.affiliation_placeholder')}
                 className={inputClass}
               />
             </div>
             {identityType === 'student' && (
               <>
                 <div>
-                  <label className={labelClass}>{t('学位', 'Degree')}</label>
+                  <label className={labelClass}>{t(lang, 'form.profile.degree')}</label>
                   <select
                     value={degree}
                     onChange={e => setDegree(e.target.value)}
                     className={selectClass}
                   >
-                    <option value="">{t('请选择', 'Select degree')}</option>
+                    <option value="">{t(lang, 'form.profile.select_degree')}</option>
                     {DEGREES.map(d => (
                       <option key={d.value} value={d.value}>
                         {lang === 'zh' ? d.zh : d.en}
@@ -301,17 +302,17 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                   </select>
                 </div>
                 <div>
-                  <label className={labelClass}>{t('专业', 'Major')}</label>
+                  <label className={labelClass}>{t(lang, 'form.profile.major')}</label>
                   <input
                     type="text"
                     value={major}
                     onChange={e => setMajor(e.target.value)}
-                    placeholder={t('例如：计算机科学', 'e.g. Computer Science')}
+                    placeholder={t(lang, 'form.profile.major_placeholder')}
                     className={inputClass}
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>{t('预计毕业年份', 'Graduation Year')}</label>
+                  <label className={labelClass}>{t(lang, 'form.profile.graduation_year')}</label>
                   <input
                     type="number"
                     value={gradYear}
@@ -329,7 +330,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
         {step === 2 && (
           <>
             <p className="text-sm text-muted">
-              {t('添加你的技能分类及具体技能（逗号分隔）', 'Add skill categories and items (comma-separated)')}
+              {t(lang, 'form.profile.skills_hint')}
             </p>
             <div className="space-y-3">
               {skills.map((s, idx) => (
@@ -339,14 +340,14 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                       type="text"
                       value={s.category}
                       onChange={e => updateSkill(idx, 'category', e.target.value)}
-                      placeholder={t('分类 (如 AI/ML)', 'Category (e.g. AI/ML)')}
+                      placeholder={t(lang, 'form.profile.category_placeholder')}
                       className={inputClass}
                     />
                     <input
                       type="text"
                       value={s.items}
                       onChange={e => updateSkill(idx, 'items', e.target.value)}
-                      placeholder={t('技能 (逗号分隔，如 PyTorch, LangChain)', 'Skills (comma-separated, e.g. PyTorch, LangChain)')}
+                      placeholder={t(lang, 'form.profile.skills_placeholder')}
                       className={inputClass}
                     />
                   </div>
@@ -367,7 +368,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               onClick={addSkill}
               className="text-sm text-lime-primary hover:text-lime-primary/80 transition-colors"
             >
-              + {t('添加技能分类', 'Add skill category')}
+              + {t(lang, 'form.profile.add_skill_category')}
             </button>
           </>
         )}
@@ -376,48 +377,48 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
         {step === 3 && (
           <>
             <div>
-              <label className={labelClass}>{t('兴趣方向', 'Interests')} ({t('逗号分隔', 'comma-separated')})</label>
+              <label className={labelClass}>{t(lang, 'form.profile.interests')} ({t(lang, 'form.profile.languages_placeholder')})</label>
               <input
                 type="text"
                 value={interests}
                 onChange={e => setInterests(e.target.value)}
-                placeholder={t('例如：AI Agent, Developer Tools', 'e.g. AI Agent, Developer Tools')}
+                placeholder={t(lang, 'form.profile.interests_placeholder')}
                 className={inputClass}
               />
             </div>
             <div>
-              <label className={labelClass}>{t('期望角色', 'Looking for Roles')} ({t('逗号分隔', 'comma-separated')})</label>
+              <label className={labelClass}>{t(lang, 'form.profile.looking_for_roles')} ({t(lang, 'form.profile.languages_placeholder')})</label>
               <input
                 type="text"
                 value={lookingForRoles}
                 onChange={e => setLookingForRoles(e.target.value)}
-                placeholder={t('例如：Frontend Developer, ML Engineer', 'e.g. Frontend Developer, ML Engineer')}
+                placeholder={t(lang, 'form.profile.roles_placeholder')}
                 className={inputClass}
               />
             </div>
             <div>
-              <label className={labelClass}>{t('理想团队规模', 'Team Size')}</label>
+              <label className={labelClass}>{t(lang, 'form.profile.team_size')}</label>
               <input
                 type="text"
                 value={teamSize}
                 onChange={e => setTeamSize(e.target.value)}
-                placeholder={t('例如：3-5', 'e.g. 3-5')}
+                placeholder={t(lang, 'form.profile.team_size_placeholder')}
                 className={inputClass}
               />
             </div>
             <div>
-              <label className={labelClass}>{t('协作方式', 'Collaboration Style')}</label>
+              <label className={labelClass}>{t(lang, 'form.profile.collaboration_style')}</label>
               <input
                 type="text"
                 value={collaborationStyle}
                 onChange={e => setCollaborationStyle(e.target.value)}
-                placeholder={t('例如：async-friendly', 'e.g. async-friendly')}
+                placeholder={t(lang, 'form.profile.collaboration_placeholder')}
                 className={inputClass}
               />
             </div>
 
             <div className="border-t border-secondary-bg pt-4 mt-4">
-              <p className="text-sm text-muted mb-4">{t('社交链接', 'Social Links')}</p>
+              <p className="text-sm text-muted mb-4">{t(lang, 'form.profile.social_links')}</p>
               <div className="space-y-4">
                 <div>
                   <label className={labelClass}>Twitter</label>
@@ -440,7 +441,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>{t('个人网站', 'Website')}</label>
+                  <label className={labelClass}>{t(lang, 'form.profile.website')}</label>
                   <input
                     type="text"
                     value={website}
@@ -458,7 +459,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
         {step === 4 && (
           <>
             <div>
-              <label className={labelClass}>{t('预览 YAML', 'Preview YAML')}</label>
+              <label className={labelClass}>{t(lang, 'form.profile.preview_yaml')}</label>
               <pre className="w-full bg-surface border border-secondary-bg rounded-md px-4 py-3 text-lime-primary text-sm font-mono overflow-x-auto whitespace-pre-wrap">
                 {yamlContent}
               </pre>
@@ -481,7 +482,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               onClick={() => setStep(s => s - 1)}
               className="px-4 py-2 rounded-lg border border-secondary-bg text-muted text-sm hover:text-white hover:border-light-gray transition-colors"
             >
-              {t('上一步', 'Back')}
+              {t(lang, 'form.profile.back')}
             </button>
           ) : (
             <div />
@@ -493,7 +494,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               onClick={() => setStep(s => s + 1)}
               className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors"
             >
-              {t('下一步', 'Next')}
+              {t(lang, 'form.profile.next')}
             </button>
           ) : (
             <button
@@ -502,7 +503,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               disabled={!isLoggedIn}
               className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {t('前往 GitHub 提交 PR', 'Submit PR on GitHub')} {'\u2192'}
+              {t(lang, 'form.profile.submit_pr')} {'\u2192'}
             </button>
           )}
         </div>

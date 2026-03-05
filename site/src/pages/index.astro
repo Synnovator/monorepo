@@ -1,11 +1,12 @@
 ---
+export const prerender = false;
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HackathonCard from '../components/HackathonCard.astro';
 import { getCollection } from 'astro:content';
-import { t, getCurrentStage } from '../lib/i18n';
+import { t, getCurrentStage, getLangFromUrl } from '../lib/i18n';
 import type { Lang } from '../lib/i18n';
 
-const lang: Lang = 'zh';
+const lang: Lang = getLangFromUrl(Astro.url);
 
 const allHackathons = await getCollection('hackathons');
 
@@ -38,7 +39,7 @@ const searchIndex = hackathons.map(entry => {
 });
 ---
 
-<BaseLayout title={t(lang, 'home.title')}>
+<BaseLayout title={t(lang, 'home.title')} lang={lang}>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <!-- Hero -->
     <div class="mb-12">
@@ -60,7 +61,7 @@ const searchIndex = hackathons.map(entry => {
         <input
           type="text"
           id="search-input"
-          placeholder={lang === 'zh' ? '搜索活动名称...' : 'Search events...'}
+          placeholder={t(lang, 'home.search_placeholder')}
           class="w-full bg-dark-bg border border-secondary-bg rounded-lg pl-10 pr-4 py-2.5 text-white text-sm placeholder-muted focus:border-lime-primary focus:outline-none transition-colors"
         />
       </div>
@@ -107,7 +108,7 @@ const searchIndex = hackathons.map(entry => {
 
     <!-- No results message -->
     <div id="no-results" class="hidden text-center py-24">
-      <p class="text-muted text-lg">{lang === 'zh' ? '没有找到匹配的活动' : 'No matching events found'}</p>
+      <p class="text-muted text-lg">{t(lang, 'home.no_matching')}</p>
     </div>
   </div>
 </BaseLayout>

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { buildPRUrl, openGitHubUrl, GITHUB_ORG, GITHUB_REPO } from '@/lib/github-url';
+import { t } from '@/lib/i18n';
+import type { Lang } from '@/lib/i18n';
 import type { Track } from './form-utils';
 
 interface RegisterFormProps {
@@ -8,7 +10,7 @@ interface RegisterFormProps {
   hackathonName: string;
   tracks: Track[];
   ndaRequired: boolean;
-  lang: 'zh' | 'en';
+  lang: Lang;
 }
 
 function escapeYamlValue(val: string): string {
@@ -31,7 +33,6 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const t = (zh: string, en: string) => lang === 'zh' ? zh : en;
   const isSolo = role === 'participant';
   const canSubmit = isLoggedIn && track && role && termsAgreed && profileConfirmed && (isSolo || teamName);
 
@@ -46,7 +47,7 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
       const profileCheck = await res.json();
 
       if (!profileCheck.exists || !profileCheck.slug) {
-        setError(t('请先创建 Profile', 'Please create your profile first'));
+        setError(t(lang, 'form.register.create_profile_first'));
         setSubmitting(false);
         return;
       }
@@ -60,15 +61,9 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
 
       if (!ghRes.ok) {
         if (ghRes.status === 404) {
-          throw new Error(t(
-            `GitHub 上未找到 Profile 文件 (${profilePath})，请确认 PR 已合并`,
-            `Profile file not found on GitHub (${profilePath}). Make sure your profile PR is merged.`
-          ));
+          throw new Error(t(lang, 'form.register.profile_not_found'));
         }
-        throw new Error(t(
-          `GitHub API 请求失败 (${ghRes.status})`,
-          `GitHub API request failed (${ghRes.status})`
-        ));
+        throw new Error(t(lang, 'form.register.github_api_failed'));
       }
 
       let profileContent = await ghRes.text();
@@ -82,10 +77,7 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
       // Check for duplicate registration
       if (profileContent.includes(`hackathon: "${safeSlug}"`) &&
           profileContent.includes('registrations:')) {
-        setError(t(
-          `您已报名参加 ${hackathonSlug}`,
-          `You have already registered for ${hackathonSlug}`
-        ));
+        setError(t(lang, 'form.register.already_registered'));
         setSubmitting(false);
         return;
       }
@@ -116,7 +108,7 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
       });
       openGitHubUrl(url);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : t('操作失败，请重试', 'Operation failed, please try again');
+      const msg = err instanceof Error ? err.message : t(lang, 'form.register.operation_failed');
       setError(msg);
     }
     setSubmitting(false);
@@ -125,17 +117,17 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
   return (
     <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6">
       <h3 className="text-lg font-heading font-bold text-white mb-6">
-        {t('活动报名', 'Register for Hackathon')}
+        {t(lang, 'form.register.title')}
       </h3>
 
       {!loading && !isLoggedIn && (
         <div className="mb-6 p-4 rounded-lg bg-warning/10 border border-warning/30">
-          <p className="text-warning text-sm mb-3">{t('请先登录 GitHub', 'Please sign in with GitHub first')}</p>
+          <p className="text-warning text-sm mb-3">{t(lang, 'form.register.sign_in_first')}</p>
           <a
             href={`/api/auth/login?returnTo=${typeof window !== 'undefined' ? encodeURIComponent(window.location.pathname) : ''}`}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors"
           >
-            {t('登录 GitHub', 'Sign in with GitHub')}
+            {t(lang, 'form.register.sign_in_github')}
           </a>
         </div>
       )}
@@ -145,7 +137,7 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
           {error}
           {error.includes('Profile') && (
             <a href="/create-profile" className="ml-2 text-lime-primary hover:underline">
-              {t('创建 Profile', 'Create Profile')}
+              {t(lang, 'form.register.create_profile')}
             </a>
           )}
         </div>
@@ -153,7 +145,7 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
 
       <fieldset disabled={!isLoggedIn || loading} className="space-y-5">
         <div>
-          <label className="block text-sm text-muted mb-2">{t('活动', 'Hackathon')}</label>
+          <label className="block text-sm text-muted mb-2">{t(lang, 'form.register.hackathon')}</label>
           <input type="text" value={hackathonName} readOnly
             className="w-full bg-surface/50 border border-secondary-bg rounded-md px-3 py-2 text-muted text-sm cursor-not-allowed" />
         </div>
@@ -165,10 +157,10 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
         </div>
 
         <div>
-          <label className="block text-sm text-muted mb-2">{t('赛道', 'Track')}</label>
+          <label className="block text-sm text-muted mb-2">{t(lang, 'form.register.track')}</label>
           <select value={track} onChange={e => setTrack(e.target.value)}
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
-            <option value="">{t('请选择赛道', 'Select a track')}</option>
+            <option value="">{t(lang, 'form.register.select_track')}</option>
             {tracks.map(tr => (
               <option key={tr.slug} value={tr.slug}>
                 {lang === 'zh' && tr.name_zh ? tr.name_zh : tr.name}
@@ -178,10 +170,10 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
         </div>
 
         <div>
-          <label className="block text-sm text-muted mb-2">{t('角色', 'Role')}</label>
+          <label className="block text-sm text-muted mb-2">{t(lang, 'form.register.role')}</label>
           <select value={role} onChange={e => setRole(e.target.value)}
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
-            <option value="">{t('请选择角色', 'Select a role')}</option>
+            <option value="">{t(lang, 'form.register.select_role')}</option>
             {ROLES.map(r => (
               <option key={r.value} value={r.value}>
                 {lang === 'zh' ? r.zh : r.en}
@@ -192,7 +184,7 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
 
         {role && !isSolo && (
           <div>
-            <label className="block text-sm text-muted mb-2">{t('队伍名称', 'Team Name')}</label>
+            <label className="block text-sm text-muted mb-2">{t(lang, 'form.register.team_name')}</label>
             <input type="text" value={teamName} onChange={e => setTeamName(e.target.value)}
               placeholder="team-alpha"
               className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none" />
@@ -202,25 +194,25 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
         <div className="space-y-3 pt-2">
           <label className="flex items-start gap-3 cursor-pointer">
             <input type="checkbox" checked={termsAgreed} onChange={e => setTermsAgreed(e.target.checked)} className="mt-0.5 accent-lime-primary" />
-            <span className="text-sm text-light-gray">{t('已阅读比赛规则并同意条款', 'I have read the rules and agree to the terms')}</span>
+            <span className="text-sm text-light-gray">{t(lang, 'form.register.terms_agree')}</span>
           </label>
           <label className="flex items-start gap-3 cursor-pointer">
             <input type="checkbox" checked={profileConfirmed} onChange={e => setProfileConfirmed(e.target.checked)} className="mt-0.5 accent-lime-primary" />
-            <span className="text-sm text-light-gray">{t('Profile 已创建且信息最新', 'My profile is created and up to date')}</span>
+            <span className="text-sm text-light-gray">{t(lang, 'form.register.profile_up_to_date')}</span>
           </label>
         </div>
 
         {ndaRequired && (
           <div className="p-3 rounded-lg bg-warning/10 border border-warning/30 text-warning text-sm">
-            {t('此活动需要签署 NDA，请在报名前完成签署', 'This hackathon requires NDA signing. Please sign before registering.')}
+            {t(lang, 'form.register.nda_required_hint')}
           </div>
         )}
 
         <button onClick={handleSubmit} disabled={!canSubmit || submitting}
           className="w-full bg-lime-primary text-near-black px-6 py-3 rounded-lg font-medium text-sm hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           {submitting
-            ? t('处理中...', 'Processing...')
-            : t('报名并创建 PR', 'Register & Create PR')} →
+            ? t(lang, 'form.register.processing')
+            : t(lang, 'form.register.submit_pr')} →
         </button>
       </fieldset>
     </div>
