@@ -28,6 +28,8 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
     "@modyfi/vite-plugin-yaml": "^1.1.1",
+    "@svgr/plugin-jsx": "^8.1.0",
+    "@svgr/plugin-svgo": "^8.1.0",
     "@tailwindcss/vite": "^4.1.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.3.3",
@@ -35,6 +37,7 @@
     "@types/react-dom": "^19.2.3",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.9.3",
+    "vite-plugin-svgr": "^4.5.0",
     "wrangler": "^4.69.0"
   },
   "pnpm": {
