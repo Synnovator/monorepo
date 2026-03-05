@@ -81,6 +81,10 @@ Consistent spacing tokens and corner radius values.
 
 ### Spacing Tokens / 间距令牌
 
+> **实现状态**: 以下 token 已规范但尚未在 `site/src/styles/global.css` 中定义为 CSS 变量。
+> 当前站点直接使用 Tailwind 的间距工具类（`p-2`, `gap-4` 等），未通过自定义 CSS 变量引用。
+> Tier 3 计划将补充实现。
+
 | Token | Variable | Value |
 |-------|----------|-------|
 | XS / 极小 | `$spacing-xs` | `4px` |
@@ -100,9 +104,40 @@ Consistent spacing tokens and corner radius values.
 | XL / 超大圆角 | `$radius-xl` | `20px` |
 | Pill / 胶囊 | `$radius-pill` | `50px` |
 
+## shadcn/ui 语义映射层
+
+站点使用 shadcn/ui 组件库，通过 CSS 变量将 Neon Forge token 映射到 shadcn/ui 的语义化接口。
+以下映射定义在 `site/src/styles/global.css` 的 `:root` 中：
+
+| shadcn 变量 | 映射到 Neon Forge Token | 用途 |
+|------------|----------------------|------|
+| `--background` | `var(--color-surface)` | 页面背景 |
+| `--foreground` | `var(--color-light-gray)` | 默认文字 |
+| `--card` | `var(--color-dark-bg)` | 卡片背景 |
+| `--primary` | `var(--color-lime-primary)` | 主操作色 |
+| `--secondary` | `var(--color-secondary-bg)` | 次要背景 |
+| `--muted` | `var(--color-secondary-bg)` | 弱化背景 |
+| `--accent` | `var(--color-secondary-bg)` | 强调背景 |
+| `--destructive` | `var(--color-error)` | 危险操作 |
+| `--border` | `var(--color-secondary-bg)` | 边框 |
+| `--ring` | `var(--color-lime-primary)` | 焦点环 |
+
+**字体 CSS 变量**（同样在 `:root` 定义）：
+
+| 变量 | 值 | 用途 |
+|------|-----|------|
+| `--font-heading` | `'Space Grotesk', sans-serif` | 标题 |
+| `--font-body` | `'Inter', sans-serif` | 正文 |
+| `--font-code` | `'Poppins', sans-serif` | 代码/数字 |
+| `--font-zh` | `'Noto Sans SC', sans-serif` | 中文 |
+
 ---
 
 ## Page Layout / 页面布局
+
+> **实现状态**: 以下布局尺寸已规范但尚未在 CSS 中定义为变量。
+> 当前站点使用 Tailwind 响应式工具类实现布局，未严格遵循 1440px 固定视口设计。
+> Tier 3 计划将评估是否需要实现为 CSS 变量。
 
 Page layout grid for the Synnovator platform at W>1440 breakpoint.
 协创者平台在 W>1440 断点下的页面布局网格。

@@ -22,15 +22,20 @@ P0 第一批实施聚焦**站点核心页面**：构建可运行的 Astro 站点
 
 ### 1.2 不在本批范围
 
-- Cloudflare Pages Hybrid 切换（保持 `output: 'static'`）
-- Pages Functions（/api/*）
+> **注意**：以下功能已在后续迭代中提前实现并合入 P0，此列表仅保留历史记录。
+> 实际 P0 已包含：Hybrid 模式、Pages Functions（OAuth、presign）、GitHub OAuth。
+
+- ~~Cloudflare Pages Hybrid 切换（保持 `output: 'static'`）~~ ✅ 已实现
+- ~~Pages Functions（/api/*）~~ ✅ 已实现（/api/auth/*, /api/presign, /api/check-profile）
 - GitHub Actions 深度校验增强
-- GitHub OAuth 认证流程
-- R2 文件上传
+- ~~GitHub OAuth 认证流程~~ ✅ 已实现
+- R2 文件上传（presigned URL 已实现，直接上传待做）
 
 ### 1.3 部署目标
 
-保持 GitHub Pages (static) 部署，后续批次切换到 Cloudflare Pages。
+~~保持 GitHub Pages (static) 部署，后续批次切换到 Cloudflare Pages。~~
+
+**当前状态**：已切换到 Cloudflare Pages (Hybrid mode)，使用 `wrangler deploy` 部署生产环境，`wrangler versions upload` 部署预览。
 
 ---
 
@@ -163,7 +168,7 @@ BaseLayout 升级为：
 ### 5.1 Astro Content Collections
 
 ```typescript
-// site/src/content/config.ts
+// site/src/content.config.ts  (Astro 5 convention)
 import { defineCollection, z } from 'astro:content';
 
 const hackathons = defineCollection({
@@ -203,9 +208,11 @@ Astro content 目录必须在 `src/content/`。通过以下方式引用 monorepo
 
 选择方案 A，在 `package.json` 添加 `prebuild` 脚本确保数据同步。
 
-### 5.3 搜索索引
+### 5.3 搜索过滤
 
-构建时从 hackathons collection 提取 `{slug, name, name_zh, type, tagline, stage}` 生成 `public/search-index.json`，供客户端过滤。
+~~构建时从 hackathons collection 提取 `{slug, name, name_zh, type, tagline, stage}` 生成 `public/search-index.json`，供客户端过滤。~~
+
+**当前实现**：首页（`index.astro`）在服务端通过 `getCollection('hackathons')` 加载全量数据，渲染为 HTML 后由浏览器端 JavaScript 进行搜索过滤，未生成独立的 `search-index.json` 文件。
 
 ---
 
@@ -283,7 +290,7 @@ Props：`action` (register/submit/appeal/create-profile/edit-file), `hackathonSl
 
 | 决策 | 选择 | 理由 |
 |------|------|------|
-| 部署模式 | `output: 'static'`（本批保持） | 降低复杂度，Hybrid 切换下一批 |
+| 部署模式 | `output: 'hybrid'` + Cloudflare Pages | 已切换，支持 SSR + Pages Functions |
 | YAML 加载 | Astro Content Collections | 内置 Schema 校验 + 类型安全 + 动态路由 |
 | 外部数据映射 | prebuild 脚本复制 | 比 symlink 更可靠，跨平台兼容 |
 | CSS 方案 | Tailwind CSS 4 @theme + CSS custom properties | 与设计系统 tokens 一致，无需 tailwind.config.js |

@@ -20,14 +20,41 @@
 | [visitor.spec](acceptance/visitor.spec.md) | 访客验收规范 |
 | [platform.spec](acceptance/platform.spec.md) | 平台基础设施验收规范 |
 
-### `plans/` — 实施计划
+### `plans/` — 实施计划与设计文档
 
-| 文档 | 内容 |
+| 文件 | 说明 |
 |------|------|
-| [architecture-design](plans/2026-03-03-architecture-design.md) | 架构设计文档（CF Pages Hybrid + R2） |
-| [acceptance-specs-design](plans/2026-03-03-acceptance-specs-design.md) | 验收规范设计决策 |
-| [monorepo-init-design](plans/2026-03-03-monorepo-init-design.md) | Monorepo 初始化设计 |
-| [monorepo-init](plans/2026-03-03-monorepo-init.md) | Monorepo 初始化实施计划 |
+| **2026-03-03 基础架构** | |
+| `2026-03-03-architecture-design.md` | 系统架构设计 |
+| `2026-03-03-monorepo-init-design.md` | Monorepo 初始化设计 |
+| `2026-03-03-monorepo-init.md` | Monorepo 初始化实施 |
+| `2026-03-03-acceptance-specs-design.md` | 验收规范设计 |
+| **2026-03-03 P0/P1 实施** | |
+| `2026-03-03-p0-full-implementation-design.md` | P0 完整实施设计 |
+| `2026-03-03-p0-full-implementation.md` | P0 完整实施计划 |
+| `2026-03-03-p0-site-core-design.md` | P0 站点核心设计 |
+| `2026-03-03-p0-site-core-implementation.md` | P0 站点核心实施 |
+| `2026-03-03-p1-core-workflows-design.md` | P1 核心工作流设计 |
+| `2026-03-03-p1-core-workflows-implementation.md` | P1 核心工作流实施 |
+| `2026-03-03-synnovator-admin-skill-design.md` | 管理 Skill 设计 |
+| **2026-03-04 功能增强** | |
+| `2026-03-04-icon-integration-design.md` | 图标集成设计 |
+| `2026-03-04-icon-integration-implementation.md` | 图标集成实施 |
+| `2026-03-04-messagechannel-fix-design.md` | MessageChannel 修复设计 |
+| `2026-03-04-smart-forms-design.md` | 智能表单设计 |
+| `2026-03-04-smart-forms-implementation.md` | 智能表单实施 |
+| `2026-03-04-submissions-redesign-design.md` | 提交页重设计 |
+| `2026-03-04-submissions-redesign-plan.md` | 提交页重设计实施 |
+| **2026-03-05 维护与新功能** | |
+| `2026-03-05-docs-alignment-design.md` | 文档对齐方案 |
+| `2026-03-05-docs-alignment-tier1.md` | 文档对齐 Tier 1 实施 |
+| `2026-03-05-fix-hackathon-500-errors.md` | Hackathon 500 错误修复 |
+| `2026-03-05-proposals-page-design.md` | Proposals 页面设计 |
+| `2026-03-05-proposals-page-plan.md` | Proposals 页面实施 |
+| `2026-03-05-simulate-subcommand-design.md` | 模拟子命令设计 |
+| `2026-03-05-simulate-subcommand-impl.md` | 模拟子命令实施 |
+| `2026-03-05-unified-guides-page-design.md` | 统一指南页设计 |
+| `2026-03-05-unified-guides-page-plan.md` | 统一指南页实施 |
 
 ### `guides/` — 指南
 
