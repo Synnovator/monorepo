@@ -2,13 +2,12 @@
 export const prerender = false;
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CreateProposalForm from '../components/forms/CreateProposalForm';
-import { getLangFromUrl } from '../lib/i18n';
 import type { Lang } from '../lib/i18n';
 import fs from 'node:fs';
 import path from 'node:path';
 import yaml from 'js-yaml';
 
-const lang: Lang = getLangFromUrl(Astro.url);
+const lang: Lang = 'zh';
 
 interface TrackInfo {
   name: string;
