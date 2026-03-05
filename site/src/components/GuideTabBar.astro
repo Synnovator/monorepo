@@ -1,0 +1,36 @@
+---
+import { t } from '../lib/i18n';
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  activeRole: 'hacker' | 'organizer' | 'judge';
+  lang?: Lang;
+}
+
+const { activeRole, lang = 'zh' } = Astro.props;
+
+const tabs = [
+  { role: 'hacker' as const, href: '/guides/hacker', labelKey: 'guide.hacker_title' },
+  { role: 'organizer' as const, href: '/guides/organizer', labelKey: 'guide.organizer_title' },
+  { role: 'judge' as const, href: '/guides/judge', labelKey: 'guide.judge_title' },
+];
+---
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+  <nav class="flex gap-6 border-b border-secondary-bg" aria-label="Guide tabs">
+    {tabs.map((tab) => (
+      <a
+        href={tab.href}
+        class:list={[
+          'pb-3 text-sm transition-colors',
+          activeRole === tab.role
+            ? 'border-b-2 border-lime-primary text-lime-primary font-medium'
+            : 'text-muted hover:text-white',
+        ]}
+        aria-current={activeRole === tab.role ? 'page' : undefined}
+      >
+        {t(lang, tab.labelKey)}
+      </a>
+    ))}
+  </nav>
+</div>
