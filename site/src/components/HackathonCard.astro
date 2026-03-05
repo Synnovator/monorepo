@@ -1,6 +1,7 @@
 ---
 import { getCurrentStage, t, localize } from '../lib/i18n';
 import type { Lang } from '../lib/i18n';
+import { TrophyIcon } from './icons';
 
 interface Props {
   hackathon: {
@@ -46,9 +47,12 @@ const stageColors: Record<string, string> = {
   </div>
 
   <!-- Title -->
-  <h3 class="text-white font-heading font-bold text-lg mb-2 group-hover:text-lime-primary transition-colors">
-    {localize(lang, hackathon.name, hackathon.name_zh)}
-  </h3>
+  <div class="flex items-center gap-2 mb-2">
+    <TrophyIcon size={20} className="shrink-0 opacity-60" />
+    <h3 class="text-white font-heading font-bold text-lg group-hover:text-lime-primary transition-colors">
+      {localize(lang, hackathon.name, hackathon.name_zh)}
+    </h3>
+  </div>
 
   <!-- Tagline -->
   <div class="flex-grow">
