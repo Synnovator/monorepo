@@ -4,36 +4,23 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { t, localize, getLangFromUrl } from '../../../lib/i18n';
 import type { Lang } from '../../../lib/i18n';
-import fs from 'node:fs';
-import path from 'node:path';
-
-export async function getStaticPaths() {
-  const allSubmissions = await getCollection('submissions');
-  return allSubmissions.map(entry => {
-    // ID format: {hackathon}/submissions/{team}/project
-    const parts = entry.id.split('/');
-    const hackathon = parts[0];
-    const team = parts[2];
-    return {
-      params: { hackathon, team },
-      props: { entry },
-    };
-  });
-}
-
-const { entry } = Astro.props;
 const { hackathon, team } = Astro.params;
+const allSubmissions = await getCollection('submissions');
+const entry = allSubmissions.find(s => {
+  const parts = s.id.split('/');
+  return parts[0] === hackathon && parts[2] === team;
+});
+if (!entry) return Astro.redirect('/404');
 const project = entry.data.project;
 const lang: Lang = getLangFromUrl(Astro.url);
 
-// Try to read README.mdx or README.md for rich content
-const readmeMdxPath = path.resolve(`../hackathons/${hackathon}/submissions/${team}/README.mdx`);
-const readmeMdPath = path.resolve(`../hackathons/${hackathon}/submissions/${team}/README.md`);
-let readmeContent: string | null = null;
-if (fs.existsSync(readmeMdxPath)) {
-  readmeContent = fs.readFileSync(readmeMdxPath, 'utf8');
-} else if (fs.existsSync(readmeMdPath)) {
-  readmeContent = fs.readFileSync(readmeMdPath, 'utf8');
+// Load README via content collection (renders MDX/markdown properly)
+const allReadmes = await getCollection('readmes');
+const readmeEntry = allReadmes.find(r => r.id.startsWith(`${hackathon}/submissions/${team}/`));
+let ReadmeContent: any = null;
+if (readmeEntry) {
+  const rendered = await readmeEntry.render();
+  ReadmeContent = rendered.Content;
 }
 
 // Get hackathon name for breadcrumb
@@ -81,9 +68,9 @@ const trackName = hackathonEntry?.data.hackathon.tracks?.find(tr => tr.slug === 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Main content (2/3) */}
       <div class="lg:col-span-2">
-        {readmeContent ? (
+        {ReadmeContent ? (
           <div class="prose prose-invert prose-sm max-w-none text-light-gray">
-            <Fragment set:html={readmeContent} />
+            <ReadmeContent />
           </div>
         ) : project.description ? (
           <div class="prose prose-invert prose-sm max-w-none text-light-gray">

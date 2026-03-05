@@ -290,4 +290,27 @@ const submissions = defineCollection({
   schema: submissionSchema,
 });
 
-export const collections = { hackathons, profiles, submissions };
+const readmes = defineCollection({
+  loader: glob({ pattern: '**/submissions/*/README.{md,mdx}', base: '../hackathons' }),
+});
+
+const results = defineCollection({
+  loader: glob({ pattern: '**/results/*.json', base: '../hackathons' }),
+  schema: z.object({
+    calculated_at: z.string(),
+    total_judges: z.number(),
+    total_teams: z.number(),
+    rankings: z.array(z.object({
+      rank: z.number(),
+      team: z.string(),
+      final_score: z.number(),
+      criteria_breakdown: z.array(z.object({
+        criterion: z.string(),
+        weight: z.number(),
+        average: z.number(),
+      })).optional(),
+    })),
+  }),
+});
+
+export const collections = { hackathons, profiles, submissions, readmes, results };

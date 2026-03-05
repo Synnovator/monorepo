@@ -7,16 +7,10 @@ import { getCollection } from 'astro:content';
 import { t, localize, getLangFromUrl } from '../../lib/i18n';
 import type { Lang } from '../../lib/i18n';
 
-export async function getStaticPaths() {
-  const profiles = await getCollection('profiles');
-  return profiles.map(entry => ({
-    // entry.id will be the filename without extension, e.g. "zhou-haoran-a1b2c3d4"
-    params: { id: entry.id },
-    props: { entry },
-  }));
-}
-
-const { entry } = Astro.props;
+const { id } = Astro.params;
+const allProfiles = await getCollection('profiles');
+const entry = allProfiles.find(e => e.id === id);
+if (!entry) return Astro.redirect('/404');
 const h = entry.data.hacker;
 const lang: Lang = getLangFromUrl(Astro.url);
 ---

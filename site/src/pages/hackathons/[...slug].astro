@@ -19,18 +19,10 @@ import { RocketIcon, ClipboardListIcon, ShieldCheckIcon } from '../../components
 import { getCollection } from 'astro:content';
 import { t, localize, getCurrentStage, getLangFromUrl } from '../../lib/i18n';
 import type { Lang } from '../../lib/i18n';
-import fs from 'node:fs';
-import path from 'node:path';
-
-export async function getStaticPaths() {
-  const hackathons = await getCollection('hackathons');
-  return hackathons.map(entry => ({
-    params: { slug: entry.data.hackathon.slug },
-    props: { entry },
-  }));
-}
-
-const { entry } = Astro.props;
+const { slug } = Astro.params;
+const allHackathons = await getCollection('hackathons');
+const entry = allHackathons.find(e => e.data.hackathon.slug === slug);
+if (!entry) return Astro.redirect('/404');
 const h = entry.data.hackathon;
 const lang: Lang = getLangFromUrl(Astro.url);
 const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
@@ -54,18 +46,17 @@ function getTeamSlug(submissionId: string): string {
 const submissionTracks = [...new Set(submissions.map(s => s.data.project.track))];
 
 // Load leaderboard results
-const resultsDir = path.resolve(`../hackathons/${h.slug}/results`);
+const allResults = await getCollection('results');
 const showLeaderboard = ['announcement', 'award', 'ended'].includes(stage);
 let trackResults: Array<{ track: string; data: any }> = [];
-if (showLeaderboard && fs.existsSync(resultsDir)) {
-  const files = fs.readdirSync(resultsDir).filter(f => f.endsWith('.json'));
-  for (const file of files) {
-    try {
-      const raw = fs.readFileSync(path.join(resultsDir, file), 'utf8');
-      const data = JSON.parse(raw);
-      trackResults.push({ track: file.replace('.json', ''), data });
-    } catch { /* skip invalid */ }
-  }
+if (showLeaderboard) {
+  trackResults = allResults
+    .filter(r => r.id.startsWith(`${h.slug}/`))
+    .map(r => {
+      const parts = r.id.split('/');
+      const track = parts[parts.length - 1];
+      return { track, data: r.data };
+    });
 }
 
 // Map track slugs to track names
