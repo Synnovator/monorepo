@@ -577,3 +577,54 @@
   - 配置变更记录（commit hash、作者、时间、变更摘要）
   - Issue/PR 操作记录（创建、Label 变更、合并）
   - 异常检测提示（如非 CODEOWNERS 的 PR 合并、短时间大量操作等）
+
+---
+
+## US-P-018: 指南中心页面 [P0]
+
+> **前置条件**: site/ 路由配置，指南子页面已存在
+> **涉及层**: Site 指南中心页面 → 角色卡片 → 指南子页面 TabBar
+
+### SC-P-018.1: 指南中心页面渲染
+
+- **Given** 用户访问 `/guides/`
+- **When** 页面加载完成
+- **Then** 显示三张角色卡片（Hacker、Organizer、Judge），每张卡片链接到对应的指南子页面
+
+### SC-P-018.2: 指南子页面 TabBar
+
+- **Given** 用户在任一指南子页面（如 `/guides/hacker`）
+- **When** 页面加载完成
+- **Then** 顶部显示 GuideTabBar，高亮当前角色，可切换到其他角色指南
+
+---
+
+## US-P-019: 提案页面 [P1]
+
+> **前置条件**: site/ 路由配置，GitHub Issue 模板已创建
+> **涉及层**: Site 提案列表页面 → 提案创建表单 → GitHub Issue URL 生成
+
+### SC-P-019.1: 提案列表展示
+
+- **Given** 用户访问 `/proposals`
+- **When** 页面加载完成
+- **Then** 显示所有提案列表
+
+### SC-P-019.2: 创建提案
+
+- **Given** 用户访问 `/create-proposal`
+- **When** 填写提案表单并提交
+- **Then** 生成预填的 GitHub Issue URL，用户点击后跳转到 GitHub 创建 Issue
+
+---
+
+## US-P-020: 结果展示页面 [P1]
+
+> **前置条件**: 活动已完成评分，results JSON 数据已生成
+> **涉及层**: Site 结果页面 → 排行榜组件 → 评分数据展示
+
+### SC-P-020.1: 结果页面渲染
+
+- **Given** 用户访问 `/results/{slug}`
+- **When** 该活动已有 results JSON 数据
+- **Then** 显示排行榜，包含团队名、总分和各评分维度分数
