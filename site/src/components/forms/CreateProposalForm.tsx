@@ -366,7 +366,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
             </button>
           ) : (
             <button type="button" onClick={handleSubmit}
-              disabled={!isLoggedIn || !name || !repo || !selectedHackathon}
+              disabled={!isLoggedIn || !name || !tagline || !track || !repo || !selectedHackathon || techStack.length === 0 || !members[0]?.github?.trim()}
               className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {t(lang, 'form.create_proposal.submit_pr')} {'\u2192'}
             </button>
