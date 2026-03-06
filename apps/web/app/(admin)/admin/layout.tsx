@@ -3,6 +3,8 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { decrypt, type Session } from '@synnovator/shared/auth';
 import { createGitHubClient } from '@synnovator/shared/data';
+import { NavBar } from '@/components/NavBar';
+import { Footer } from '@/components/Footer';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -27,21 +29,29 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!['admin', 'maintain', 'write'].includes(permission)) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-heading text-error mb-2">Access Denied</h1>
-          <p className="text-muted">You need admin or maintain permission on the repository.</p>
+      <>
+        <Suspense><NavBar /></Suspense>
+        <div className="min-h-screen pt-16 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-heading text-error mb-2">Access Denied</h1>
+            <p className="text-muted">You need admin or maintain permission on the repository.</p>
+          </div>
         </div>
-      </div>
+        <Suspense><Footer /></Suspense>
+      </>
     );
   }
 
   return (
-    <div className="flex min-h-screen">
-      <Suspense>
-        <AdminSidebar user={session} />
-      </Suspense>
-      <div className="flex-1 p-8">{children}</div>
-    </div>
+    <>
+      <Suspense><NavBar /></Suspense>
+      <div className="flex min-h-screen pt-16">
+        <Suspense>
+          <AdminSidebar user={session} />
+        </Suspense>
+        <div className="flex-1 p-8">{children}</div>
+      </div>
+      <Suspense><Footer /></Suspense>
+    </>
   );
 }

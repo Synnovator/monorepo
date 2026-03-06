@@ -133,7 +133,10 @@
     "or_use_github": "或使用 GitHub 登录",
     "or_use_password": "或使用密码登录",
     "invalid_credentials": "用户名或密码错误",
-    "network_error": "网络错误，请重试"
+    "network_error": "网络错误，请重试",
+    "loading": "加载中...",
+    "link_github": "关联 GitHub",
+    "link_github_hint": "请先登录 GitHub 以创建 Profile"
   },
   "score": {
     "title": "评分卡",

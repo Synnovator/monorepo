@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 export interface AuthUser {
   login: string;
   avatar_url: string;
+  isGitHub: boolean;
 }
 
 export interface AuthState {
@@ -23,7 +24,7 @@ export function useAuth(): AuthState {
         const data = await res.json();
         if (!cancelled) {
           if (data.authenticated) {
-            setUser({ login: data.login, avatar_url: data.avatar_url });
+            setUser({ login: data.login, avatar_url: data.avatar_url, isGitHub: data.isGitHub });
           } else {
             setUser(null);
           }

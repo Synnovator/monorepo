@@ -13,5 +13,6 @@ export async function GET(request: NextRequest) {
     authenticated: true,
     login: session.login,
     avatar_url: session.avatar_url,
+    isGitHub: session.access_token !== 'dev-token',
   });
 }
