@@ -479,37 +479,37 @@ GitHub Actions 负责:                     Cloudflare Pages 负责:
 ### 8.1 页面结构
 
 ```
-site/src/pages/
-├── index.astro                          # 首页：活动列表聚合
+apps/web/app/
+├── page.tsx                             # 首页：活动列表聚合
 ├── hackathons/
-│   └── [slug].astro                     # 活动详情（prerender: true）
+│   └── [slug]/page.tsx                  # 活动详情（SSG）
 ├── hackers/
-│   └── [id].astro                       # Hacker Profile（prerender: true）
+│   └── [id]/page.tsx                    # Hacker Profile（SSG）
 ├── projects/
-│   └── [team].astro                     # 项目展示（prerender: true）
+│   └── [hackathon]/[team]/page.tsx      # 项目展示（SSG）
 ├── guides/
-│   ├── organizer.astro                  # 组织者指南
-│   ├── hacker.astro                     # 参赛者指南
-│   └── judge.astro                      # 评委指南
-└── api/                                 # Pages Functions（prerender: false）
-    ├── presign.ts
-    ├── search.ts
-    ├── vote.ts
+│   ├── organizer/page.tsx               # 组织者指南
+│   ├── hacker/page.tsx                  # 参赛者指南
+│   └── judge/page.tsx                   # 评委指南
+└── api/                                 # Route Handlers
+    ├── presign/route.ts
+    ├── search/route.ts
+    ├── vote/route.ts
     └── auth/
-        ├── login.ts
-        └── callback.ts
+        ├── login/route.ts
+        └── callback/route.ts
 ```
 
 ### 8.2 核心组件
 
 | 组件 | 职责 | 交互方式 |
 |------|------|---------|
-| `GitHubRedirect.astro` | 生成预填 Issue/PR URL，跳转 GitHub | 纯客户端 JS，`target="_blank"` |
-| `ScoreCard.astro` | 评分卡 UI → 生成 YAML → GitHubRedirect | 客户端表单 → URL 编码 |
-| `Timeline.astro` | 7 阶段时间线可视化，当前阶段高亮 | 纯展示 + 阶段感知操作提示 |
-| `LanguageSwitcher.astro` | 中英文切换 | localStorage + URL 参数 |
-| `OAuthButton.astro` | GitHub OAuth 登录按钮 | 跳转 /api/auth/login |
-| `DatasetDownload.astro` | NDA 数据集下载按钮 | 调用 /api/presign |
+| `GitHubRedirect.tsx` | 生成预填 Issue/PR URL，跳转 GitHub | 纯客户端 JS，`target="_blank"` |
+| `ScoreCard.tsx` | 评分卡 UI → 生成 YAML → GitHubRedirect | 客户端表单 → URL 编码 |
+| `Timeline.tsx` | 7 阶段时间线可视化，当前阶段高亮 | 纯展示 + 阶段感知操作提示 |
+| `LanguageSwitcher.tsx` | 中英文切换 | localStorage + URL 参数 |
+| `OAuthButton.tsx` | GitHub OAuth 登录按钮 | 跳转 /api/auth/login |
+| `DatasetDownload.tsx` | NDA 数据集下载按钮 | 调用 /api/presign |
 
 ### 8.3 数据加载策略
 

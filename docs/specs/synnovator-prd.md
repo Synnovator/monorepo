@@ -379,23 +379,23 @@ hackathon:
         criteria:
           - name: "Innovation"
             name_zh: "创新性"
-            weight: 30
+            weight: 0.30
             description: "方法是否有新意，是否超越已有公开方案"
             score_range: [0, 100]
             hard_constraint: false
           - name: "Technical Depth"
             name_zh: "技术实现"
-            weight: 30
+            weight: 0.30
             description: "代码质量、可运行性、指标达成"
             score_range: [0, 100]
             hard_constraint: false
           - name: "Usability"
             name_zh: "完整度"
-            weight: 20
+            weight: 0.20
             score_range: [0, 100]
           - name: "Presentation"
             name_zh: "展示"
-            weight: 20
+            weight: 0.20
             score_range: [0, 100]
 
       # [P0 Gap 8] 提交物规范
@@ -436,19 +436,19 @@ hackathon:
         criteria:
           - name: "FRR_metric"
             name_zh: "误拒率指标"
-            weight: 35
+            weight: 0.35
             hard_constraint: false
           - name: "Bad_debt_constraint"
             name_zh: "坏账率约束"
-            weight: 25
+            weight: 0.25
             hard_constraint: true        # 超限则该维度 0 分
             constraint_rule: "坏账率变化须在 ±0.2pp 以内，超出则本项 0 分"
           - name: "Feasibility"
             name_zh: "技术可行性"
-            weight: 25
+            weight: 0.25
           - name: "Completeness"
             name_zh: "完整度"
-            weight: 15
+            weight: 0.15
 
       deliverables:
         required:
@@ -563,9 +563,22 @@ hacker:
 
   # 评委相关字段（当该用户作为评委时填写）
   judge_profile:
-    available: true
-    expertise: ["AI Agent", "NLP", "Code Generation"]
+    available: true                      # boolean — 是否可作为评委
+    expertise: ["AI Agent", "NLP", "Code Generation"]  # string[] — 专业领域列表
     conflict_declaration: ""             # 利益冲突声明 PDF 链接（R2）
+
+  # NDA 签署记录
+  nda_signed:
+    - hackathon: "enterprise-risk-2026"  # 活动 slug
+      signed_at: "2026-04-02T10:30:00Z"  # 签署时间 (ISO 8601)
+
+  # 活动报名记录
+  registrations:
+    - hackathon: "ai-agent-challenge-2026"  # 活动 slug
+      track: "ai-agent-framework"           # 赛道 slug
+      role: "participant"                   # enum: participant | mentor | observer
+      team: "team-alpha"                    # 所属团队（可选）
+      registered_at: "2026-04-01T09:00:00Z" # 报名时间 (ISO 8601)
 ```
 
 ### 6.3 Project Submission Schema
@@ -581,9 +594,9 @@ project:
 
   team:
     - github: "alice-dev"
-      role: "Lead Developer"
+      role: "leader"             # enum: leader | developer | designer | researcher | mentor
     - github: "bob-ai"
-      role: "AI Engineer"
+      role: "developer"
 
   mentors:                               # 指导教师（可选，高校竞赛场景）
     - github: "prof-wang"
@@ -626,7 +639,17 @@ project:
     AgentFlow 是一个可视化工作流构建器...
 ```
 
-### 6.4 Issue Templates
+### 6.4 Role Enums
+
+以下是各场景中 `role` 字段的枚举值定义：
+
+| 场景 | 字段路径 | 枚举值 | 说明 |
+|------|---------|--------|------|
+| 主办方/合作方 | `hackathon.organizers[].role` | `host` \| `co-host` \| `sponsor` \| `partner` | 活动组织者角色 |
+| 项目团队成员 | `project.team[].role` | `leader` \| `developer` \| `designer` \| `researcher` \| `mentor` | 提交团队中的成员角色 |
+| 活动报名 | `hacker.registrations[].role` | `participant` \| `mentor` \| `observer` | 报名时的参与角色 |
+
+### 6.5 Issue Templates
 
 #### 评委评分 Issue (`judge-score.yml`)
 
