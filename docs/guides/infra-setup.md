@@ -27,10 +27,11 @@
 - Build command: `cd site && pnpm install && pnpm build`
 - Build output directory: `site/dist`
 - Root directory: `/`（留空，不要设为 `site/`）
-- **Deploy command**: `cd site && pnpm run deploy`（执行 `wrangler deploy`）
+- **生产部署**: `cd site && pnpm run deploy`（执行 `wrangler deploy`）
+- **预览部署**: `cd site && pnpm run deploy:preview`（执行 `wrangler versions upload`，用于非 main 分支）
 - Node.js version: 环境变量 `NODE_VERSION` = `20`
 
-> **注意**: Production 和 Non-production 的 deploy command 都需要设置为 `cd site && pnpm run deploy`。
+> **注意**: Production 使用 `pnpm run deploy`，Non-production（PR Preview）使用 `pnpm run deploy:preview`。
 
 ### 1.3 自定义域名
 
@@ -111,6 +112,8 @@
 |--------|------|------|
 | `SITE_URL` | `https://home.synnovator.space` | 站点 URL（构建回调 URI） |
 | `GITHUB_CLIENT_ID` | `Iv23li...` | GitHub OAuth App Client ID（公开值） |
+| `GITHUB_OWNER` | `Synnovator` | GitHub 组织名 |
+| `GITHUB_REPO` | `monorepo` | 仓库名 |
 
 ### 4.2 Worker Secrets（敏感，通过 Dashboard 或 CLI 配置）
 
@@ -268,6 +271,8 @@ directory = "./dist"
 [vars]
 SITE_URL = "https://home.synnovator.space"
 GITHUB_CLIENT_ID = "Iv23li..."
+GITHUB_OWNER = "Synnovator"        # GitHub 组织名
+GITHUB_REPO = "monorepo"           # 仓库名
 ```
 
 > `[vars]` 存放非敏感运行时变量，敏感值通过 Worker Secrets 配置（见 §4.2）。
@@ -316,7 +321,7 @@ _worker.js
 
 ### 7.5 环境变量
 
-- [ ] `wrangler.toml [vars]`: `SITE_URL`, `GITHUB_CLIENT_ID` 已配置
+- [ ] `wrangler.toml [vars]`: `SITE_URL`, `GITHUB_CLIENT_ID`, `GITHUB_OWNER`, `GITHUB_REPO` 已配置
 - [ ] Worker Secrets: `GITHUB_CLIENT_SECRET`, `AUTH_SECRET`, R2 相关 4 项已配置
 - [ ] CF Pages Build Settings: `NODE_VERSION=20` 已配置
 - [ ] GitHub Actions Secrets: 5 项已配置（`gh secret list` 验证）

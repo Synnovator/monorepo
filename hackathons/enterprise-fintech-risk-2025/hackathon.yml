@@ -222,35 +222,35 @@ hackathon:
       name_zh: "赵文博"
       title: "Chief Review Officer"
       affiliation: "Xinchen FinTech"
-      expertise: "信贷风控，18年"
+      expertise: ["信贷风控"]
       conflict_declaration: ""
     - github: "lin-xiaohui"
       name: "Lin Xiaohui"
       name_zh: "林晓慧"
       title: "Algorithm Lead"
       affiliation: "Xinchen FinTech"
-      expertise: "机器学习，7年"
+      expertise: ["机器学习"]
       conflict_declaration: ""
     - github: "wu-hao"
       name: "Wu Hao"
       name_zh: "吴昊"
       title: "Former Chief Risk Scientist"
       affiliation: "External Expert"
-      expertise: "风控算法，14年"
+      expertise: ["风控算法"]
       conflict_declaration: ""
     - github: "zhang-ruping"
       name: "Zhang Ruping"
       name_zh: "张汝萍"
       title: "Regulatory Compliance Researcher"
       affiliation: "Fintech Regulatory Research Institute"
-      expertise: "算法合规，8年"
+      expertise: ["算法合规"]
       conflict_declaration: ""
     - github: "qian-shining"
       name: "Qian Shining"
       name_zh: "钱世宁"
       title: "Product Director"
       affiliation: "Xinchen FinTech"
-      expertise: "风控产品，5年"
+      expertise: ["风控产品"]
       conflict_declaration: ""
 
   datasets:

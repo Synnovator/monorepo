@@ -46,12 +46,15 @@ site/src/
 │   │   ├── TeamFormationForm.tsx
 │   │   ├── ProfileCreateForm.tsx
 │   │   ├── CreateHackathonForm.tsx
+│   │   ├── CreateProposalForm.tsx    ← 提案创建表单，生成 GitHub Issue URL
+│   │   ├── TimelineEditor.tsx        ← 时间线编辑器，用于 CreateHackathonForm 中的阶段日期选择
 │   │   └── form-utils.ts
 │   │
 │   ├── ScoreCard.tsx              ← Migrated from .astro
 │   ├── FAQAccordion.tsx           ← Migrated from .astro
 │   ├── DatasetDownload.tsx        ← Migrated from .astro
 │   ├── OAuthButton.tsx            ← Migrated from .astro
+│   ├── HackathonTabs.tsx          ← 活动详情页 Tab 切换器（Details / Submissions / Leaderboard）
 │   │
 │   ├── HackathonCard.astro        ← Keep (no interaction)
 │   ├── ProjectCard.astro          ← Keep (no interaction)
@@ -366,6 +369,9 @@ interface CreateHackathonFormProps {
 | DatasetDownload | `client:visible` | Below fold |
 | ProfileCreateForm | `client:load` | Page's main content |
 | CreateHackathonForm | `client:load` | Page's main content |
+| CreateProposalForm | `client:visible` | Below fold |
+| TimelineEditor | `client:visible` | Embedded within CreateHackathonForm |
+| HackathonTabs | `client:load` | Tab navigation needed immediately |
 
 ## Out of Scope
 

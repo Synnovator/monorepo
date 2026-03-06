@@ -65,6 +65,19 @@ Synnovator 采用 **Git-native + 最小服务端** 架构。核心思想是将 G
 | AI 服务 | Claude API | 评审摘要、组队匹配、PDF 内容提取 |
 | 数据库 | Cloudflare D1 (P1 可选) | SQL 数据库，搜索索引和评分缓存，非 P0 必需 |
 
+**运行时依赖补充**（P0 实际使用）：
+
+| 依赖 | 版本 | 用途 |
+|------|------|------|
+| `@astrojs/react` | — | React Islands（交互组件客户端水合） |
+| `@astrojs/mdx` | — | MDX 内容渲染（提交项目 README） |
+| `@modyfi/vite-plugin-yaml` | — | YAML 文件直接 import（i18n 等） |
+| `vite-plugin-svgr` | — | SVG 文件作为 React 组件使用 |
+| `@radix-ui/react-*` | — | shadcn/ui 底层无障碍组件原语 |
+| `lucide-react` | — | 图标库 |
+| `react` / `react-dom` | ^19.2 | React 19（Islands 运行时） |
+| `@aws-sdk/s3-request-presigner` | — | R2 presigned URL 生成 |
+
 ### 2.2 P0 不引入 D1 的理由
 
 | 功能 | 无 D1 方案 (P0) | 有 D1 方案 (P1) |
@@ -121,12 +134,19 @@ PR Preview：
 // site/astro.config.mjs
 import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
-import tailwind from '@astrojs/tailwind';
+import react from '@astrojs/react';
+import mdx from '@astrojs/mdx';
+import tailwindcss from '@tailwindcss/vite';
+import yaml from '@modyfi/vite-plugin-yaml';
+import svgr from 'vite-plugin-svgr';
 
 export default defineConfig({
   output: 'hybrid',           // 默认静态，按需动态
-  adapter: cloudflare(),
-  integrations: [tailwind()],
+  adapter: cloudflare({ platformProxy: { enabled: true } }),
+  integrations: [react(), mdx()],
+  vite: {
+    plugins: [tailwindcss(), yaml(), svgr()],
+  },
   site: 'https://home.synnovator.space',
 });
 ```
@@ -140,6 +160,8 @@ export default defineConfig({
 | `/api/vote` | POST | 缓存 Reactions 计数（P0 可选） | GitHub OAuth token |
 | `/api/auth/login` | GET | 发起 GitHub OAuth 授权流程 | 无 |
 | `/api/auth/callback` | GET | 处理 OAuth 回调，设置 HttpOnly cookie | 无 |
+| `/api/check-profile` | GET | 检查用户 Profile 是否存在（按 GitHub username 查询） | 无 |
+| `/api/auth/logout` | GET | 清除 session cookie，重定向到首页 | 无 |
 
 ### 3.4 环境变量与 Bindings
 

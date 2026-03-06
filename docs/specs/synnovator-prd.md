@@ -219,7 +219,7 @@ hackathon:
       github: "synnovator"
       logo: "./assets/organizer-logo.png"
       website: "https://home.synnovator.space"
-      role: "host"                       # host | co-host
+      role: "host"                       # host | co-host | co-organizer
     - name: "Pengcheng Laboratory"
       name_zh: "鹏城实验室"
       role: "co-host"
@@ -228,7 +228,7 @@ hackathon:
     - name: "BYD Energy Storage"
       name_zh: "比亚迪储能事业部"
       logo: "./assets/byd-logo.png"
-      tier: "gold"                       # platinum | gold | silver
+      role: "gold-sponsor"               # e.g. platinum-sponsor | gold-sponsor | enterprise-challenge-partner
 
   partners:                              # 协办/合作方
     - name: "Shenzhen New Energy Association"
@@ -269,8 +269,8 @@ hackathon:
     # 开源场景: Apache-2.0 | MIT | GPL-3.0 | ...
     # 企业场景: proprietary
 
-    ip_ownership: "creator"
-    # enum: creator (参赛者保留) | organizer (转让给主办方) | shared
+    ip_ownership: "participant"
+    # enum: participant (参赛者保留) | organizer (转让给主办方) | shared
 
     nda:
       required: false

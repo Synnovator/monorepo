@@ -20,7 +20,7 @@ const rewardSchema = z.object({
 const criterionSchema = z.object({
   name: z.string(),
   name_zh: z.string().optional(),
-  weight: z.number(),
+  weight: z.number().min(0).max(1),
   description: z.string().optional(),
   score_range: z.array(z.number()).optional(),
   hard_constraint: z.boolean().optional(),
@@ -41,8 +41,8 @@ const trackSchema = z.object({
   description_zh: z.string().optional(),
   rewards: z.array(rewardSchema).optional(),
   judging: z.object({
-    mode: z.string(),
-    vote_weight: z.number().optional(),
+    mode: z.enum(['expert_only', 'expert_plus_vote', 'weighted', 'peer']),
+    vote_weight: z.number().min(0).max(1).optional(),
     criteria: z.array(criterionSchema).optional(),
   }).optional(),
   deliverables: z.object({
@@ -57,7 +57,7 @@ const judgeSchema = z.object({
   name_zh: z.string().optional(),
   title: z.string().optional(),
   affiliation: z.string().optional(),
-  expertise: z.string().optional(),
+  expertise: z.array(z.string()).optional(),
   conflict_declaration: z.string().optional(),
 });
 
@@ -85,7 +85,7 @@ const datasetSchema = z.object({
   name_zh: z.string().optional(),
   version: z.string().optional(),
   description: z.string().optional(),
-  access_control: z.string().optional(),
+  access_control: z.enum(['public', 'nda-required']).optional(),
   format: z.string().optional(),
   size: z.string().optional(),
   download_url: z.string().optional(),
@@ -118,7 +118,8 @@ const hackathons = defineCollection({
         name: z.string().optional(),
         name_zh: z.string().optional(),
         logo: z.string().optional(),
-        tier: z.string().optional(),
+        role: z.string().optional(),
+        website: z.string().optional(),
       })).optional(),
       partners: z.array(z.object({
         name: z.string().optional(),
@@ -126,7 +127,7 @@ const hackathons = defineCollection({
         role: z.string().optional(),
       })).optional(),
       eligibility: z.object({
-        open_to: z.string().optional(),
+        open_to: z.enum(['all', 'students', 'professionals', 'invited']).optional(),
         restrictions: z.array(z.string()).optional(),
         blacklist: z.array(z.string()).optional(),
         team_size: z.object({
@@ -142,8 +143,8 @@ const hackathons = defineCollection({
         }).optional(),
       }).optional(),
       legal: z.object({
-        license: z.string().optional(),
-        ip_ownership: z.string().optional(),
+        license: z.enum(['MIT', 'Apache-2.0', 'GPL-3.0', 'BSD-3-Clause', 'proprietary']).optional(),
+        ip_ownership: z.enum(['participant', 'organizer', 'shared']).optional(),
         nda: z.object({
           required: z.boolean().optional(),
           document_url: z.string().optional(),
@@ -168,11 +169,11 @@ const hackathons = defineCollection({
       faq: z.array(faqSchema).optional(),
       settings: z.object({
         allow_multi_track: z.boolean().optional(),
-        multi_track_rule: z.string().optional(),
+        multi_track_rule: z.enum(['independent', 'shared']).optional(),
         language: z.array(z.string()).optional(),
         ai_review: z.boolean().optional(),
         ai_team_matching: z.boolean().optional(),
-        public_vote: z.string().optional(),
+        public_vote: z.enum(['none', 'reactions']).optional(),
         vote_emoji: z.string().optional(),
       }).optional(),
     }),
@@ -264,6 +265,12 @@ const submissionDeliverablesSchema = z.object({
     local_path: z.string().optional(),
     r2_url: z.string().optional(),
   }).optional(),
+  slides: z.string().optional(),
+  attachments: z.array(z.object({
+    name: z.string(),
+    local_path: z.string().optional(),
+    r2_url: z.string().optional(),
+  })).optional(),
 });
 
 const submissionSchema = z.object({
@@ -275,11 +282,21 @@ const submissionSchema = z.object({
     tagline_zh: z.string().optional(),
     track: z.string(),
     team: z.array(submissionTeamMemberSchema),
+    mentors: z.array(z.object({
+      github: z.string(),
+      name: z.string().optional(),
+      affiliation: z.string().optional(),
+    })).optional(),
     deliverables: submissionDeliverablesSchema.optional(),
     tech_stack: z.array(z.string()).optional(),
     description: z.string().optional(),
     description_zh: z.string().optional(),
     likes: z.number().optional(),
+    references: z.array(z.object({
+      name: z.string(),
+      url: z.string(),
+      usage: z.string().optional(),
+    })).optional(),
   }),
 });
 
@@ -306,7 +323,7 @@ const results = defineCollection({
       final_score: z.number(),
       criteria_breakdown: z.array(z.object({
         criterion: z.string(),
-        weight: z.number(),
+        weight: z.number().min(0).max(1),
         average: z.number(),
       })).optional(),
     })),

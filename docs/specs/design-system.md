@@ -81,14 +81,16 @@ Consistent spacing tokens and corner radius values.
 
 ### Spacing Tokens / 间距令牌
 
+> **CSS 变量**: 已在 `site/src/styles/global.css` 的 `@theme` 块中实现。
+
 | Token | Variable | Value |
 |-------|----------|-------|
-| XS / 极小 | `$spacing-xs` | `4px` |
-| SM / 小 | `$spacing-sm` | `8px` |
-| MD / 中 | `$spacing-md` | `16px` |
-| LG / 大 | `$spacing-lg` | `24px` |
-| XL / 极大 | `$spacing-xl` | `32px` |
-| XXL / 极大+ | `$spacing-xxl` | `36px` |
+| XS / 极小 | `--spacing-xs` | `4px` |
+| SM / 小 | `--spacing-sm` | `8px` |
+| MD / 中 | `--spacing-md` | `16px` |
+| LG / 大 | `--spacing-lg` | `24px` |
+| XL / 极大 | `--spacing-xl` | `32px` |
+| XXL / 极大+ | `--spacing-xxl` | `36px` |
 
 ### Border Radius / 圆角
 
@@ -100,9 +102,39 @@ Consistent spacing tokens and corner radius values.
 | XL / 超大圆角 | `$radius-xl` | `20px` |
 | Pill / 胶囊 | `$radius-pill` | `50px` |
 
+## shadcn/ui 语义映射层
+
+站点使用 shadcn/ui 组件库，通过 CSS 变量将 Neon Forge token 映射到 shadcn/ui 的语义化接口。
+以下映射定义在 `site/src/styles/global.css` 的 `:root` 中：
+
+| shadcn 变量 | 映射到 Neon Forge Token | 用途 |
+|------------|----------------------|------|
+| `--background` | `var(--color-surface)` | 页面背景 |
+| `--foreground` | `var(--color-light-gray)` | 默认文字 |
+| `--card` | `var(--color-dark-bg)` | 卡片背景 |
+| `--primary` | `var(--color-lime-primary)` | 主操作色 |
+| `--secondary` | `var(--color-secondary-bg)` | 次要背景 |
+| `--muted` | `var(--color-secondary-bg)` | 弱化背景 |
+| `--accent` | `var(--color-secondary-bg)` | 强调背景 |
+| `--destructive` | `var(--color-error)` | 危险操作 |
+| `--border` | `var(--color-secondary-bg)` | 边框 |
+| `--ring` | `var(--color-lime-primary)` | 焦点环 |
+
+**字体 CSS 变量**（同样在 `:root` 定义）：
+
+| 变量 | 值 | 用途 |
+|------|-----|------|
+| `--font-heading` | `'Space Grotesk', sans-serif` | 标题 |
+| `--font-body` | `'Inter', sans-serif` | 正文 |
+| `--font-code` | `'Poppins', sans-serif` | 代码/数字 |
+| `--font-zh` | `'Noto Sans SC', sans-serif` | 中文 |
+
 ---
 
 ## Page Layout / 页面布局
+
+> **CSS 变量**: 布局尺寸已在 `site/src/styles/global.css` 的 `@theme` 块中定义为 CSS 变量。
+> 当前站点使用 Tailwind 响应式工具类实现布局，CSS 变量作为参考值提供。
 
 Page layout grid for the Synnovator platform at W>1440 breakpoint.
 协创者平台在 W>1440 断点下的页面布局网格。
@@ -124,20 +156,20 @@ Page layout grid for the Synnovator platform at W>1440 breakpoint.
 
 | Region | Variable | Dimensions | Position |
 |--------|----------|------------|----------|
-| 搜索区 Search Bar | `$layout-search-height` | 1440 × 60 | Top, full width |
-| 导航栏 Navigation | `$layout-nav-width` | 168 × 900 | Left, full height |
-| 内容区 Content | `$layout-content-width` | W: 856 | Starts at (188, 84) |
-| 多功能区 Sidebar | `$layout-sidebar-width` × `$layout-sidebar-height` | 328 × 720 | Starts at (1076, 144) |
+| 搜索区 Search Bar | `--layout-search-height` | 1440 × 60 | Top, full width |
+| 导航栏 Navigation | `--layout-nav-width` | 168 × 900 | Left, full height |
+| 内容区 Content | `--layout-content-width` | W: 856 | Starts at (188, 84) |
+| 多功能区 Sidebar | `--layout-sidebar-width` × `--layout-sidebar-height` | 328 × 720 | Starts at (1076, 144) |
 
 ### Spacing Between Regions / 区域间距
 
 | Gap | Variable | Value |
 |-----|----------|-------|
-| 导航栏 → 内容区 | `$layout-gap-nav-content` | `20px` |
-| 搜索区 → 内容区 | `$layout-gap-search-content` | `24px` |
-| 内容区 → 多功能区 | `$layout-gap-content-sidebar` | `32px` |
-| 搜索区 → 多功能区 | `$layout-gap-search-sidebar` | `84px` |
-| 多功能区 → 右边缘/底边缘 | `$layout-sidebar-margin-right` / `$layout-sidebar-margin-bottom` | `36px` |
+| 导航栏 → 内容区 | `--layout-gap-nav-content` | `20px` |
+| 搜索区 → 内容区 | `--layout-gap-search-content` | `24px` |
+| 内容区 → 多功能区 | `--layout-gap-content-sidebar` | `32px` |
+| 搜索区 → 多功能区 | `--layout-gap-search-sidebar` | `84px` |
+| 多功能区 → 右边缘/底边缘 | `--layout-sidebar-margin` | `36px` |
 
 ---
 
