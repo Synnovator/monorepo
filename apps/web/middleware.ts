@@ -4,7 +4,7 @@ export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/admin')) {
     const sessionCookie = request.cookies.get('session')?.value;
     if (!sessionCookie) {
-      const loginUrl = new URL('/api/auth/login', request.url);
+      const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('returnTo', request.nextUrl.pathname);
       return NextResponse.redirect(loginUrl);
     }

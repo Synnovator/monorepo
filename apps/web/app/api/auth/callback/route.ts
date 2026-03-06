@@ -53,7 +53,8 @@ export async function GET(request: NextRequest) {
     authSecret,
   );
 
+  const isSecure = request.nextUrl.protocol === 'https:';
   const headers = new Headers({ Location: returnTo });
-  setSessionCookie(headers, token);
+  setSessionCookie(headers, token, isSecure);
   return new NextResponse(null, { status: 302, headers });
 }

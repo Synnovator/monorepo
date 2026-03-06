@@ -11,7 +11,8 @@
     "create_btn": "+ Create",
     "create_hackathon": "Create Hackathon",
     "create_proposal": "Create Proposal",
-    "lang_switch": "中 / EN"
+    "lang_switch": "中 / EN",
+    "admin": "Admin"
   },
   "footer": {
     "platform": "Platform",
@@ -95,6 +96,26 @@
     "edit": "Edit Profile",
     "hackathons": "Hackathon History"
   },
+  "admin": {
+    "title": "Admin",
+    "dashboard": "Dashboard",
+    "hackathons": "Hackathons",
+    "profiles": "Profiles",
+    "submissions": "Submissions",
+    "pending": "Pending",
+    "access_denied": "Access Denied",
+    "access_denied_desc": "You need admin or maintain permission on the repository.",
+    "no_pending": "No pending reviews",
+    "submitter": "Submitter",
+    "created_at": "Created",
+    "approve": "Approve",
+    "reject": "Reject",
+    "request_changes": "Request Changes",
+    "reject_reason": "Reason for rejection",
+    "review_comment": "Review comment",
+    "confirm_approve": "Approve this PR?",
+    "confirm_reject": "Reject this PR?"
+  },
   "common": {
     "back_home": "Back to Home",
     "not_found": "Page Not Found",
@@ -103,8 +124,18 @@
   "auth": {
     "login": "Sign In",
     "login_github": "Sign in with GitHub",
+    "login_password": "Sign in with Password",
     "logout": "Sign Out",
-    "my_profile": "My Profile"
+    "my_profile": "My Profile",
+    "username": "Username",
+    "password": "Password",
+    "signing_in": "Signing in...",
+    "sign_in": "Sign In",
+    "sign_in_with_github": "Sign in with GitHub",
+    "or_use_github": "Or sign in with GitHub",
+    "or_use_password": "Or sign in with password",
+    "invalid_credentials": "Invalid username or password",
+    "network_error": "Network error, please try again"
   },
   "score": {
     "title": "Score Card",

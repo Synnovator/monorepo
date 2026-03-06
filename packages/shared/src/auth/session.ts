@@ -67,10 +67,11 @@ export async function decrypt(token: string, secret: string): Promise<Session | 
   }
 }
 
-export function setSessionCookie(headers: Headers, token: string): void {
+export function setSessionCookie(headers: Headers, token: string, secure?: boolean): void {
+  const securePart = secure === false ? '' : ' Secure;';
   headers.append(
     'Set-Cookie',
-    `${COOKIE_NAME}=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}`,
+    `${COOKIE_NAME}=${token}; Path=/; HttpOnly;${securePart} SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}`,
   );
 }
 

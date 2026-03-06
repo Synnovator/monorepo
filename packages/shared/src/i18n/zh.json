@@ -11,7 +11,8 @@
     "create_btn": "+ 创建",
     "create_hackathon": "创建活动",
     "create_proposal": "创建提案",
-    "lang_switch": "EN / 中"
+    "lang_switch": "EN / 中",
+    "admin": "管理"
   },
   "footer": {
     "platform": "平台",
@@ -93,6 +94,26 @@
     "edit": "编辑 Profile",
     "hackathons": "参赛记录"
   },
+  "admin": {
+    "title": "管理",
+    "dashboard": "仪表盘",
+    "hackathons": "活动管理",
+    "profiles": "Profile 管理",
+    "submissions": "提交管理",
+    "pending": "待审核",
+    "access_denied": "访问被拒绝",
+    "access_denied_desc": "您需要仓库的 admin 或 maintain 权限。",
+    "no_pending": "暂无待审核项目",
+    "submitter": "提交者",
+    "created_at": "提交时间",
+    "approve": "批准",
+    "reject": "拒绝",
+    "request_changes": "请求修改",
+    "reject_reason": "拒绝原因",
+    "review_comment": "审核意见",
+    "confirm_approve": "确认批准此 PR？",
+    "confirm_reject": "确认拒绝此 PR？"
+  },
   "common": {
     "back_home": "返回首页",
     "not_found": "页面未找到",
@@ -101,8 +122,18 @@
   "auth": {
     "login": "登录",
     "login_github": "GitHub 登录",
+    "login_password": "密码登录",
     "logout": "退出",
-    "my_profile": "我的 Profile"
+    "my_profile": "我的 Profile",
+    "username": "用户名",
+    "password": "密码",
+    "signing_in": "登录中...",
+    "sign_in": "登录",
+    "sign_in_with_github": "使用 GitHub 登录",
+    "or_use_github": "或使用 GitHub 登录",
+    "or_use_password": "或使用密码登录",
+    "invalid_credentials": "用户名或密码错误",
+    "network_error": "网络错误，请重试"
   },
   "score": {
     "title": "评分卡",
