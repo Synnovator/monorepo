@@ -1,0 +1,302 @@
+import { notFound } from 'next/navigation';
+import { getHackathon } from '@synnovator/shared/data';
+import { listSubmissions, listProfiles } from '@synnovator/shared/data';
+import { t, localize, getCurrentStage, getLangFromSearchParams } from '@synnovator/shared/i18n';
+import type { Lang } from '@synnovator/shared/i18n';
+import { Timeline } from '@/components/Timeline';
+import { TrackSection } from '@/components/TrackSection';
+import { JudgeCard } from '@/components/JudgeCard';
+import { EventCalendar } from '@/components/EventCalendar';
+import { ProjectCard } from '@/components/ProjectCard';
+import { GitHubRedirect } from '@/components/GitHubRedirect';
+import { HackathonTabs } from '@/components/HackathonTabs';
+import { FAQAccordion } from '@/components/FAQAccordion';
+import { ScoreCard } from '@/components/ScoreCard';
+import { DatasetDownload } from '@/components/DatasetDownload';
+import path from 'node:path';
+
+const DATA_ROOT = path.resolve(process.cwd(), '../..');
+
+export default async function HackathonDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ lang?: string }>;
+}) {
+  const { slug } = await params;
+  const sp = await searchParams;
+  const lang: Lang = getLangFromSearchParams(new URLSearchParams(sp as Record<string, string>));
+
+  const entry = await getHackathon(slug, DATA_ROOT);
+  if (!entry) notFound();
+
+  const h = entry.hackathon;
+  const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
+
+  // Load submissions
+  const allSubmissions = await listSubmissions(DATA_ROOT);
+  const submissions = allSubmissions.filter(s => s._hackathonSlug === slug);
+
+  // Load results (embedded in hackathon data or separate)
+  const showLeaderboard = ['announcement', 'award', 'ended'].includes(stage);
+
+  // Track name map
+  const trackNameMap: Record<string, { name: string; name_zh?: string }> = {};
+  for (const track of (h.tracks || [])) {
+    trackNameMap[track.slug] = { name: track.name, name_zh: track.name_zh };
+  }
+
+  // Collect unique tracks from submissions for filter pills
+  const submissionTracks = [...new Set(submissions.map(s => s.project.track))];
+
+  // Build github → profile slug map for judge links
+  const profiles = await listProfiles(DATA_ROOT);
+  const githubToProfile = new Map<string, string>();
+  for (const p of profiles) {
+    if (p.hacker.github) {
+      githubToProfile.set(p.hacker.github, p.hacker.github);
+    }
+  }
+
+  // Prepare tracks for form components
+  const formTracks = (h.tracks ?? []).map((tr: { slug: string; name: string; name_zh?: string }) => ({
+    slug: tr.slug,
+    name: tr.name,
+    name_zh: tr.name_zh,
+  }));
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+      {/* Hero */}
+      <div className="mb-12">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-xs px-3 py-1 rounded-full bg-secondary-bg text-muted">
+            {t(lang, `hackathon.type_${h.type.replace('-', '_')}`)}
+          </span>
+          <span className="text-xs px-3 py-1 rounded-full bg-lime-primary/20 text-lime-primary">
+            {t(lang, `stage.${stage}`)}
+          </span>
+        </div>
+
+        <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-3">
+          {localize(lang, h.name, h.name_zh)}
+        </h1>
+
+        <p className="text-lg text-muted max-w-3xl mb-6">
+          {localize(lang, h.tagline, h.tagline_zh)}
+        </p>
+
+        <div className="flex flex-wrap gap-3">
+          {stage === 'registration' && (
+            <a href="#register-section" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors">
+              {t(lang, 'hackathon.register')}
+            </a>
+          )}
+          {stage === 'submission' && (
+            <GitHubRedirect action="submit" hackathonSlug={h.slug} label={t(lang, 'hackathon.submit')} className="bg-lime-primary text-near-black hover:bg-lime-primary/80" />
+          )}
+          {['announcement', 'award', 'ended'].includes(stage) && (
+            <a href="#leaderboard" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors">
+              {t(lang, 'hackathon.results')}
+            </a>
+          )}
+          {stage === 'announcement' && (
+            <a href="#appeal-section" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary-bg text-white text-sm font-medium hover:bg-secondary-bg/80 transition-colors">
+              {t(lang, 'hackathon.appeal')}
+            </a>
+          )}
+          {h.legal?.nda?.required && (
+            <span className="inline-flex items-center text-xs text-warning px-3 py-2 rounded-lg bg-warning/10">
+              {t(lang, 'hackathon.nda_warning')}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main content with Tabs (2/3) */}
+        <div className="lg:col-span-2">
+          <HackathonTabs
+            detailsLabel={t(lang, 'tab.details')}
+            submissionsLabel={t(lang, 'tab.submissions')}
+            leaderboardLabel={t(lang, 'tab.leaderboard')}
+          />
+
+          {/* Tab 1: Details */}
+          <div data-tab-panel="details">
+            <div className="space-y-12 pt-6">
+              <section>
+                <div className="prose prose-invert prose-sm max-w-none text-light-gray">
+                  <p>{localize(lang, h.description, h.description_zh)}</p>
+                </div>
+              </section>
+
+              {h.organizers && h.organizers.length > 0 && (
+                <section>
+                  <h2 className="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.organizers')}</h2>
+                  <div className="flex flex-wrap gap-4">
+                    {h.organizers.map((org: { name?: string; name_zh?: string; role?: string }, i: number) => (
+                      <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-lg border border-secondary-bg bg-dark-bg">
+                        <div>
+                          <p className="text-white text-sm font-medium">{localize(lang, org.name, org.name_zh)}</p>
+                          {org.role && <p className="text-muted text-xs">{org.role}</p>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {h.tracks && h.tracks.length > 0 && (
+                <section>
+                  <h2 className="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.tracks')}</h2>
+                  <div className="space-y-6">
+                    {h.tracks.map((track: any) => (
+                      <TrackSection key={track.slug} track={track} lang={lang} />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {h.eligibility && (
+                <section>
+                  <h2 className="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.eligibility')}</h2>
+                  <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6 space-y-3">
+                    {h.eligibility.team_size && (
+                      <p className="text-sm text-light-gray">
+                        Team size: {h.eligibility.team_size.min}–{h.eligibility.team_size.max}
+                        {h.eligibility.allow_solo && ' (solo allowed)'}
+                      </p>
+                    )}
+                    {h.eligibility.restrictions?.map((r: string, i: number) => (
+                      <p key={i} className="text-sm text-muted">{r}</p>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {h.datasets && h.datasets.length > 0 && (
+                <section>
+                  <h2 className="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.datasets')}</h2>
+                  <DatasetDownload datasets={h.datasets} hackathonSlug={h.slug} lang={lang} />
+                </section>
+              )}
+
+              {h.legal && (
+                <section>
+                  <h2 className="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.legal')}</h2>
+                  <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6 space-y-3">
+                    {h.legal.license && <p className="text-sm text-light-gray">License: {h.legal.license}</p>}
+                    {h.legal.ip_ownership && <p className="text-sm text-light-gray">IP: {h.legal.ip_ownership}</p>}
+                    {h.legal.compliance_notes?.map((note: string, i: number) => (
+                      <p key={i} className="text-sm text-muted">{note}</p>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {h.faq && h.faq.length > 0 && (
+                <section>
+                  <h2 className="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.faq')}</h2>
+                  <FAQAccordion items={h.faq} lang={lang} />
+                </section>
+              )}
+
+              {stage === 'judging' && h.tracks?.map((track: any) => (
+                track.judging?.criteria && track.judging.criteria.length > 0 && (
+                  <section key={track.slug}>
+                    <h2 className="text-xl font-heading font-bold text-white mb-4">
+                      {t(lang, 'score.title')} — {localize(lang, track.name, track.name_zh)}
+                    </h2>
+                    <ScoreCard hackathonSlug={h.slug} trackSlug={track.slug} criteria={track.judging.criteria} lang={lang} />
+                  </section>
+                )
+              ))}
+            </div>
+          </div>
+
+          {/* Tab 2: Submissions */}
+          <div data-tab-panel="submissions" style={{ display: 'none' }}>
+            <div className="space-y-6 pt-6">
+              {submissionTracks.length > 1 && (
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-xs px-3 py-1.5 rounded-full bg-lime-primary/20 text-lime-primary cursor-pointer">
+                    {t(lang, 'project.filter_all')}
+                  </span>
+                  {submissionTracks.map(trackSlug => (
+                    <span key={trackSlug} className="text-xs px-3 py-1.5 rounded-full bg-secondary-bg text-muted hover:text-white cursor-pointer transition-colors">
+                      {trackNameMap[trackSlug] ? localize(lang, trackNameMap[trackSlug].name, trackNameMap[trackSlug].name_zh) : trackSlug}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {submissions.length === 0 ? (
+                <div className="rounded-lg border border-secondary-bg bg-dark-bg p-12 text-center">
+                  <p className="text-muted text-lg">{t(lang, 'project.no_submissions')}</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {submissions.map(sub => (
+                    <ProjectCard
+                      key={sub._teamSlug}
+                      project={sub.project}
+                      hackathonSlug={slug}
+                      teamSlug={sub._teamSlug}
+                      lang={lang}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Tab 3: Leaderboard */}
+          <div data-tab-panel="leaderboard" style={{ display: 'none' }}>
+            <div className="space-y-8 pt-6">
+              {!showLeaderboard ? (
+                <div className="rounded-lg border border-secondary-bg bg-dark-bg p-12 text-center">
+                  <p className="text-muted text-lg">{t(lang, 'project.leaderboard_pending')}</p>
+                </div>
+              ) : (
+                <div className="rounded-lg border border-secondary-bg bg-dark-bg p-12 text-center">
+                  <p className="text-muted text-lg">{t(lang, 'result.pending')}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar (1/3) */}
+        <aside className="space-y-8">
+          {h.timeline && (
+            <section>
+              <h2 className="text-lg font-heading font-bold text-white mb-4">{t(lang, 'hackathon.timeline')}</h2>
+              <Timeline timeline={h.timeline} lang={lang} />
+            </section>
+          )}
+
+          {h.events && h.events.length > 0 && (
+            <section>
+              <h2 className="text-lg font-heading font-bold text-white mb-4">{t(lang, 'hackathon.events')}</h2>
+              <EventCalendar events={h.events} lang={lang} />
+            </section>
+          )}
+
+          {h.judges && h.judges.length > 0 && (
+            <section>
+              <h2 className="text-lg font-heading font-bold text-white mb-4">{t(lang, 'hackathon.judges')}</h2>
+              <div className="space-y-3">
+                {h.judges.map((judge: any) => (
+                  <JudgeCard key={judge.github} judge={judge} lang={lang} profileSlug={githubToProfile.get(judge.github)} />
+                ))}
+              </div>
+            </section>
+          )}
+        </aside>
+      </div>
+    </div>
+  );
+}
