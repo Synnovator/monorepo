@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "pnpm opennextjs-cloudflare build",
+    "build": "next build",
+    "build:worker": "opennextjs-cloudflare build",
     "start": "next start",
-    "deploy": "pnpm opennextjs-cloudflare build && wrangler deploy",
-    "deploy:preview": "pnpm opennextjs-cloudflare build && wrangler versions upload"
+    "deploy": "opennextjs-cloudflare build && wrangler deploy",
+    "deploy:preview": "opennextjs-cloudflare build && wrangler versions upload"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1",
