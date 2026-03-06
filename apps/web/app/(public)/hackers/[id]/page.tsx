@@ -1,11 +1,14 @@
 import { notFound } from 'next/navigation';
-import { getProfile } from '@synnovator/shared/data';
+import { getProfile, listProfiles } from '@/app/_generated/data';
 import { t, localize, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { SkillBadge } from '@/components/SkillBadge';
-import path from 'node:path';
 
-const DATA_ROOT = path.resolve(process.cwd(), '../..');
+export const dynamic = 'force-static';
+
+export function generateStaticParams() {
+  return listProfiles().map(p => ({ id: p.hacker.github }));
+}
 
 export default async function HackerProfilePage({
   params,
@@ -18,7 +21,7 @@ export default async function HackerProfilePage({
   const sp = await searchParams;
   const lang: Lang = getLangFromSearchParams(new URLSearchParams(sp as Record<string, string>));
 
-  const entry = await getProfile(id, DATA_ROOT);
+  const entry = getProfile(id);
   if (!entry) notFound();
 
   const h = entry.hacker;

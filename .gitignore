@@ -24,5 +24,8 @@ dist/
 .next/
 *.tsbuildinfo
 
+# Build artifacts
+apps/web/app/_generated/static-data.json
+
 # Logs
 *.log

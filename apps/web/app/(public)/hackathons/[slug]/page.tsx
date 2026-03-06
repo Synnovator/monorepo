@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getHackathon } from '@synnovator/shared/data';
-import { listSubmissions, listProfiles } from '@synnovator/shared/data';
+import { getHackathon, listHackathons, listSubmissions, listProfiles } from '@/app/_generated/data';
 import { t, localize, getCurrentStage, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Timeline } from '@/components/Timeline';
@@ -13,9 +12,12 @@ import { HackathonTabs } from '@/components/HackathonTabs';
 import { FAQAccordion } from '@/components/FAQAccordion';
 import { ScoreCard } from '@/components/ScoreCard';
 import { DatasetDownload } from '@/components/DatasetDownload';
-import path from 'node:path';
 
-const DATA_ROOT = path.resolve(process.cwd(), '../..');
+export const dynamic = 'force-static';
+
+export function generateStaticParams() {
+  return listHackathons().map(h => ({ slug: h.hackathon.slug }));
+}
 
 export default async function HackathonDetailPage({
   params,
@@ -28,14 +30,14 @@ export default async function HackathonDetailPage({
   const sp = await searchParams;
   const lang: Lang = getLangFromSearchParams(new URLSearchParams(sp as Record<string, string>));
 
-  const entry = await getHackathon(slug, DATA_ROOT);
+  const entry = getHackathon(slug);
   if (!entry) notFound();
 
   const h = entry.hackathon;
   const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
 
   // Load submissions
-  const allSubmissions = await listSubmissions(DATA_ROOT);
+  const allSubmissions = listSubmissions();
   const submissions = allSubmissions.filter(s => s._hackathonSlug === slug);
 
   // Load results (embedded in hackathon data or separate)
@@ -51,20 +53,13 @@ export default async function HackathonDetailPage({
   const submissionTracks = [...new Set(submissions.map(s => s.project.track))];
 
   // Build github → profile slug map for judge links
-  const profiles = await listProfiles(DATA_ROOT);
+  const profiles = listProfiles();
   const githubToProfile = new Map<string, string>();
   for (const p of profiles) {
     if (p.hacker.github) {
       githubToProfile.set(p.hacker.github, p.hacker.github);
     }
   }
-
-  // Prepare tracks for form components
-  const formTracks = (h.tracks ?? []).map((tr: { slug: string; name: string; name_zh?: string }) => ({
-    slug: tr.slug,
-    name: tr.name,
-    name_zh: tr.name_zh,
-  }));
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -180,7 +175,7 @@ export default async function HackathonDetailPage({
               {h.datasets && h.datasets.length > 0 && (
                 <section>
                   <h2 className="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.datasets')}</h2>
-                  <DatasetDownload datasets={h.datasets} hackathonSlug={h.slug} lang={lang} />
+                  <DatasetDownload datasets={h.datasets as any} hackathonSlug={h.slug} lang={lang} />
                 </section>
               )}
 

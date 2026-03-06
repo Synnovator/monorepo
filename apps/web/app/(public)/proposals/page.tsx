@@ -1,10 +1,9 @@
-import { listSubmissions, listHackathons } from '@synnovator/shared/data';
+import { listSubmissions, listHackathons } from '@/app/_generated/data';
 import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { ProposalsViewToggle } from '@/components/ProposalsViewToggle';
-import path from 'node:path';
 
-const DATA_ROOT = path.resolve(process.cwd(), '../..');
+export const dynamic = 'force-static';
 
 export default async function ProposalsPage({
   searchParams,
@@ -14,8 +13,8 @@ export default async function ProposalsPage({
   const sp = await searchParams;
   const lang: Lang = getLangFromSearchParams(new URLSearchParams(sp as Record<string, string>));
 
-  const allSubmissions = await listSubmissions(DATA_ROOT);
-  const allHackathons = await listHackathons(DATA_ROOT);
+  const allSubmissions = listSubmissions();
+  const allHackathons = listHackathons();
 
   // Build hackathon name lookup
   const hackathonMap = new Map<string, { name: string; name_zh?: string; slug: string }>();

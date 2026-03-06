@@ -1,11 +1,14 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getHackathon, getResults } from '@synnovator/shared/data';
+import { getHackathon, getResults, listHackathons } from '@/app/_generated/data';
 import { t, localize, getCurrentStage, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import path from 'node:path';
 
-const DATA_ROOT = path.resolve(process.cwd(), '../..');
+export const dynamic = 'force-static';
+
+export function generateStaticParams() {
+  return listHackathons().map(h => ({ slug: h.hackathon.slug }));
+}
 
 export default async function ResultsPage({
   params,
@@ -18,14 +21,14 @@ export default async function ResultsPage({
   const sp = await searchParams;
   const lang: Lang = getLangFromSearchParams(new URLSearchParams(sp as Record<string, string>));
 
-  const entry = await getHackathon(slug, DATA_ROOT);
+  const entry = getHackathon(slug);
   if (!entry) notFound();
 
   const h = entry.hackathon;
   const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
   const showResults = ['announcement', 'award', 'ended'].includes(stage);
 
-  const trackResults = showResults ? await getResults(slug, DATA_ROOT) : [];
+  const trackResults = showResults ? getResults(slug) : [];
 
   const trackNameMap: Record<string, { name: string; name_zh?: string }> = {};
   for (const track of (h.tracks || [])) {

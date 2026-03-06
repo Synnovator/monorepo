@@ -1,9 +1,8 @@
-import { listHackathons } from '@synnovator/shared/data';
+import { listHackathons } from '@/app/_generated/data';
 import { getLangFromSearchParams, t } from '@synnovator/shared/i18n';
 import { HackathonFilter } from '@/components/HackathonFilter';
-import path from 'node:path';
 
-const DATA_ROOT = path.resolve(process.cwd(), '../..');
+export const dynamic = 'force-static';
 
 export default async function HomePage({
   searchParams,
@@ -12,10 +11,10 @@ export default async function HomePage({
 }) {
   const params = await searchParams;
   const lang = getLangFromSearchParams(new URLSearchParams(params as Record<string, string>));
-  const hackathons = await listHackathons(DATA_ROOT);
+  const hackathons = listHackathons();
 
   // Sort by registration start date descending
-  hackathons.sort((a, b) => {
+  const sorted = [...hackathons].sort((a, b) => {
     const aStart = a.hackathon.timeline?.registration?.start || '';
     const bStart = b.hackathon.timeline?.registration?.start || '';
     return bStart.localeCompare(aStart);
@@ -31,7 +30,7 @@ export default async function HomePage({
           {t(lang, 'home.subtitle')}
         </p>
       </div>
-      <HackathonFilter hackathons={hackathons} lang={lang} />
+      <HackathonFilter hackathons={sorted} lang={lang} />
     </div>
   );
 }

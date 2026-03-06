@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { listProfiles } from '@synnovator/shared/data';
-import path from 'node:path';
 
-const DATA_ROOT = path.resolve(process.cwd(), '../..');
+const GITHUB_OWNER = process.env.GITHUB_OWNER || 'Synnovator';
+const GITHUB_REPO = process.env.GITHUB_REPO || 'monorepo';
 
 export async function GET(request: NextRequest) {
   const username = request.nextUrl.searchParams.get('username');
@@ -10,11 +9,20 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ exists: false, slug: null });
   }
 
-  const profiles = await listProfiles(DATA_ROOT);
-  const match = profiles.find(p => p.hacker.github === username);
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/profiles/${encodeURIComponent(username)}.yml`,
+      {
+        method: 'HEAD',
+        headers: { 'User-Agent': 'Synnovator' },
+      },
+    );
 
-  return NextResponse.json({
-    exists: !!match,
-    slug: match ? match.hacker.github : null,
-  });
+    return NextResponse.json({
+      exists: res.ok,
+      slug: res.ok ? username : null,
+    });
+  } catch {
+    return NextResponse.json({ exists: false, slug: null });
+  }
 }

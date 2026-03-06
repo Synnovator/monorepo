@@ -1,11 +1,14 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { listSubmissions, listProfiles, getHackathon } from '@synnovator/shared/data';
+import { listSubmissions, listProfiles, getHackathon } from '@/app/_generated/data';
 import { t, localize, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import path from 'node:path';
 
-const DATA_ROOT = path.resolve(process.cwd(), '../..');
+export const dynamic = 'force-static';
+
+export function generateStaticParams() {
+  return listSubmissions().map(s => ({ hackathon: s._hackathonSlug, team: s._teamSlug }));
+}
 
 export default async function ProjectDetailPage({
   params,
@@ -18,14 +21,14 @@ export default async function ProjectDetailPage({
   const sp = await searchParams;
   const lang: Lang = getLangFromSearchParams(new URLSearchParams(sp as Record<string, string>));
 
-  const allSubmissions = await listSubmissions(DATA_ROOT);
+  const allSubmissions = listSubmissions();
   const entry = allSubmissions.find(s => s._hackathonSlug === hackathon && s._teamSlug === team);
   if (!entry) notFound();
 
   const project = entry.project;
 
   // Get hackathon name for breadcrumb
-  const hackathonEntry = await getHackathon(hackathon, DATA_ROOT);
+  const hackathonEntry = getHackathon(hackathon);
   const hackathonName = hackathonEntry
     ? localize(lang, hackathonEntry.hackathon.name, hackathonEntry.hackathon.name_zh)
     : hackathon;
@@ -34,7 +37,7 @@ export default async function ProjectDetailPage({
   const trackName = hackathonEntry?.hackathon.tracks?.find((tr: { slug: string }) => tr.slug === project.track);
 
   // Build github → profile slug map for member links
-  const profiles = await listProfiles(DATA_ROOT);
+  const profiles = listProfiles();
   const githubToProfile = new Map<string, string>();
   for (const p of profiles) {
     if (p.hacker.github) {
