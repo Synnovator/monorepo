@@ -1,7 +1,12 @@
-import zhData from './zh.yml';
-import enData from './en.yml';
+import zhData from './zh.json';
+import enData from './en.json';
 
 export type Lang = 'zh' | 'en';
+
+const translations: Record<Lang, Record<string, unknown>> = {
+  zh: zhData as Record<string, unknown>,
+  en: enData as Record<string, unknown>,
+};
 
 /**
  * Get language from URL search params. Defaults to 'zh' when missing or not 'en'.
@@ -10,11 +15,6 @@ export function getLangFromSearchParams(params: URLSearchParams): Lang {
   const lang = params.get('lang');
   return lang === 'en' ? 'en' : 'zh';
 }
-
-const translations: Record<Lang, Record<string, unknown>> = {
-  zh: zhData as Record<string, unknown>,
-  en: enData as Record<string, unknown>,
-};
 
 /**
  * Get a translated string by dot-notation key.
