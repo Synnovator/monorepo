@@ -12,9 +12,12 @@
     "deploy:preview": "opennextjs-cloudflare build && wrangler versions upload"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1003.0",
+    "@aws-sdk/s3-request-presigner": "^3.1003.0",
     "@opennextjs/cloudflare": "^1",
     "@synnovator/shared": "workspace:*",
     "@synnovator/ui": "workspace:*",
+    "js-yaml": "^4.1.1",
     "next": "^15",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
@@ -22,6 +25,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4",
     "@tailwindcss/postcss": "^4.1.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.3.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
