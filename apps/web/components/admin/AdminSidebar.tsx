@@ -1,23 +1,26 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import type { Session } from '@synnovator/shared/auth';
+import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
 
 const navItems = [
-  { href: '/admin', label: 'Dashboard' },
-  { href: '/admin/hackathons', label: 'Hackathons' },
-  { href: '/admin/profiles', label: 'Profiles' },
-  { href: '/admin/submissions', label: 'Submissions' },
-];
+  { href: '/admin', key: 'admin.dashboard' },
+  { href: '/admin/hackathons', key: 'admin.hackathons' },
+  { href: '/admin/profiles', key: 'admin.profiles' },
+  { href: '/admin/submissions', key: 'admin.submissions' },
+] as const;
 
 export function AdminSidebar({ user }: { user: Session }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const lang = getLangFromSearchParams(searchParams);
 
   return (
     <aside className="w-64 bg-dark-bg border-r border-secondary-bg p-4">
       <div className="mb-8">
-        <h2 className="text-lime-primary font-heading text-lg">Admin</h2>
+        <h2 className="text-lime-primary font-heading text-lg">{t(lang, 'admin.title')}</h2>
         <p className="text-muted text-sm">@{user.login}</p>
       </div>
       <nav className="space-y-1">
@@ -31,7 +34,7 @@ export function AdminSidebar({ user }: { user: Session }) {
                 : 'text-muted hover:text-light-gray hover:bg-secondary-bg/50'
             }`}
           >
-            {item.label}
+            {t(lang, item.key)}
           </Link>
         ))}
       </nav>

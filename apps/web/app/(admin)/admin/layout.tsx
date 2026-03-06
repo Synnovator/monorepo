@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { decrypt, type Session } from '@synnovator/shared/auth';
@@ -8,17 +9,21 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('session')?.value;
 
-  if (!sessionCookie) redirect('/api/auth/login?returnTo=/admin');
+  if (!sessionCookie) redirect('/login?returnTo=/admin');
 
-  const session = await decrypt(sessionCookie, process.env.AUTH_SECRET!) as Session | null;
-  if (!session) redirect('/api/auth/login?returnTo=/admin');
+  const session = await decrypt(sessionCookie, process.env.AUTH_SECRET || 'dev-secret-key-min-32-chars-long!!') as Session | null;
+  if (!session) redirect('/login?returnTo=/admin');
 
-  const client = createGitHubClient(session.access_token);
-  const permission = await client.checkRepoPermission(
-    process.env.GITHUB_OWNER || 'Synnovator',
-    process.env.GITHUB_REPO || 'monorepo',
-    session.login,
-  );
+  // Skip GitHub permission check for dev login
+  let permission = 'admin';
+  if (session.access_token !== 'dev-token') {
+    const client = createGitHubClient(session.access_token);
+    permission = await client.checkRepoPermission(
+      process.env.GITHUB_OWNER || 'Synnovator',
+      process.env.GITHUB_REPO || 'monorepo',
+      session.login,
+    );
+  }
 
   if (!['admin', 'maintain', 'write'].includes(permission)) {
     return (
@@ -33,7 +38,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="flex min-h-screen">
-      <AdminSidebar user={session} />
+      <Suspense>
+        <AdminSidebar user={session} />
+      </Suspense>
       <div className="flex-1 p-8">{children}</div>
     </div>
   );

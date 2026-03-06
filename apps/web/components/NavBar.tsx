@@ -58,6 +58,9 @@ export function NavBar() {
           <Link href={langHref('/guides')} className="text-muted hover:text-white transition-colors text-sm">
             {t(lang, 'nav.guides')}
           </Link>
+          <Link href="/admin" className="text-muted hover:text-white transition-colors text-sm">
+            {t(lang, 'nav.admin')}
+          </Link>
         </div>
 
         <div className="flex items-center gap-4">
