@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
 
 export function Footer() {
@@ -23,7 +24,9 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-start gap-8">
           {/* Brand */}
           <div>
-            <span className="text-lime-primary font-heading font-bold text-lg">Synnovator</span>
+            <Link href={langHref('/')}>
+              <Image src="/logo-light.svg" alt="Synnovator" width={72} height={36} />
+            </Link>
             <p className="text-muted text-sm mt-2 max-w-xs">
               {t(lang, 'site.tagline')}
             </p>
