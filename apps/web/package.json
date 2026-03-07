@@ -1,0 +1,37 @@
+{
+  "name": "@synnovator/web",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prebuild": "node scripts/generate-static-data.mjs",
+    "dev": "node scripts/generate-static-data.mjs && next dev --turbopack",
+    "build": "node scripts/generate-static-data.mjs && next build",
+    "build:worker": "node scripts/generate-static-data.mjs && opennextjs-cloudflare build",
+    "start": "next start",
+    "deploy": "opennextjs-cloudflare build && wrangler deploy",
+    "deploy:preview": "opennextjs-cloudflare build && wrangler versions upload"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1003.0",
+    "@aws-sdk/s3-request-presigner": "^3.1003.0",
+    "@opennextjs/cloudflare": "^1",
+    "@synnovator/shared": "workspace:*",
+    "@synnovator/ui": "workspace:*",
+    "js-yaml": "^4.1.1",
+    "next": "^15",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4",
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^25.3.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.69.0"
+  }
+}

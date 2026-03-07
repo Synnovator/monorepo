@@ -563,9 +563,22 @@ hacker:
 
   # 评委相关字段（当该用户作为评委时填写）
   judge_profile:
-    available: true
-    expertise: ["AI Agent", "NLP", "Code Generation"]
+    available: true                      # boolean — 是否可作为评委
+    expertise: ["AI Agent", "NLP", "Code Generation"]  # string[] — 专业领域列表
     conflict_declaration: ""             # 利益冲突声明 PDF 链接（R2）
+
+  # NDA 签署记录
+  nda_signed:
+    - hackathon: "enterprise-risk-2026"  # 活动 slug
+      signed_at: "2026-04-02T10:30:00Z"  # 签署时间 (ISO 8601)
+
+  # 活动报名记录
+  registrations:
+    - hackathon: "ai-agent-challenge-2026"  # 活动 slug
+      track: "ai-agent-framework"           # 赛道 slug
+      role: "participant"                   # enum: participant | mentor | observer
+      team: "team-alpha"                    # 所属团队（可选）
+      registered_at: "2026-04-01T09:00:00Z" # 报名时间 (ISO 8601)
 ```
 
 ### 6.3 Project Submission Schema
@@ -581,9 +594,9 @@ project:
 
   team:
     - github: "alice-dev"
-      role: "Lead Developer"
+      role: "leader"             # enum: leader | developer | designer | researcher | mentor
     - github: "bob-ai"
-      role: "AI Engineer"
+      role: "developer"
 
   mentors:                               # 指导教师（可选，高校竞赛场景）
     - github: "prof-wang"
@@ -626,7 +639,17 @@ project:
     AgentFlow 是一个可视化工作流构建器...
 ```
 
-### 6.4 Issue Templates
+### 6.4 Role Enums
+
+以下是各场景中 `role` 字段的枚举值定义：
+
+| 场景 | 字段路径 | 枚举值 | 说明 |
+|------|---------|--------|------|
+| 主办方/合作方 | `hackathon.organizers[].role` | `host` \| `co-host` \| `sponsor` \| `partner` | 活动组织者角色 |
+| 项目团队成员 | `project.team[].role` | `leader` \| `developer` \| `designer` \| `researcher` \| `mentor` | 提交团队中的成员角色 |
+| 活动报名 | `hacker.registrations[].role` | `participant` \| `mentor` \| `observer` | 报名时的参与角色 |
+
+### 6.5 Issue Templates
 
 #### 评委评分 Issue (`judge-score.yml`)
 

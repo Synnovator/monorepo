@@ -21,6 +21,11 @@ Thumbs.db
 node_modules/
 dist/
 .astro/
+.next/
+*.tsbuildinfo
+
+# Build artifacts
+apps/web/app/_generated/static-data.json
 
 # Logs
 *.log
