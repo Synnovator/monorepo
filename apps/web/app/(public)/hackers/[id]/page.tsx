@@ -3,6 +3,7 @@ import { getProfile, listProfiles } from '@/app/_generated/data';
 import { t, localize, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { SkillBadge } from '@/components/SkillBadge';
+import { SparklesIcon, ExternalLinkIcon } from '@/components/icons';
 
 export const dynamic = 'force-static';
 
@@ -53,7 +54,10 @@ export default async function HackerProfilePage({
         <div className="md:col-span-2 space-y-10">
           {h.skills && h.skills.length > 0 && (
             <section>
-              <h2 className="text-lg font-heading font-bold text-white mb-4">{t(lang, 'profile.skills')}</h2>
+              <h2 className="text-lg font-heading font-bold text-white mb-4 flex items-center gap-2">
+                <SparklesIcon size={20} className="shrink-0" />
+                {t(lang, 'profile.skills')}
+              </h2>
               {h.skills.map((group: { category: string; items: string[] }, i: number) => (
                 <div key={i} className="mb-4">
                   <h3 className="text-xs text-muted mb-2">{group.category}</h3>
@@ -162,9 +166,7 @@ export default async function HackerProfilePage({
             className="inline-flex items-center gap-2 text-xs text-muted hover:text-lime-primary transition-colors"
           >
             {t(lang, 'profile.edit')}
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
+            <ExternalLinkIcon size={12} />
           </a>
         </aside>
       </div>

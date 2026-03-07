@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getCurrentStage, t, localize } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { TrophyIcon } from './icons';
 
 interface HackathonCardProps {
   hackathon: {
@@ -25,17 +26,6 @@ const stageColors: Record<string, string> = {
   award: 'bg-mint/20 text-mint',
   ended: 'bg-muted/20 text-muted',
 };
-
-function TrophyIcon({ size = 20, className }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-      <path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22" />
-      <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22" />
-      <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
-    </svg>
-  );
-}
 
 export function HackathonCard({ hackathon, lang }: HackathonCardProps) {
   const stage = hackathon.timeline ? getCurrentStage(hackathon.timeline) : 'draft';

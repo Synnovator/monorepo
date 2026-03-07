@@ -12,6 +12,7 @@ import { HackathonTabs } from '@/components/HackathonTabs';
 import { FAQAccordion } from '@/components/FAQAccordion';
 import { ScoreCard } from '@/components/ScoreCard';
 import { DatasetDownload } from '@/components/DatasetDownload';
+import { ClipboardListIcon, ShieldCheckIcon } from '@/components/icons';
 
 export const dynamic = 'force-static';
 
@@ -157,7 +158,10 @@ export default async function HackathonDetailPage({
 
               {h.eligibility && (
                 <section>
-                  <h2 className="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.eligibility')}</h2>
+                  <h2 className="text-xl font-heading font-bold text-white mb-4 flex items-center gap-2">
+                    <ClipboardListIcon size={22} className="shrink-0" />
+                    {t(lang, 'hackathon.eligibility')}
+                  </h2>
                   <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6 space-y-3">
                     {h.eligibility.team_size && (
                       <p className="text-sm text-light-gray">
@@ -181,7 +185,10 @@ export default async function HackathonDetailPage({
 
               {h.legal && (
                 <section>
-                  <h2 className="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.legal')}</h2>
+                  <h2 className="text-xl font-heading font-bold text-white mb-4 flex items-center gap-2">
+                    <ShieldCheckIcon size={22} className="shrink-0" />
+                    {t(lang, 'hackathon.legal')}
+                  </h2>
                   <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6 space-y-3">
                     {h.legal.license && <p className="text-sm text-light-gray">License: {h.legal.license}</p>}
                     {h.legal.ip_ownership && <p className="text-sm text-light-gray">IP: {h.legal.ip_ownership}</p>}

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import { OAuthButton } from './OAuthButton';
+import { ChevronDownIcon } from './icons';
 
 export function NavBar() {
   const searchParams = useSearchParams();
@@ -74,9 +75,7 @@ export function NavBar() {
               aria-label={t(lang, 'nav.create_btn')}
             >
               <span>{t(lang, 'nav.create_btn')}</span>
-              <svg className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <ChevronDownIcon size={16} className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
             </button>
             {dropdownOpen && (
               <div className="absolute right-0 top-full mt-1.5 min-w-[10rem] py-1 bg-dark-bg border border-secondary-bg rounded-lg shadow-lg z-50" role="menu">
