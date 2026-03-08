@@ -290,5 +290,4 @@ hackathon:
     multi_track_rule: "independent"
     language: ["en", "zh"]
     ai_review: true
-    ai_team_matching: false
     public_vote: "none"

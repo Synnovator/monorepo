@@ -317,7 +317,6 @@ hackathon:
     multi_track_rule: "independent"
     language: ["en", "zh"]
     ai_review: true
-    ai_team_matching: false
     public_vote: "none"
 ```
 
@@ -1070,7 +1069,6 @@ const hackathons = defineCollection({
         multi_track_rule: z.string().optional(),
         language: z.array(z.string()).optional(),
         ai_review: z.boolean().optional(),
-        ai_team_matching: z.boolean().optional(),
         public_vote: z.string().optional(),
         vote_emoji: z.string().optional(),
       }).optional(),

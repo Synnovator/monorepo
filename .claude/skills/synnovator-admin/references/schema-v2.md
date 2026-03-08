@@ -153,7 +153,6 @@ hackathon:
     multi_track_rule: ""     # independent | shared
     language: ["zh", "en"]
     ai_review: false
-    ai_team_matching: false
     public_vote: "none"      # none | reactions
     vote_emoji: ""           # e.g., "👍" (only when public_vote == reactions)
 ```

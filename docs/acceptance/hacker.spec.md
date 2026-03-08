@@ -267,7 +267,7 @@
 ## US-H-008: 组队/找队友 [P1]
 
 > **前置条件**: 用户已创建 Profile 且有 `looking_for` 字段
-> **涉及层**: Site → Issue Template `team-formation.yml` → Actions `ai-team-match.yml`
+> **涉及层**: Site → Issue Template `team-formation.yml`
 
 ### SC-H-008.1: 提交组队请求
 
@@ -277,22 +277,7 @@
   - template: `team-formation.yml`
   - title: `[Team] {username} 寻找队友 — {hackathon-slug}`
   - labels: `team-formation`, `hackathon:{slug}`
-
-### SC-H-008.2: AI 组队匹配建议
-
-- **Given** 用户提交了组队 Issue
-- **And** hackathon.yml 中 `settings.ai_team_matching = true`
-- **When** Actions 触发 `ai-team-match` workflow
-- **Then** AI 分析用户 Profile（skills, interests, looking_for）
-- **And** 与同活动已注册用户的 Profile 匹配
-- **And** Bot 评论推荐队友列表（GitHub username + 匹配度简述）
-
-### SC-H-008.3: AI 匹配未启用
-
-- **Given** hackathon.yml 中 `settings.ai_team_matching = false`
-- **When** 用户提交组队 Issue
-- **Then** 不触发 AI 匹配
-- **And** Issue 仅作为公开的队友招募帖子存在
+- **And** Issue 作为公开的队友招募帖子存在，其他参赛者可通过 Issue 评论联系
 
 ---
 

@@ -62,7 +62,7 @@ Synnovator 采用 **Git-native + 最小服务端** 架构。核心思想是将 G
 | 文件存储 | Cloudflare R2 | S3 兼容 API，无出站流量费，与 Pages Functions 同区域低延迟 |
 | 自动化 | GitHub Actions | PR/Issue 事件触发，公开仓库免费无限分钟 |
 | 认证 | GitHub OAuth | 用户群体即 GitHub 用户，单点登录，最小权限 |
-| AI 服务 | Claude API | 评审摘要、组队匹配、PDF 内容提取 |
+| AI 服务 | Claude API | 评审摘要、PDF 内容提取 |
 | 数据库 | Cloudflare D1 (P1 可选) | SQL 数据库，搜索索引和评分缓存，非 P0 必需 |
 
 **运行时依赖补充**（P0 实际使用）：
@@ -476,7 +476,6 @@ synnovator-admin Skill
 | `upload-assets.yml` | PR merge (含二进制文件) | 上传到 R2 → 填充 r2_url → 移除文件 |
 | `status-update.yml` | cron (每小时) | 遍历 timeline → 更新 stage Label |
 | `ai-review.yml` | PR (submission 校验通过后) | Claude API 评审摘要 |
-| `ai-team-match.yml` | Issue (label: team-formation) | Claude API 组队匹配 |
 | `deploy.yml` | push to main | 触发 CF Pages 重建（可选，CF Pages 自身也监听 push） |
 
 ### 7.2 Actions 与 CF Pages 分工
