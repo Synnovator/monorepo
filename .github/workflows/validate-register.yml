@@ -2,11 +2,13 @@ name: Validate Registration
 
 on:
   issues:
-    types: [opened, edited]
+    types: [opened, edited, labeled]
 
 jobs:
   validate:
-    if: contains(github.event.issue.labels.*.name, 'registration')
+    if: |
+      contains(github.event.issue.labels.*.name, 'registration') &&
+      (github.event.action != 'labeled' || github.event.label.name == 'registration')
     runs-on: ubuntu-latest
     permissions:
       issues: write

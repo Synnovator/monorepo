@@ -2,11 +2,13 @@ name: Validate Team Formation
 
 on:
   issues:
-    types: [opened, edited]
+    types: [opened, edited, labeled]
 
 jobs:
   validate:
-    if: contains(github.event.issue.labels.*.name, 'team-formation')
+    if: |
+      contains(github.event.issue.labels.*.name, 'team-formation') &&
+      (github.event.action != 'labeled' || github.event.label.name == 'team-formation')
     runs-on: ubuntu-latest
     permissions:
       issues: write

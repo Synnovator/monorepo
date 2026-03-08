@@ -2,11 +2,13 @@ name: Validate NDA
 
 on:
   issues:
-    types: [opened, edited]
+    types: [opened, edited, labeled]
 
 jobs:
   validate:
-    if: contains(github.event.issue.labels.*.name, 'nda-sign')
+    if: |
+      contains(github.event.issue.labels.*.name, 'nda-sign') &&
+      (github.event.action != 'labeled' || github.event.label.name == 'nda-sign')
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -68,27 +70,23 @@ jobs:
               errors.push(`${unchecked.length} checkbox(es) not checked — all NDA confirmations are required`);
             }
 
-            // 6. Verify user is registered for this hackathon
-            if (trimmedSlug && errors.length === 0) {
-              try {
-                const registrationIssues = await github.rest.issues.listForRepo({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  labels: `register,hackathon:${trimmedSlug}`,
-                  creator: author,
-                  state: 'all',
-                  per_page: 100,
+            // 6. Verify profile exists (NDA signer must have a profile)
+            if (trimmedUser) {
+              const profilesDir = 'profiles';
+              if (fs.existsSync(profilesDir)) {
+                const profileFiles = fs.readdirSync(profilesDir).filter(f =>
+                  f.endsWith('.yml') && !f.startsWith('_')
+                );
+                const profileFound = profileFiles.some(pf => {
+                  try {
+                    const profileData = yaml.load(fs.readFileSync(`${profilesDir}/${pf}`, 'utf8'));
+                    return profileData?.hacker?.github?.toLowerCase() === author.toLowerCase();
+                  } catch { return false; }
                 });
 
-                const registered = registrationIssues.data.some(i =>
-                  i.labels.some(l => l.name === 'registered')
-                );
-
-                if (!registered) {
-                  errors.push(`@${author} is not registered for hackathon "${trimmedSlug}" — please register first`);
+                if (!profileFound) {
+                  errors.push(`No profile found for @${author} in \`profiles/\`. Please create a profile first.`);
                 }
-              } catch (e) {
-                errors.push(`Failed to check registration status: ${e.message}`);
               }
             }
 
@@ -105,7 +103,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                labels: ['nda-approved'],
+                labels: ['nda-approved', `hackathon:${trimmedSlug}`],
               });
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
