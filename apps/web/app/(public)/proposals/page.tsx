@@ -3,8 +3,6 @@ import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { ProposalsViewToggle } from '@/components/ProposalsViewToggle';
 
-export const dynamic = 'force-static';
-
 export default async function ProposalsPage({
   searchParams,
 }: {
