@@ -49,8 +49,8 @@ All write operations follow the same pattern:
 Collect params → Create branch → Execute → Validate → Commit → Offer PR
 ```
 
-Branch naming: `feat/hackathon-{slug}` for hackathon ops, `feat/profile-{username}` for profiles,
-`feat/submission-{slug}-{team}` for submissions.
+Branch naming: `data/hackathon-{slug}` for hackathon ops, `data/profile-{username}` for profiles,
+`data/submission-{slug}-{team}` for submissions.
 
 Commit format: `type(scope): description` — types are `feat`, `fix`, `chore`; scope is usually
 `hackathons` or `profiles`.
@@ -65,7 +65,7 @@ After commit, offer to create PR but never push without the admin's confirmation
 ### create-hackathon
 
 1. Ask for: `slug` (lowercase alphanumeric + hyphens), `type` (community / enterprise / youth-league / open-source), `name`
-2. Create branch: `git checkout -b feat/hackathon-{slug}`
+2. Create branch: `git checkout -b data/hackathon-{slug}`
 3. Run: `bash scripts/create-hackathon.sh {slug} {type} "{name}"`
 4. Check if `docs/templates/{type}/hackathon.yml` exists — if so, read the template and use its
    structure to replace the generated skeleton. Preserve the `slug`, `name`, and `type` values
@@ -144,7 +144,7 @@ Markdown archive — using fictional but realistic data. The output is indisting
 real platform data. Useful for user research interviews, operational dry-runs, demos, and
 pitch materials.
 
-Branch naming: `feat/simulate-{slug}`
+Branch naming: `data/simulate-{slug}`
 
 **Two organizer personas** shape defaults for legal, eligibility, confidentiality, and risk focus:
 
@@ -184,7 +184,7 @@ any step to accept all remaining defaults.
 #### Execution steps
 
 1. **Confirm persona** — `organizer_type` selects default legal/eligibility/risk settings
-2. **Create branch** — `git checkout -b feat/simulate-{slug}`
+2. **Create branch** — `git checkout -b data/simulate-{slug}`
 3. **Generate `hackathon.yml`**
    - Read `references/schema-v2.md` for field structure
    - Read `references/simulate-output-template.md` for content richness guidance
