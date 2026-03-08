@@ -66,22 +66,41 @@ pnpm lint             # 全量 lint
 
 ## 分支策略
 
+### 代码开发分支
+
 ```
-feat/xxx → dev → main → [自动部署]
+feat/xxx ──→ main → [自动部署]
+fix/xxx  ──→ main
+docs/xxx ──→ main
 ```
 
-| 分支 | 用途 |
-|------|------|
-| `main` | 稳定主分支，自动部署 |
-| `dev` | 日常开发分支 |
-| `feat/*` | 功能分支，从 `dev` 开出 |
+| 前缀 | 用途 | 示例 |
+|------|------|------|
+| `feat/*` | 新功能开发 | `feat/add-voting-ui` |
+| `fix/*` | Bug 修复 | `fix/i18n-fallback` |
+| `docs/*` | 文档变更 | `docs/update-prd` |
+| `refactor/*` | 重构 | `refactor/extract-utils` |
+| `chore/*` | 配置/依赖 | `chore/bump-deps` |
+| `ci/*` | CI/CD 变更 | `ci/add-lint-check` |
+
+### 数据操作分支
+
+平台数据变更（YAML）使用 `data/` 前缀，与代码分支区分：
+
+| 前缀 | 用途 | 示例 |
+|------|------|------|
+| `data/hackathon-*` | 创建/编辑活动 | `data/hackathon-ai-challenge-2026` |
+| `data/profile-*` | 创建/编辑 Profile | `data/profile-alice` |
+| `data/submission-*` | 提交项目 | `data/submission-ai-challenge-team-alpha` |
+| `data/simulate-*` | 模拟数据 | `data/simulate-fintech-2025` |
+| `data/sync-*` | Actions 自动同步 | `data/sync-registrations-2026-03-08` |
 
 ## Pull Request
 
-1. 从 `dev` 创建功能分支：`feat/my-feature`
-2. 开发完成后提交 PR 到 `dev`
+1. 从 `main` 创建功能/数据分支
+2. 开发完成后提交 PR 到 `main`
 3. PR 标题遵循 Commit 规范格式
-4. 合并到 `main` 后自动部署
+4. 合并后自动部署
 
 ## 数据贡献
 
