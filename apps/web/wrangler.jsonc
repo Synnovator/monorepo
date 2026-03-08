@@ -1,0 +1,16 @@
+{
+  "name": "synnovator",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2024-12-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "vars": {
+    "SITE_URL": "https://home.synnovator.space",
+    "GITHUB_CLIENT_ID": "Iv23liQaa34mwXMU912V",
+    "GITHUB_OWNER": "Synnovator",
+    "GITHUB_REPO": "monorepo"
+  }
+}

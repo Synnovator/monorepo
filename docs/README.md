@@ -55,6 +55,9 @@
 | `2026-03-05-simulate-subcommand-impl.md` | 模拟子命令实施 |
 | `2026-03-05-unified-guides-page-design.md` | 统一指南页设计 |
 | `2026-03-05-unified-guides-page-plan.md` | 统一指南页实施 |
+| **2026-03-05 Next.js 迁移** | |
+| `2026-03-05-nextjs-migration-design.md` | Next.js 迁移设计 |
+| `2026-03-05-nextjs-migration-implementation.md` | Next.js 迁移实施计划 |
 
 ### `guides/` — 指南
 
