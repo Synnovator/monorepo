@@ -376,7 +376,7 @@ interface CreateHackathonFormProps {
 ## Out of Scope
 
 - validate-registration workflow (backend automation — separate task)
-- AI Review / AI Team Matching workflows
+- AI Review workflow
 - Public voting UI
 - User dashboard (my registrations/submissions)
 - Language switcher implementation

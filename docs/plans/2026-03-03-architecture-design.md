@@ -40,7 +40,7 @@ Synnovator 采用 **Git-native + 最小服务端** 架构。核心思想是将 G
 │  ┌───────────────────────┐    ┌──────────────────────────────────┐  │
 │  │ 管理员本地 (管理平面)  │    │  外部服务                        │  │
 │  │                       │    │                                  │  │
-│  │  • git clone/push     │    │  • Claude API (AI 评审/匹配)     │  │
+│  │  • git clone/push     │    │  • Claude API (AI 评审)           │  │
 │  │  • synnovator-admin   │    │                                  │  │
 │  │    CLI Skill          │    │                                  │  │
 │  └───────────────────────┘    └──────────────────────────────────┘  │
@@ -486,7 +486,7 @@ GitHub Actions 负责:                     Cloudflare Pages 负责:
 ├── Label 管理（状态标记）                ├── 静态页面 CDN 分发
 ├── Bot Comment（校验结果反馈）           ├── Pages Functions 运行
 ├── R2 文件上传（通过 S3 API）            ├── PR Preview 部署
-├── AI 评审/匹配（Claude API 调用）       └── 自定义域名/SSL
+├── AI 评审（Claude API 调用）       └── 自定义域名/SSL
 ├── 阶段自动切换（cron status-update）
 └── Issue 自动处理（报名/NDA/申诉）
 
