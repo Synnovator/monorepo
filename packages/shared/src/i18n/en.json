@@ -69,7 +69,11 @@
     "results": "Results",
     "results_pending": "Results not yet published",
     "appeal_window": "Appeal Window",
-    "team_formation": "Team Formation"
+    "team_formation": "Team Formation",
+    "team_size_label": "Team size",
+    "solo_allowed": "(solo allowed)",
+    "license_label": "License",
+    "ip_label": "IP"
   },
   "stage": {
     "draft": "Draft",
@@ -94,7 +98,12 @@
     "projects": "Projects",
     "links": "Links",
     "edit": "Edit Profile",
-    "hackathons": "Hackathon History"
+    "hackathons": "Hackathon History",
+    "seeking": "Seeking",
+    "team_size": "Team size",
+    "collab_style": "Style",
+    "identity": "Identity",
+    "view_project": "View project"
   },
   "admin": {
     "title": "Admin",
