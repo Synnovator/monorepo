@@ -13,6 +13,10 @@ import { FAQAccordion } from '@/components/FAQAccordion';
 import { ScoreCard } from '@/components/ScoreCard';
 import { DatasetDownload } from '@/components/DatasetDownload';
 import { ClipboardListIcon, ShieldCheckIcon } from '@/components/icons';
+import { RegisterForm } from '@/components/forms/RegisterForm';
+import { NDASignForm } from '@/components/forms/NDASignForm';
+import { AppealForm } from '@/components/forms/AppealForm';
+import { TeamFormationForm } from '@/components/forms/TeamFormationForm';
 
 export const dynamic = 'force-static';
 
@@ -43,6 +47,12 @@ export default async function HackathonDetailPage({
 
   // Load results (embedded in hackathon data or separate)
   const showLeaderboard = ['announcement', 'award', 'ended'].includes(stage);
+
+  const formTracks = (h.tracks ?? []).map((tr: any) => ({
+    slug: tr.slug,
+    name: tr.name,
+    name_zh: tr.name_zh,
+  }));
 
   // Track name map
   const trackNameMap: Record<string, { name: string; name_zh?: string }> = {};
@@ -165,8 +175,8 @@ export default async function HackathonDetailPage({
                   <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6 space-y-3">
                     {h.eligibility.team_size && (
                       <p className="text-sm text-light-gray">
-                        Team size: {h.eligibility.team_size.min}–{h.eligibility.team_size.max}
-                        {h.eligibility.allow_solo && ' (solo allowed)'}
+                        {t(lang, 'hackathon.team_size_label')}: {h.eligibility.team_size.min}–{h.eligibility.team_size.max}
+                        {h.eligibility.allow_solo && ` ${t(lang, 'hackathon.solo_allowed')}`}
                       </p>
                     )}
                     {h.eligibility.restrictions?.map((r: string, i: number) => (
@@ -190,8 +200,8 @@ export default async function HackathonDetailPage({
                     {t(lang, 'hackathon.legal')}
                   </h2>
                   <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6 space-y-3">
-                    {h.legal.license && <p className="text-sm text-light-gray">License: {h.legal.license}</p>}
-                    {h.legal.ip_ownership && <p className="text-sm text-light-gray">IP: {h.legal.ip_ownership}</p>}
+                    {h.legal.license && <p className="text-sm text-light-gray">{t(lang, 'hackathon.license_label')}: {h.legal.license}</p>}
+                    {h.legal.ip_ownership && <p className="text-sm text-light-gray">{t(lang, 'hackathon.ip_label')}: {h.legal.ip_ownership}</p>}
                     {h.legal.compliance_notes?.map((note: string, i: number) => (
                       <p key={i} className="text-sm text-muted">{note}</p>
                     ))}
@@ -216,6 +226,62 @@ export default async function HackathonDetailPage({
                   </section>
                 )
               ))}
+
+              {/* NDA Sign Form */}
+              {h.legal?.nda?.required && (
+                <section>
+                  <h2 className="text-xl font-heading font-bold text-white mb-4">
+                    {t(lang, 'hackathon.nda_sign')}
+                  </h2>
+                  <NDASignForm
+                    hackathonSlug={h.slug}
+                    ndaDocumentUrl={h.legal.nda.document_url}
+                    ndaSummary={h.legal.nda.summary}
+                    lang={lang}
+                  />
+                </section>
+              )}
+
+              {/* Register Form (during registration stage) */}
+              {stage === 'registration' && (
+                <section id="register-section">
+                  <h2 className="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.register')}</h2>
+                  <RegisterForm
+                    hackathonSlug={h.slug}
+                    hackathonName={localize(lang, h.name, h.name_zh)}
+                    tracks={formTracks}
+                    ndaRequired={!!h.legal?.nda?.required}
+                    lang={lang}
+                  />
+                </section>
+              )}
+
+              {/* Team Formation (during registration/development stages) */}
+              {(['registration', 'development'].includes(stage)) && (
+                <section id="team-formation-section">
+                  <h2 className="text-xl font-heading font-bold text-white mb-4">
+                    {t(lang, 'hackathon.team_formation')}
+                  </h2>
+                  <TeamFormationForm
+                    hackathonSlug={h.slug}
+                    tracks={formTracks}
+                    lang={lang}
+                  />
+                </section>
+              )}
+
+              {/* Appeal Form (during announcement stage) */}
+              {stage === 'announcement' && (
+                <section id="appeal-section">
+                  <h2 className="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.appeal')}</h2>
+                  <AppealForm
+                    hackathonSlug={h.slug}
+                    tracks={formTracks}
+                    teams={[]}
+                    lang={lang}
+                  />
+                </section>
+              )}
             </div>
           </div>
 

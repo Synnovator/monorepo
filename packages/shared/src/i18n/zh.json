@@ -67,7 +67,11 @@
     "results": "评审结果",
     "results_pending": "结果尚未公布",
     "appeal_window": "申诉窗口",
-    "team_formation": "组队 / 寻找队友"
+    "team_formation": "组队 / 寻找队友",
+    "team_size_label": "团队规模",
+    "solo_allowed": "（允许个人参赛）",
+    "license_label": "许可证",
+    "ip_label": "知识产权"
   },
   "stage": {
     "draft": "筹备中",
@@ -92,7 +96,12 @@
     "projects": "项目",
     "links": "链接",
     "edit": "编辑 Profile",
-    "hackathons": "参赛记录"
+    "hackathons": "参赛记录",
+    "seeking": "正在寻找",
+    "team_size": "团队规模",
+    "collab_style": "协作方式",
+    "identity": "身份",
+    "view_project": "查看项目"
   },
   "admin": {
     "title": "管理",

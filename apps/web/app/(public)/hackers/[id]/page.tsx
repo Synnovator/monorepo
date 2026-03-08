@@ -92,7 +92,7 @@ export default async function HackerProfilePage({
                     {proj.description && <p className="text-muted text-xs mt-1">{proj.description}</p>}
                     {proj.url && (
                       <a href={proj.url} target="_blank" className="text-lime-primary text-xs mt-2 inline-block hover:underline">
-                        View project
+                        {t(lang, 'profile.view_project')}
                       </a>
                     )}
                   </div>
@@ -124,7 +124,7 @@ export default async function HackerProfilePage({
               <div className="rounded-lg border border-secondary-bg bg-dark-bg p-4 space-y-2">
                 {h.looking_for.roles && (
                   <div>
-                    <p className="text-xs text-muted">Seeking:</p>
+                    <p className="text-xs text-muted">{t(lang, 'profile.seeking')}:</p>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {h.looking_for.roles.map((r: string) => (
                         <span key={r} className="text-xs px-2 py-0.5 rounded-full bg-cyan/10 text-cyan">{r}</span>
@@ -132,15 +132,15 @@ export default async function HackerProfilePage({
                     </div>
                   </div>
                 )}
-                {h.looking_for.team_size && <p className="text-xs text-muted">Team size: {h.looking_for.team_size}</p>}
-                {h.looking_for.collaboration_style && <p className="text-xs text-muted">Style: {h.looking_for.collaboration_style}</p>}
+                {h.looking_for.team_size && <p className="text-xs text-muted">{t(lang, 'profile.team_size')}: {h.looking_for.team_size}</p>}
+                {h.looking_for.collaboration_style && <p className="text-xs text-muted">{t(lang, 'profile.collab_style')}: {h.looking_for.collaboration_style}</p>}
               </div>
             </section>
           )}
 
           {h.identity && (
             <section>
-              <h2 className="text-sm font-heading font-bold text-white mb-3">Identity</h2>
+              <h2 className="text-sm font-heading font-bold text-white mb-3">{t(lang, 'profile.identity')}</h2>
               <div className="rounded-lg border border-secondary-bg bg-dark-bg p-4 space-y-1">
                 {h.identity.type && <p className="text-xs text-light-gray capitalize">{h.identity.type}</p>}
                 {h.identity.affiliation && <p className="text-xs text-muted">{h.identity.affiliation}</p>}

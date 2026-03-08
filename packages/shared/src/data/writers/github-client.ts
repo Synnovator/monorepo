@@ -119,14 +119,19 @@ export function createGitHubClient(token: string) {
       return data;
     },
 
-    async checkRepoPermission(owner: string, repo: string, username: string) {
+    async checkRepoPermission(owner: string, repo: string, _username: string) {
       try {
-        const { data } = await octokit.rest.repos.getCollaboratorPermissionLevel({
-          owner,
-          repo,
-          username,
-        });
-        return data.permission;
+        // Use repos.get() which returns permissions for the authenticated user
+        // without requiring elevated OAuth scopes (read:user is sufficient)
+        const { data } = await octokit.rest.repos.get({ owner, repo });
+        const perms = data.permissions;
+        if (!perms) return 'none';
+        if (perms.admin) return 'admin';
+        if (perms.maintain) return 'maintain';
+        if (perms.push) return 'write';
+        if (perms.triage) return 'triage';
+        if (perms.pull) return 'read';
+        return 'none';
       } catch {
         return 'none';
       }

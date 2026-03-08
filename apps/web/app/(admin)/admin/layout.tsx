@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { decrypt, type Session } from '@synnovator/shared/auth';
 import { createGitHubClient } from '@synnovator/shared/data';
+import { t } from '@synnovator/shared/i18n';
 import { NavBar } from '@/components/NavBar';
 import { Footer } from '@/components/Footer';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
@@ -33,8 +34,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <Suspense><NavBar /></Suspense>
         <div className="min-h-screen pt-16 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-heading text-error mb-2">Access Denied</h1>
-            <p className="text-muted">You need admin or maintain permission on the repository.</p>
+            <h1 className="text-2xl font-heading text-error mb-2">{t('zh', 'admin.access_denied')}</h1>
+            <p className="text-muted">{t('zh', 'admin.access_denied_desc')}</p>
+            <p className="text-muted text-sm mt-1">{t('en', 'admin.access_denied_desc')}</p>
           </div>
         </div>
         <Suspense><Footer /></Suspense>
