@@ -41,11 +41,39 @@ export function HackathonTabs({ detailsLabel, submissionsLabel, leaderboardLabel
   useEffect(() => {
     const onHashChange = () => {
       const hash = window.location.hash.replace('#', '');
+      if (!hash) return;
+
+      // If it's a tab ID, switch to that tab
       if (TAB_IDS.includes(hash as TabId)) {
         setActiveTab(hash as TabId);
+        return;
       }
+
+      // For non-tab anchors (e.g. #register-section), find the element
+      // and ensure its parent tab panel is visible, then scroll to it
+      const target = document.getElementById(hash);
+      if (!target) return;
+
+      const panel = target.closest<HTMLElement>('[data-tab-panel]');
+      if (panel?.dataset.tabPanel) {
+        const panelTab = panel.dataset.tabPanel as TabId;
+        if (TAB_IDS.includes(panelTab)) {
+          setActiveTab(panelTab);
+        }
+      }
+
+      // Scroll after a tick so the panel is visible
+      requestAnimationFrame(() => {
+        target.scrollIntoView({ behavior: 'smooth' });
+      });
     };
     window.addEventListener('hashchange', onHashChange);
+
+    // Also handle initial hash on mount (e.g. direct link with #register-section)
+    if (window.location.hash) {
+      onHashChange();
+    }
+
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
