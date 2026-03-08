@@ -1,0 +1,283 @@
+name: Sync Issue Data to YAML
+
+on:
+  issues:
+    types: [labeled]
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync-registrations:
+    if: >
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event.label.name == 'registered'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install js-yaml
+
+      - name: Collect and sync registrations
+        id: sync
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const yaml = require('./node_modules/js-yaml');
+
+            // Fetch all Issues with 'registered' label
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'registered',
+              state: 'all',
+              per_page: 100
+            });
+
+            // Group registrations by username
+            const registrations = {};
+            for (const issue of issues) {
+              const match = issue.title.match(/^\[Register\]\s+(\S+)\s+—\s+(\S+)$/);
+              if (!match) continue;
+              const [, username, hackathon] = match;
+
+              // Parse body fields
+              const body = issue.body || '';
+              const getField = (label) => {
+                const regex = new RegExp(`### ${label}\\s*\\n\\s*(.+)`, 'i');
+                const m = body.match(regex);
+                return m ? m[1].trim() : '';
+              };
+
+              if (!registrations[username]) registrations[username] = [];
+              registrations[username].push({
+                hackathon,
+                track: getField('Track Slug'),
+                role: getField('Role').toLowerCase().replace(/[()]/g, '').replace(/\s+/g, '-') || 'participant',
+                registered_at: issue.created_at
+              });
+            }
+
+            // Build a map of github username → profile file path
+            const profileDir = 'profiles';
+            const profileFiles = fs.readdirSync(profileDir).filter(f =>
+              f.endsWith('.yml') && !f.startsWith('_')
+            );
+            const usernameToFile = {};
+            for (const file of profileFiles) {
+              try {
+                const data = yaml.load(fs.readFileSync(path.join(profileDir, file), 'utf8'));
+                const gh = data?.hacker?.github;
+                if (gh) usernameToFile[gh.toLowerCase()] = file;
+              } catch { /* skip malformed profiles */ }
+            }
+
+            let changed = false;
+
+            for (const [username, regs] of Object.entries(registrations)) {
+              const profileFile = usernameToFile[username.toLowerCase()];
+              if (!profileFile) {
+                core.warning(`No profile found for user: ${username}`);
+                continue;
+              }
+
+              const filePath = path.join(profileDir, profileFile);
+              const raw = fs.readFileSync(filePath, 'utf8');
+              const data = yaml.load(raw);
+
+              if (!data.hacker) continue;
+              if (!Array.isArray(data.hacker.registrations)) {
+                data.hacker.registrations = [];
+              }
+
+              let fileChanged = false;
+              for (const reg of regs) {
+                // Check if registration for this hackathon already exists
+                const exists = data.hacker.registrations.some(
+                  r => r.hackathon === reg.hackathon
+                );
+                if (exists) continue;
+
+                data.hacker.registrations.push({
+                  hackathon: reg.hackathon,
+                  track: reg.track,
+                  role: reg.role,
+                  registered_at: reg.registered_at
+                });
+                fileChanged = true;
+              }
+
+              if (fileChanged) {
+                fs.writeFileSync(filePath, yaml.dump(data, {
+                  lineWidth: -1,
+                  quotingType: '"',
+                  forceQuotes: true
+                }));
+                changed = true;
+                core.info(`Updated registrations in ${filePath}`);
+              }
+            }
+
+            core.setOutput('changed', changed.toString());
+
+      - name: Create PR if changed
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          DATE=$(date +%Y-%m-%d)
+          BRANCH="data/sync-registrations-${DATE}"
+          git checkout -b "${BRANCH}"
+          git add profiles/
+          git commit -m "chore: sync registration data from Issues [automated]"
+          git push origin "${BRANCH}"
+          gh pr create \
+            --title "chore: sync registration data from validated Issues" \
+            --body "Automated sync of registration data from GitHub Issues with \`registered\` label into profile YAML files." \
+            --base main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  sync-nda:
+    if: >
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event.label.name == 'nda-approved'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install js-yaml
+
+      - name: Collect and sync NDA records
+        id: sync
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const yaml = require('./node_modules/js-yaml');
+
+            // Fetch all Issues with 'nda-approved' label
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'nda-approved',
+              state: 'all',
+              per_page: 100
+            });
+
+            // Group NDA records by username
+            const ndaRecords = {};
+            for (const issue of issues) {
+              const match = issue.title.match(/^\[NDA\]\s+(\S+)\s+—\s+(\S+)$/);
+              if (!match) continue;
+              const [, username, hackathon] = match;
+
+              if (!ndaRecords[username]) ndaRecords[username] = [];
+              ndaRecords[username].push({
+                hackathon,
+                signed_at: issue.created_at
+              });
+            }
+
+            // Build a map of github username → profile file path
+            const profileDir = 'profiles';
+            const profileFiles = fs.readdirSync(profileDir).filter(f =>
+              f.endsWith('.yml') && !f.startsWith('_')
+            );
+            const usernameToFile = {};
+            for (const file of profileFiles) {
+              try {
+                const data = yaml.load(fs.readFileSync(path.join(profileDir, file), 'utf8'));
+                const gh = data?.hacker?.github;
+                if (gh) usernameToFile[gh.toLowerCase()] = file;
+              } catch { /* skip malformed profiles */ }
+            }
+
+            let changed = false;
+
+            for (const [username, records] of Object.entries(ndaRecords)) {
+              const profileFile = usernameToFile[username.toLowerCase()];
+              if (!profileFile) {
+                core.warning(`No profile found for user: ${username}`);
+                continue;
+              }
+
+              const filePath = path.join(profileDir, profileFile);
+              const raw = fs.readFileSync(filePath, 'utf8');
+              const data = yaml.load(raw);
+
+              if (!data.hacker) continue;
+              if (!Array.isArray(data.hacker.nda_signed)) {
+                data.hacker.nda_signed = [];
+              }
+
+              let fileChanged = false;
+              for (const rec of records) {
+                // Check if NDA for this hackathon already exists
+                const exists = data.hacker.nda_signed.some(
+                  r => r.hackathon === rec.hackathon
+                );
+                if (exists) continue;
+
+                data.hacker.nda_signed.push({
+                  hackathon: rec.hackathon,
+                  signed_at: rec.signed_at
+                });
+                fileChanged = true;
+              }
+
+              if (fileChanged) {
+                fs.writeFileSync(filePath, yaml.dump(data, {
+                  lineWidth: -1,
+                  quotingType: '"',
+                  forceQuotes: true
+                }));
+                changed = true;
+                core.info(`Updated NDA records in ${filePath}`);
+              }
+            }
+
+            core.setOutput('changed', changed.toString());
+
+      - name: Create PR if changed
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          DATE=$(date +%Y-%m-%d)
+          BRANCH="data/sync-nda-${DATE}"
+          git checkout -b "${BRANCH}"
+          git add profiles/
+          git commit -m "chore: sync NDA records from Issues [automated]"
+          git push origin "${BRANCH}"
+          gh pr create \
+            --title "chore: sync NDA records from validated Issues" \
+            --body "Automated sync of NDA signing records from GitHub Issues with \`nda-approved\` label into profile YAML files." \
+            --base main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
