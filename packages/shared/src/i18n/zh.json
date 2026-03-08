@@ -68,6 +68,10 @@
     "results_pending": "结果尚未公布",
     "appeal_window": "申诉窗口",
     "team_formation": "组队 / 寻找队友",
+    "teams_browse": "浏览正在组队的帖子，或发布你自己的组队信息。",
+    "teams_browse_link": "浏览组队帖子",
+    "teams_post": "发布组队",
+    "teams_not_available": "组队功能仅在报名和开发阶段开放。",
     "team_size_label": "团队规模",
     "solo_allowed": "（允许个人参赛）",
     "license_label": "许可证",
@@ -86,7 +90,8 @@
   "tab": {
     "details": "详情",
     "submissions": "提案",
-    "leaderboard": "排行榜"
+    "leaderboard": "排行榜",
+    "teams": "组队"
   },
   "profile": {
     "skills": "技能",
@@ -202,7 +207,8 @@
     "description": "项目介绍",
     "no_readme": "详细介绍暂未提供",
     "leaderboard_pending": "评审结果尚未公布",
-    "filter_all": "全部"
+    "filter_all": "全部",
+    "edit": "编辑项目"
   },
   "form": {
     "register": {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { buildPRUrl, openGitHubUrl, GITHUB_ORG, GITHUB_REPO } from '@/lib/github-url';
+import { buildIssueUrl, openGitHubUrl } from '@/lib/github-url';
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import type { Track } from './form-utils';
@@ -15,14 +15,10 @@ interface RegisterFormProps {
   lang: Lang;
 }
 
-function escapeYamlValue(val: string): string {
-  return val.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
-}
-
 const ROLES = [
-  { value: 'participant', zh: '个人参赛', en: 'Participant (Solo)' },
-  { value: 'team-lead', zh: '队长', en: 'Team Lead' },
-  { value: 'team-member', zh: '队员', en: 'Team Member' },
+  { value: 'participant', label: 'Participant (Solo)', zh: '个人参赛', en: 'Participant (Solo)' },
+  { value: 'team-lead', label: 'Team Lead', zh: '队长', en: 'Team Lead' },
+  { value: 'team-member', label: 'Team Member', zh: '队员', en: 'Team Member' },
 ];
 
 export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired, lang }: RegisterFormProps) {
@@ -54,59 +50,20 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
         return;
       }
 
-      // Fetch current profile content
-      const profilePath = `profiles/${profileCheck.slug}.yml`;
-      const ghRes = await fetch(
-        `https://api.github.com/repos/${GITHUB_ORG}/${GITHUB_REPO}/contents/${profilePath}`,
-        { headers: { Accept: 'application/vnd.github.v3.raw' } }
-      );
+      // Map role value to the label expected by the issue template dropdown
+      const roleLabel = ROLES.find(r => r.value === role)?.label ?? role;
 
-      if (!ghRes.ok) {
-        if (ghRes.status === 404) {
-          throw new Error(t(lang, 'form.register.profile_not_found'));
-        }
-        throw new Error(t(lang, 'form.register.github_api_failed'));
-      }
-
-      let profileContent = await ghRes.text();
-
-      // Escape user-controlled values
-      const safeSlug = escapeYamlValue(hackathonSlug);
-      const safeTrack = escapeYamlValue(track);
-      const safeRole = escapeYamlValue(role);
-      const safeTeam = teamName ? escapeYamlValue(teamName) : '';
-
-      // Check for duplicate registration
-      if (profileContent.includes(`hackathon: "${safeSlug}"`) &&
-          profileContent.includes('registrations:')) {
-        setError(t(lang, 'form.register.already_registered'));
-        setSubmitting(false);
-        return;
-      }
-
-      // Build registration entry
-      const regLines = [
-        `    - hackathon: "${safeSlug}"`,
-        `      track: "${safeTrack}"`,
-        `      role: "${safeRole}"`,
-        ...(isSolo ? [] : [`      team: "${safeTeam}"`]),
-        `      registered_at: "${new Date().toISOString()}"`,
-      ];
-
-      // Check if registrations section already exists
-      if (profileContent.includes('registrations:')) {
-        profileContent = profileContent.replace(
-          /registrations:[ \t]*\n/,
-          `registrations:\n${regLines.join('\n')}\n`
-        );
-      } else {
-        profileContent = profileContent.trimEnd() + '\n\n  registrations:\n' + regLines.join('\n') + '\n';
-      }
-
-      const url = buildPRUrl({
-        filename: profilePath,
-        value: profileContent,
-        message: `feat(profiles): ${user.login} registers for ${hackathonSlug}`,
+      const url = buildIssueUrl({
+        template: 'register.yml',
+        title: `[Register] ${user.login} — ${hackathonSlug}`,
+        labels: ['registration'],
+        fields: {
+          hackathon: hackathonSlug,
+          github: user.login,
+          track,
+          role: roleLabel,
+          team: isSolo ? '' : teamName,
+        },
       });
       openGitHubUrl(url);
     } catch (err) {

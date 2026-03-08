@@ -11,12 +11,13 @@ import { GitHubRedirect } from '@/components/GitHubRedirect';
 import { HackathonTabs } from '@/components/HackathonTabs';
 import { FAQAccordion } from '@/components/FAQAccordion';
 import { ScoreCard } from '@/components/ScoreCard';
-import { DatasetDownload } from '@/components/DatasetDownload';
+import { DatasetSection } from '@/components/DatasetSection';
 import { ClipboardListIcon, ShieldCheckIcon } from '@/components/icons';
 import { RegisterForm } from '@/components/forms/RegisterForm';
 import { NDASignForm } from '@/components/forms/NDASignForm';
 import { AppealForm } from '@/components/forms/AppealForm';
 import { TeamFormationForm } from '@/components/forms/TeamFormationForm';
+import { TeamsTab } from '@/components/TeamsTab';
 
 export const dynamic = 'force-static';
 
@@ -128,6 +129,7 @@ export default async function HackathonDetailPage({
             detailsLabel={t(lang, 'tab.details')}
             submissionsLabel={t(lang, 'tab.submissions')}
             leaderboardLabel={t(lang, 'tab.leaderboard')}
+            teamsLabel={t(lang, 'tab.teams')}
           />
 
           {/* Tab 1: Details */}
@@ -189,7 +191,7 @@ export default async function HackathonDetailPage({
               {h.datasets && h.datasets.length > 0 && (
                 <section>
                   <h2 className="text-xl font-heading font-bold text-white mb-4">{t(lang, 'hackathon.datasets')}</h2>
-                  <DatasetDownload datasets={h.datasets as any} hackathonSlug={h.slug} lang={lang} />
+                  <DatasetSection datasets={h.datasets as any} hackathonSlug={h.slug} lang={lang} />
                 </section>
               )}
 
@@ -333,6 +335,13 @@ export default async function HackathonDetailPage({
                   <p className="text-muted text-lg">{t(lang, 'result.pending')}</p>
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Tab 4: Teams */}
+          <div data-tab-panel="teams" style={{ display: 'none' }}>
+            <div className="space-y-8 pt-6">
+              <TeamsTab hackathonSlug={h.slug} stage={stage} lang={lang} />
             </div>
           </div>
         </div>

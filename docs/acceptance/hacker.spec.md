@@ -117,42 +117,43 @@
 ## US-H-004: 报名参加活动 [P0]
 
 > **前置条件**: 用户已创建 Profile，活动处于 registration 阶段
-> **涉及层**: Site → GitHubRedirect → Issue `register.yml` → Actions 校验
+> **涉及层**: Site 表单 → Issue [Register] → validate-register.yml 校验 → `registered` Label → sync-issue-data.yml → PR → profile YAML
 
 ### SC-H-004.1: 提交报名 Issue
 
 - **Given** 用户已有 Profile（profiles/ 目录下存在其 YAML 文件）
 - **And** 活动处于 `registration` 阶段
-- **When** 用户在详情页点击「立即报名」
-- **Then** GitHubRedirect 生成预填 Issue URL：
+- **When** 用户在详情页填写报名表单（RegisterForm）并提交
+- **Then** RegisterForm 通过 GitHub API 创建 Issue：
   - title: `[Register] {username} — {hackathon-slug}`
   - labels: `register`, `hackathon:{slug}`
-  - body: 预填用户 GitHub 用户名和活动 slug
-- **And** 浏览器跳转到 GitHub Issue 创建页
+  - body: 包含用户 GitHub 用户名、活动 slug、赛道等报名信息
+- **And** 页面显示提交成功提示及 Issue 链接
 
 ### SC-H-004.2: 报名校验 — Profile 存在
 
 - **Given** 用户提交了报名 Issue
-- **When** Actions 处理该 Issue
+- **When** `validate-register.yml` workflow 被触发
 - **Then** Actions 检查 `profiles/` 目录下是否存在该用户的 YAML 文件
-- **And** 如果不存在 → Bot 评论 "❌ 请先创建 Profile 后再报名" + 提供 Profile 创建链接
+- **And** 如果不存在 → Bot 评论提示先创建 Profile + 提供 Profile 创建链接
 - **And** Issue 获得 `blocked:no-profile` Label
 
 ### SC-H-004.3: 报名校验 — eligibility 检查
 
 - **Given** 用户提交了报名 Issue 且 Profile 存在
 - **And** 活动的 `eligibility.open_to = "students"`
-- **When** Actions 检查用户 Profile 的 `identity.type`
+- **When** `validate-register.yml` 检查用户 Profile 的 `identity.type`
 - **Then** 如果 `identity.type = "student"` → 校验通过，Issue 获得 `registered` Label
-- **Or** 如果 `identity.type != "student"` → Bot 评论 "❌ 本活动仅限学生参加"
+- **Or** 如果 `identity.type != "student"` → Bot 评论提示本活动仅限学生参加
 
-### SC-H-004.4: 报名成功确认
+### SC-H-004.4: 报名成功 — 数据持久化
 
-- **Given** 报名 Issue 通过所有校验
-- **When** Actions 完成处理
-- **Then** Issue 获得 `registered` Label
-- **And** Bot 评论 "✅ 报名成功！请关注活动时间线，开发期将于 {development.start} 开始"
-- **And** 如果活动需要 NDA → Bot 追加 "⚠️ 请在开发前完成 NDA 签署"
+- **Given** 报名 Issue 通过所有校验并获得 `registered` Label
+- **When** `sync-issue-data.yml` 被 Label 事件触发
+- **Then** Actions 解析 Issue body 中的报名数据
+- **And** 创建 PR 将报名记录写入用户的 profile YAML（`registrations` 数组）
+- **And** Bot 在 Issue 评论报名成功确认及 PR 链接
+- **And** 如果活动需要 NDA → Bot 追加提示在开发前完成 NDA 签署
 
 ---
 
@@ -230,10 +231,10 @@
 
 ---
 
-## US-H-007: 签署 NDA [P1]
+## US-H-007: 签署 NDA [P0]
 
 > **前置条件**: 活动需要 NDA（`legal.nda.required = true`），用户已报名
-> **涉及层**: Site → Issue Template `nda-sign.yml` → Actions → R2 文件
+> **涉及层**: Site 表单 → Issue [NDA] → validate-nda.yml 校验 → `nda-approved` Label → sync-issue-data.yml → PR → profile YAML
 
 ### SC-H-007.1: NDA 签署引导
 
@@ -242,18 +243,26 @@
 - **Then** 页面展示：
   - NDA 文档下载链接（R2 PDF）
   - NDA 摘要文本（`legal.nda.summary`）
-  - 「签署 NDA」按钮（GitHubRedirect → Issue `nda-sign.yml`）
-- **And** 页面内嵌步骤说明："1. 下载并阅读 NDA → 2. 点击签署 → 3. 确认 Issue → 4. 等待审核"
+  - NDA 签署表单（NDASignForm）
+- **And** 页面内嵌步骤说明："1. 下载并阅读 NDA → 2. 勾选确认 → 3. 提交 → 4. 等待审核"
 
 ### SC-H-007.2: NDA 签署确认
 
-- **Given** 用户提交了 NDA 签署 Issue
-- **And** Issue 中勾选了 "我已阅读并同意 NDA 条款" checkbox
-- **When** Actions 处理该 Issue
-- **Then** Issue 获得 `nda-approved` Label
-- **And** Bot 评论 "✅ NDA 签署确认完成"
+- **Given** 用户通过 NDASignForm 提交了 NDA 签署 Issue
+- **And** Issue 中包含 NDA 确认声明
+- **When** `validate-nda.yml` workflow 被触发
+- **Then** Actions 校验 Issue 格式和用户报名状态
+- **And** 校验通过后 Issue 获得 `nda-approved` Label
 
-### SC-H-007.3: NDA 签署后获取数据集
+### SC-H-007.3: NDA 签署数据持久化
+
+- **Given** NDA Issue 获得 `nda-approved` Label
+- **When** `sync-issue-data.yml` 被 Label 事件触发
+- **Then** Actions 解析 Issue body 中的 NDA 签署数据
+- **And** 创建 PR 将 NDA 签署记录写入用户的 profile YAML（`nda_signed` 数组）
+- **And** Bot 在 Issue 评论 NDA 签署确认及 PR 链接
+
+### SC-H-007.4: NDA 签署后获取数据集
 
 - **Given** NDA 签署已通过（`nda-approved` Label）
 - **And** 活动有 `access_control = "nda-required"` 的数据集
@@ -267,7 +276,7 @@
 ## US-H-008: 组队/找队友 [P1]
 
 > **前置条件**: 用户已创建 Profile 且有 `looking_for` 字段
-> **涉及层**: Site → Issue Template `team-formation.yml` → Actions `ai-team-match.yml`
+> **涉及层**: Site → Issue Template `team-formation.yml`
 
 ### SC-H-008.1: 提交组队请求
 
@@ -277,22 +286,7 @@
   - template: `team-formation.yml`
   - title: `[Team] {username} 寻找队友 — {hackathon-slug}`
   - labels: `team-formation`, `hackathon:{slug}`
-
-### SC-H-008.2: AI 组队匹配建议
-
-- **Given** 用户提交了组队 Issue
-- **And** hackathon.yml 中 `settings.ai_team_matching = true`
-- **When** Actions 触发 `ai-team-match` workflow
-- **Then** AI 分析用户 Profile（skills, interests, looking_for）
-- **And** 与同活动已注册用户的 Profile 匹配
-- **And** Bot 评论推荐队友列表（GitHub username + 匹配度简述）
-
-### SC-H-008.3: AI 匹配未启用
-
-- **Given** hackathon.yml 中 `settings.ai_team_matching = false`
-- **When** 用户提交组队 Issue
-- **Then** 不触发 AI 匹配
-- **And** Issue 仅作为公开的队友招募帖子存在
+- **And** Issue 作为公开的队友招募帖子存在，其他参赛者可通过 Issue 评论联系
 
 ---
 

@@ -1,0 +1,188 @@
+name: Validate Registration
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+
+jobs:
+  validate:
+    if: |
+      contains(github.event.issue.labels.*.name, 'registration') &&
+      (github.event.action != 'labeled' || github.event.label.name == 'registration')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install js-yaml
+
+      - name: Parse and validate registration
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('./node_modules/js-yaml');
+            const issue = context.payload.issue;
+            const title = issue.title;
+            const body = issue.body || '';
+            const author = issue.user.login;
+            const errors = [];
+
+            // 1. Parse title: [Register] {username} — {hackathon-slug}
+            const titleMatch = title.match(/\[Register\]\s*(.*?)\s*—\s*(.*)/);
+            if (!titleMatch) {
+              errors.push('Issue title must match: `[Register] {username} — {hackathon-slug}`');
+            }
+            const [, declaredUser, slug] = titleMatch || [null, '', ''];
+            const trimmedSlug = slug.trim();
+            const trimmedUser = declaredUser.trim();
+
+            // 2. Anti-impersonation: issue author must match declared username
+            if (trimmedUser && trimmedUser.toLowerCase() !== author.toLowerCase()) {
+              errors.push(`Username mismatch: title declares "${trimmedUser}" but Issue was filed by @${author}`);
+            }
+
+            // 3. Parse body fields
+            const hackathonField = body.match(/### Hackathon Slug\s*\n\s*(.+)/);
+            const trackField = body.match(/### Track Slug\s*\n\s*(.+)/);
+            const roleField = body.match(/### Role\s*\n\s*(.+)/);
+            const bodySlug = hackathonField ? hackathonField[1].trim() : '';
+            const bodyTrack = trackField ? trackField[1].trim() : '';
+            const bodyRole = roleField ? roleField[1].trim() : '';
+
+            // Use body slug if title slug is empty, or validate consistency
+            const effectiveSlug = trimmedSlug || bodySlug;
+
+            if (!effectiveSlug) {
+              errors.push('Hackathon slug is required (in title or body)');
+            }
+
+            if (effectiveSlug) {
+              // 4. Verify hackathon exists
+              const hackathonPath = `hackathons/${effectiveSlug}/hackathon.yml`;
+              if (!fs.existsSync(hackathonPath)) {
+                errors.push(`Hackathon not found: \`${effectiveSlug}\``);
+              } else {
+                const data = yaml.load(fs.readFileSync(hackathonPath, 'utf8'));
+                const h = data.hackathon;
+
+                // Validate track if specified
+                if (bodyTrack) {
+                  const tracks = (h.tracks || []).map(t => t.slug);
+                  if (!tracks.includes(bodyTrack)) {
+                    errors.push(`Track not found: \`${bodyTrack}\`. Available tracks: ${tracks.join(', ')}`);
+                  }
+                }
+
+                // 6. Check hackathon is in registration stage
+                if (h.timeline?.registration) {
+                  const start = new Date(h.timeline.registration.start);
+                  const end = new Date(h.timeline.registration.end);
+                  const now = new Date();
+                  if (now < start) {
+                    errors.push(`Registration has not opened yet. Registration period: ${h.timeline.registration.start} — ${h.timeline.registration.end}`);
+                  } else if (now > end) {
+                    errors.push(`Registration has closed. Registration period: ${h.timeline.registration.start} — ${h.timeline.registration.end}`);
+                  }
+                }
+
+                // 7. Check NDA requirement
+                if (h.legal?.nda?.required === true && errors.length === 0) {
+                  try {
+                    const ndaIssues = await github.rest.issues.listForRepo({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      labels: `nda-sign,hackathon:${effectiveSlug}`,
+                      creator: author,
+                      state: 'all',
+                      per_page: 100,
+                    });
+
+                    const ndaApproved = ndaIssues.data.some(i =>
+                      i.labels.some(l => l.name === 'nda-approved')
+                    );
+
+                    if (!ndaApproved) {
+                      errors.push(`Hackathon \`${effectiveSlug}\` requires NDA signing. Please submit an NDA Issue first.`);
+                    }
+                  } catch (e) {
+                    errors.push(`Failed to check NDA status: ${e.message}`);
+                  }
+                }
+              }
+            }
+
+            // 5. Verify profile exists
+            if (trimmedUser) {
+              const profilesDir = 'profiles';
+              if (fs.existsSync(profilesDir)) {
+                const profileFiles = fs.readdirSync(profilesDir).filter(f =>
+                  f.endsWith('.yml') && !f.startsWith('_')
+                );
+                const profileFound = profileFiles.some(pf => {
+                  try {
+                    const profileData = yaml.load(fs.readFileSync(`${profilesDir}/${pf}`, 'utf8'));
+                    return profileData?.hacker?.github?.toLowerCase() === author.toLowerCase();
+                  } catch { return false; }
+                });
+
+                if (!profileFound) {
+                  errors.push(`No profile found for @${author} in \`profiles/\`. Please create a profile first.`);
+                }
+              }
+            }
+
+            // 8. Check duplicate registration
+            if (effectiveSlug && errors.length === 0) {
+              try {
+                const existingIssues = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: `registered,hackathon:${effectiveSlug}`,
+                  creator: author,
+                  state: 'all',
+                  per_page: 100,
+                });
+
+                const duplicate = existingIssues.data.find(i =>
+                  i.number !== issue.number
+                );
+
+                if (duplicate) {
+                  errors.push(`@${author} is already registered for hackathon \`${effectiveSlug}\` in issue #${duplicate.number}.`);
+                }
+              } catch (e) {
+                errors.push(`Failed to check duplicate registration: ${e.message}`);
+              }
+            }
+
+            // 9 & 10. Report results
+            if (errors.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `❌ **Registration validation failed:**\n\n${errors.map(e => `- ${e}`).join('\n')}\n\nPlease fix and re-edit this issue.`,
+              });
+            } else {
+              const labels = ['registered', `hackathon:${effectiveSlug}`];
+              if (bodyTrack) labels.push(`track:${bodyTrack}`);
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels,
+              });
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `✅ **Registration approved.** Welcome, @${author}! You are now registered for \`${effectiveSlug}\`.\n\nTrack: \`${bodyTrack || 'N/A'}\`\nRole: ${bodyRole || 'N/A'}`,
+              });
+            }

@@ -273,33 +273,6 @@
 
 ---
 
-## US-P-009: AI Team Matching [P1]
-
-> **前置条件**: Claude API Key 配置，用户提交组队 Issue
-> **涉及层**: Actions `ai-team-match.yml` → Claude API → Issue Comment
-
-### SC-P-009.1: 匹配算法执行
-
-- **Given** 用户提交了组队 Issue（Label: `team-formation`）
-- **And** 活动配置 `settings.ai_team_matching = true`
-- **When** Actions 触发 `ai-team-match` workflow
-- **Then** workflow 读取请求者 Profile（skills, interests, looking_for）
-- **And** 读取同活动所有已注册用户的 Profile
-- **And** 调用 Claude API 分析匹配度
-- **And** Bot 评论推荐列表（Top 3-5 匹配用户），每人附带：
-  - GitHub 用户名（链接到 Profile 页）
-  - 技能互补分析
-  - 匹配理由简述
-
-### SC-P-009.2: 无匹配结果处理
-
-- **Given** 同活动注册用户数量不足或无合适匹配
-- **When** AI 分析完成
-- **Then** Bot 评论 "暂未找到高度匹配的队友，建议查看以下 Profile 或在活动 Discussion 中发帖"
-- **And** 提供活动 Discussion 链接
-
----
-
 ## US-P-010: 代码抄袭检测 [P2]
 
 > **前置条件**: Moss/JPlag 服务配置

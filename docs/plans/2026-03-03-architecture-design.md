@@ -40,7 +40,7 @@ Synnovator 采用 **Git-native + 最小服务端** 架构。核心思想是将 G
 │  ┌───────────────────────┐    ┌──────────────────────────────────┐  │
 │  │ 管理员本地 (管理平面)  │    │  外部服务                        │  │
 │  │                       │    │                                  │  │
-│  │  • git clone/push     │    │  • Claude API (AI 评审/匹配)     │  │
+│  │  • git clone/push     │    │  • Claude API (AI 评审)           │  │
 │  │  • synnovator-admin   │    │                                  │  │
 │  │    CLI Skill          │    │                                  │  │
 │  └───────────────────────┘    └──────────────────────────────────┘  │
@@ -62,7 +62,7 @@ Synnovator 采用 **Git-native + 最小服务端** 架构。核心思想是将 G
 | 文件存储 | Cloudflare R2 | S3 兼容 API，无出站流量费，与 Pages Functions 同区域低延迟 |
 | 自动化 | GitHub Actions | PR/Issue 事件触发，公开仓库免费无限分钟 |
 | 认证 | GitHub OAuth | 用户群体即 GitHub 用户，单点登录，最小权限 |
-| AI 服务 | Claude API | 评审摘要、组队匹配、PDF 内容提取 |
+| AI 服务 | Claude API | 评审摘要、PDF 内容提取 |
 | 数据库 | Cloudflare D1 (P1 可选) | SQL 数据库，搜索索引和评分缓存，非 P0 必需 |
 
 **运行时依赖补充**（P0 实际使用）：
@@ -476,7 +476,6 @@ synnovator-admin Skill
 | `upload-assets.yml` | PR merge (含二进制文件) | 上传到 R2 → 填充 r2_url → 移除文件 |
 | `status-update.yml` | cron (每小时) | 遍历 timeline → 更新 stage Label |
 | `ai-review.yml` | PR (submission 校验通过后) | Claude API 评审摘要 |
-| `ai-team-match.yml` | Issue (label: team-formation) | Claude API 组队匹配 |
 | `deploy.yml` | push to main | 触发 CF Pages 重建（可选，CF Pages 自身也监听 push） |
 
 ### 7.2 Actions 与 CF Pages 分工
@@ -487,7 +486,7 @@ GitHub Actions 负责:                     Cloudflare Pages 负责:
 ├── Label 管理（状态标记）                ├── 静态页面 CDN 分发
 ├── Bot Comment（校验结果反馈）           ├── Pages Functions 运行
 ├── R2 文件上传（通过 S3 API）            ├── PR Preview 部署
-├── AI 评审/匹配（Claude API 调用）       └── 自定义域名/SSL
+├── AI 评审（Claude API 调用）       └── 自定义域名/SSL
 ├── 阶段自动切换（cron status-update）
 └── Issue 自动处理（报名/NDA/申诉）
 

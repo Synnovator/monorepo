@@ -1,0 +1,92 @@
+name: Validate Team Formation
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+
+jobs:
+  validate:
+    if: |
+      contains(github.event.issue.labels.*.name, 'team-formation') &&
+      (github.event.action != 'labeled' || github.event.label.name == 'team-formation')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install js-yaml
+
+      - name: Parse and validate team formation
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('./node_modules/js-yaml');
+            const issue = context.payload.issue;
+            const title = issue.title;
+            const body = issue.body || '';
+            const author = issue.user.login;
+            const errors = [];
+
+            // 1. Parse title: [Team] {team-name} — {hackathon-slug}
+            const titleMatch = title.match(/\[Team\]\s*(.*?)\s*—\s*(.*)/);
+            if (!titleMatch) {
+              errors.push('Issue title must match: `[Team] {team-name} — {hackathon-slug}`');
+            }
+            const [, teamName, slug] = titleMatch || [null, '', ''];
+            const trimmedSlug = slug.trim();
+            const trimmedTeam = teamName.trim();
+
+            if (trimmedSlug) {
+              // 2. Verify hackathon exists
+              const hackathonPath = `hackathons/${trimmedSlug}/hackathon.yml`;
+              if (!fs.existsSync(hackathonPath)) {
+                errors.push(`Hackathon not found: \`${trimmedSlug}\``);
+              } else {
+                const data = yaml.load(fs.readFileSync(hackathonPath, 'utf8'));
+                const h = data.hackathon;
+
+                // 3. Validate track if specified in body
+                const trackField = body.match(/### Track Slug\s*\n\s*(.+)/);
+                const bodyTrack = trackField ? trackField[1].trim() : '';
+
+                if (bodyTrack) {
+                  const tracks = (h.tracks || []).map(t => t.slug);
+                  if (!tracks.includes(bodyTrack)) {
+                    errors.push(`Track not found: \`${bodyTrack}\`. Available tracks: ${tracks.join(', ')}`);
+                  }
+                }
+              }
+            }
+
+            // Report results
+            if (errors.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `❌ **Team formation validation failed:**\n\n${errors.map(e => `- ${e}`).join('\n')}\n\nPlease fix and re-edit this issue.`,
+              });
+            } else {
+              // 4. Add routing label
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: [`hackathon:${trimmedSlug}`],
+              });
+
+              // 5. Post welcome comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `✅ **Team formation post validated.** Looking to join? Comment below.\n\nTeam: \`${trimmedTeam}\`\nHackathon: \`${trimmedSlug}\``,
+              });
+            }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { buildPRUrl, openGitHubUrl, GITHUB_ORG, GITHUB_REPO } from '@/lib/github-url';
+import { buildIssueUrl, openGitHubUrl } from '@/lib/github-url';
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 
@@ -11,10 +11,6 @@ interface NDASignFormProps {
   ndaDocumentUrl?: string;
   ndaSummary?: string;
   lang: Lang;
-}
-
-function escapeYamlValue(val: string): string {
-  return val.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
 }
 
 export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }: NDASignFormProps) {
@@ -45,61 +41,14 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
         return;
       }
 
-      // Fetch current profile content from GitHub API (public raw)
-      const profilePath = `profiles/${profileCheck.slug}.yml`;
-      const ghRes = await fetch(
-        `https://api.github.com/repos/${GITHUB_ORG}/${GITHUB_REPO}/contents/${profilePath}`,
-        { headers: { Accept: 'application/vnd.github.v3.raw' } }
-      );
-
-      if (!ghRes.ok) {
-        const profilePath = `profiles/${profileCheck.slug}.yml`;
-        if (ghRes.status === 404) {
-          throw new Error(t(lang, 'form.register.profile_not_found'));
-        }
-        throw new Error(t(lang, 'form.register.github_api_failed'));
-      }
-
-      let profileContent = await ghRes.text();
-
-      // Check for duplicate NDA signing
-      const safeSlug = escapeYamlValue(hackathonSlug);
-      if (profileContent.includes(`hackathon: "${safeSlug}"`) &&
-          profileContent.includes('nda_signed:')) {
-        setError(t(lang, 'form.nda.already_signed'));
-        setSubmitting(false);
-        return;
-      }
-
-      // Append nda_signed entry
-      const timestamp = new Date().toISOString();
-      const ndaEntry = [
-        '',
-        '  nda_signed:',
-        `    - hackathon: "${safeSlug}"`,
-        `      signed_at: "${timestamp}"`,
-      ].join('\n');
-
-      // Check if nda_signed section already exists in the profile
-      if (profileContent.includes('nda_signed:')) {
-        // Append to existing nda_signed array
-        const insertEntry = [
-          `    - hackathon: "${safeSlug}"`,
-          `      signed_at: "${timestamp}"`,
-        ].join('\n');
-        profileContent = profileContent.replace(
-          /nda_signed:[ \t]*\n/,
-          `nda_signed:\n${insertEntry}\n`
-        );
-      } else {
-        // Add nda_signed section at the end
-        profileContent = profileContent.trimEnd() + '\n' + ndaEntry + '\n';
-      }
-
-      const url = buildPRUrl({
-        filename: profilePath,
-        value: profileContent,
-        message: `feat(profiles): ${user.login} signs NDA for ${hackathonSlug}`,
+      const url = buildIssueUrl({
+        template: 'nda-sign.yml',
+        title: `[NDA] ${user.login} — ${hackathonSlug}`,
+        labels: ['nda-sign'],
+        fields: {
+          hackathon: hackathonSlug,
+          github: user.login,
+        },
       });
       openGitHubUrl(url);
     } catch (err) {

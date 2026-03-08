@@ -44,7 +44,7 @@ hackathon:
     ip_ownership: "organizer"
     nda:
       required: true
-      document_url: ""
+      document_url: "hackathons/enterprise-fintech-risk-2025/nda.pdf"
       summary: "参赛前须签署《保密及竞赛参与协议》，数据集仅限本地使用，严禁上传至任何公开存储。"
     compliance_notes:
       - "参赛提交的模型权重、特征工程代码、方案文档，所有权自动转让予星辰金融科技"
@@ -290,5 +290,4 @@ hackathon:
     multi_track_rule: "independent"
     language: ["en", "zh"]
     ai_review: true
-    ai_team_matching: false
     public_vote: "none"

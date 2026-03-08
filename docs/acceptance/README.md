@@ -81,7 +81,7 @@
 | US-V-005 | 参与公众投票 | 访客 | 2 | [visitor.spec.md](visitor.spec.md) | ⬜ |
 | US-P-007 | R2 文件上传 | 平台 | 3 | [platform.spec.md](platform.spec.md) | ⬜ |
 | US-P-008 | AI Review Workflow | 平台 | 2 | [platform.spec.md](platform.spec.md) | ⬜ |
-| US-P-009 | AI Team Matching | 平台 | 2 | [platform.spec.md](platform.spec.md) | ⬜ |
+
 
 ### P2 — Enhancement（Month 5+）
 

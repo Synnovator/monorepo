@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { listSubmissions, listProfiles, getHackathon } from '@/app/_generated/data';
 import { t, localize, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { EditProjectButton } from '@/components/EditProjectButton';
 
 export const dynamic = 'force-static';
 
@@ -146,6 +147,13 @@ export default async function ProjectDetailPage({
               </div>
             </section>
           )}
+
+          <EditProjectButton
+            hackathonSlug={hackathon}
+            teamSlug={team}
+            teamMembers={project.team.map((m: { github: string }) => m.github)}
+            lang={lang}
+          />
         </aside>
       </div>
     </div>

@@ -70,6 +70,10 @@
     "results_pending": "Results not yet published",
     "appeal_window": "Appeal Window",
     "team_formation": "Team Formation",
+    "teams_browse": "Browse open team formation posts or create your own.",
+    "teams_browse_link": "Browse Team Posts",
+    "teams_post": "Post Team",
+    "teams_not_available": "Team formation is only available during registration and development stages.",
     "team_size_label": "Team size",
     "solo_allowed": "(solo allowed)",
     "license_label": "License",
@@ -88,7 +92,8 @@
   "tab": {
     "details": "Details",
     "submissions": "Submissions",
-    "leaderboard": "Leaderboard"
+    "leaderboard": "Leaderboard",
+    "teams": "Teams"
   },
   "profile": {
     "skills": "Skills",
@@ -204,7 +209,8 @@
     "description": "About",
     "no_readme": "Detailed description not yet provided",
     "leaderboard_pending": "Judging results have not been published yet",
-    "filter_all": "All"
+    "filter_all": "All",
+    "edit": "Edit Project"
   },
   "form": {
     "register": {

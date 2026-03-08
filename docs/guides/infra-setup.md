@@ -180,7 +180,7 @@ gh secret set CLAUDE_CODE_OAUTH_TOKEN
 **注意事项**：
 - Token 有过期时间（约 1 天），过期后需重新运行 `claude setup-token` 并更新 Secret
 - 使用个人订阅额度，不产生额外 API 费用
-- 自定义 AI workflow（ai-review、ai-team-match）暂不使用此 token，待迁移 `ANTHROPIC_API_KEY` 后启用
+- 自定义 AI workflow（ai-review）暂不使用此 token，待迁移 `ANTHROPIC_API_KEY` 后启用
 
 ---
 
@@ -330,7 +330,7 @@ _worker.js
 
 ## 附录：后续迁移到 ANTHROPIC_API_KEY
 
-当需要启用自定义 AI workflow（ai-review、ai-team-match）或需要更稳定的 token 时：
+当需要启用自定义 AI workflow（ai-review）或需要更稳定的 token 时：
 
 1. [console.anthropic.com](https://console.anthropic.com) → Create Key + 充值 credits
 2. `gh secret set ANTHROPIC_API_KEY`
