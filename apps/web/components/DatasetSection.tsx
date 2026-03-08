@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { buildIssueUrl } from '@/lib/github-url';
-import { t } from '@synnovator/shared/i18n';
+import { t, localize } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 
 interface Dataset {
@@ -17,18 +17,15 @@ interface Dataset {
   download_url?: string;
 }
 
-interface DatasetDownloadProps {
+interface DatasetSectionProps {
   datasets: Dataset[];
   hackathonSlug: string;
   lang: Lang;
 }
 
-function loc(lang: 'zh' | 'en', en?: string, zh?: string): string {
-  if (lang === 'zh') return zh || en || '';
-  return en || zh || '';
-}
+export function DatasetSection({ datasets, hackathonSlug, lang }: DatasetSectionProps) {
+  if (!datasets || datasets.length === 0) return null;
 
-export function DatasetDownload({ datasets, hackathonSlug, lang }: DatasetDownloadProps) {
   return (
     <div className="space-y-4">
       {datasets.map((ds, idx) => (
@@ -44,6 +41,7 @@ function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; h
   const [error, setError] = useState<string | null>(null);
   const [ndaUrl, setNdaUrl] = useState<string | null>(null);
   const isNdaRequired = ds.access_control === 'nda-required' || ds.access_control === 'nda';
+  const isPublic = ds.access_control === 'public' || (!ds.access_control && !isNdaRequired);
 
   async function handlePresign() {
     setLoading(true);
@@ -81,30 +79,40 @@ function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; h
   return (
     <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-white font-medium text-sm">{loc(lang, ds.name, ds.name_zh)}</p>
+        <p className="text-white font-medium text-sm">{localize(lang, ds.name, ds.name_zh)}</p>
         {ds.version && <span className="text-xs text-muted">v{ds.version}</span>}
       </div>
       {ds.description && <p className="text-muted text-sm mt-1">{ds.description}</p>}
       <div className="flex flex-wrap gap-4 mt-3 text-xs text-muted">
-        {ds.format && <span>Format: {ds.format}</span>}
-        {ds.size && <span>Size: {ds.size}</span>}
+        {ds.format && (
+          <span className="px-2 py-0.5 rounded bg-secondary-bg text-light-gray font-code">
+            {ds.format.toUpperCase()}
+          </span>
+        )}
+        {ds.size && <span>{ds.size}</span>}
         {ds.access_control && (
           <span className={isNdaRequired ? 'px-2 py-0.5 rounded bg-warning/20 text-warning' : 'px-2 py-0.5 rounded bg-lime-primary/20 text-lime-primary'}>
             {isNdaRequired ? t(lang, 'dataset.nda_required') : t(lang, 'dataset.public')}
           </span>
         )}
       </div>
-      {ds.download_url ? (
+
+      {/* Public datasets: direct download link */}
+      {isPublic && ds.download_url && (
         <a href={ds.download_url} target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg bg-secondary-bg text-white text-sm hover:bg-secondary-bg/80 transition-colors">
           {t(lang, 'dataset.download')}
         </a>
-      ) : isNdaRequired ? (
+      )}
+
+      {/* NDA-required datasets: presign flow */}
+      {isNdaRequired && (
         <button onClick={handlePresign} disabled={loading}
           className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg bg-lime-primary/20 text-lime-primary text-sm hover:bg-lime-primary/30 transition-colors cursor-pointer disabled:opacity-50">
           {loading ? '...' : t(lang, 'dataset.get_download_link')}
         </button>
-      ) : null}
+      )}
+
       {error && (
         <div className="mt-3 p-3 rounded-lg bg-warning/10 border border-warning/30 text-warning text-sm">
           {error}
