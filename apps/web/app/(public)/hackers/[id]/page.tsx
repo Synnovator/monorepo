@@ -3,7 +3,8 @@ import { getProfile, listProfiles } from '@/app/_generated/data';
 import { t, localize, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { SkillBadge } from '@/components/SkillBadge';
-import { SparklesIcon, ExternalLinkIcon } from '@/components/icons';
+import { SparklesIcon } from '@/components/icons';
+import { EditProfileButton } from '@/components/EditProfileButton';
 
 export const dynamic = 'force-static';
 
@@ -159,15 +160,7 @@ export default async function HackerProfilePage({
             </section>
           )}
 
-          <a
-            href={`https://github.com/synnovator/monorepo/edit/main/profiles/${id}.yml`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-xs text-muted hover:text-lime-primary transition-colors"
-          >
-            {t(lang, 'profile.edit')}
-            <ExternalLinkIcon size={12} />
-          </a>
+          <EditProfileButton profileUsername={h.github} lang={lang} />
         </aside>
       </div>
     </div>
