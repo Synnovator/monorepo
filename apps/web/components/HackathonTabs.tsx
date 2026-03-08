@@ -7,9 +7,10 @@ interface HackathonTabsProps {
   detailsLabel: string;
   submissionsLabel: string;
   leaderboardLabel: string;
+  teamsLabel: string;
 }
 
-const TAB_IDS = ['details', 'submissions', 'leaderboard'] as const;
+const TAB_IDS = ['details', 'submissions', 'leaderboard', 'teams'] as const;
 type TabId = typeof TAB_IDS[number];
 
 function getInitialTab(): TabId {
@@ -19,13 +20,14 @@ function getInitialTab(): TabId {
   return 'details';
 }
 
-export function HackathonTabs({ detailsLabel, submissionsLabel, leaderboardLabel }: HackathonTabsProps) {
+export function HackathonTabs({ detailsLabel, submissionsLabel, leaderboardLabel, teamsLabel }: HackathonTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>(getInitialTab);
 
   const labels: Record<TabId, string> = {
     details: detailsLabel,
     submissions: submissionsLabel,
     leaderboard: leaderboardLabel,
+    teams: teamsLabel,
   };
 
   const syncPanels = useCallback((tab: TabId) => {
