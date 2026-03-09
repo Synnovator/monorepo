@@ -236,7 +236,7 @@
     "profile": {
       "sign_in_first": "请先登录 GitHub",
       "sign_in_github": "登录 GitHub",
-      "display_name_en": "显示名称 (英文)",
+      "display_name_en": "显示名称 (英文) *",
       "display_name_zh": "显示名称 (中文)",
       "optional": "可选",
       "bio": "简介",
@@ -272,7 +272,10 @@
       "back": "上一步",
       "next": "下一步",
       "submit_pr": "前往 GitHub 提交 PR",
-      "name_placeholder": "张三"
+      "name_placeholder": "张三",
+      "required": "必填",
+      "complete_required": "请完成必填项后继续",
+      "name_required": "请输入显示名称"
     },
     "nda": {
       "operation_failed": "操作失败，请重试",
@@ -346,7 +349,13 @@
       "next": "下一步",
       "submit_pr": "前往 GitHub 提交 PR",
       "submit_hint": "点击提交后将在 GitHub 上创建 PR，文件路径为",
-      "tagline_placeholder_zh": "用 AI 构建令人惊叹的应用"
+      "tagline_placeholder_zh": "用 AI 构建令人惊叹的应用",
+      "required": "必填",
+      "complete_required": "请完成必填项后继续",
+      "type_required": "请选择 Hackathon 类型",
+      "name_required": "请输入名称",
+      "organizer_required": "至少需要一位组织者名称",
+      "track_required": "至少需要一个赛道名称"
     },
     "create_proposal": {
       "sign_in_first": "请先登录 GitHub",
@@ -379,7 +388,16 @@
       "submit_hint": "点击提交后将在 GitHub 上创建 PR，文件路径为",
       "back": "上一步",
       "next": "下一步",
-      "submit_pr": "前往 GitHub 提交 PR"
+      "submit_pr": "前往 GitHub 提交 PR",
+      "required": "必填",
+      "complete_required": "请完成必填项后继续",
+      "hackathon_required": "请选择活动",
+      "name_required": "请输入项目名称",
+      "tagline_required": "请输入一句话描述",
+      "track_required": "请选择赛道",
+      "tech_required": "至少添加一项技术栈",
+      "member_required": "至少需要一位成员填写 GitHub 用户名",
+      "repo_required": "请填写代码仓库 URL"
     },
     "team": {
       "title": "组队 / 寻找队友",

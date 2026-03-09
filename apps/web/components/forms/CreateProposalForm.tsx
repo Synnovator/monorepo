@@ -95,6 +95,17 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
     });
   }
 
+  function isStepValid(s: number): boolean {
+    switch (s) {
+      case 0: return selectedHackathon !== '';
+      case 1: return name.trim() !== '' && tagline.trim() !== '' && track !== '' && techStack.length > 0;
+      case 2: return members.some(m => m.github.trim() !== '');
+      case 3: return repo.trim() !== '';
+      case 4: return true; // preview
+      default: return true;
+    }
+  }
+
   const teamSlug = useMemo(() => {
     const firstGithub = members[0]?.github?.trim() || 'team';
     const projectSlug = toSlug(name) || 'project';
@@ -156,9 +167,9 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
             <div className="flex flex-col items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
                 idx === step ? 'bg-lime-primary text-near-black'
-                  : idx < step ? 'bg-lime-primary/30 text-lime-primary' : 'bg-secondary-bg text-muted'
+                  : idx < step ? (isStepValid(idx) ? 'bg-lime-primary/30 text-lime-primary' : 'bg-warning/30 text-warning') : 'bg-secondary-bg text-muted'
               }`}>
-                {idx < step ? '\u2713' : idx + 1}
+                {idx < step ? (isStepValid(idx) ? '\u2713' : '!') : idx + 1}
               </div>
               <span className={`mt-1 text-xs whitespace-nowrap ${idx === step ? 'text-lime-primary' : 'text-muted'}`}>
                 {label}
@@ -351,6 +362,13 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
           </>
         )}
 
+        {/* Validation hint */}
+        {!isStepValid(step) && step < TOTAL_STEPS - 1 && (
+          <p className="text-xs text-warning">
+            {t(lang, 'form.create_proposal.complete_required')}
+          </p>
+        )}
+
         {/* Navigation */}
         <div className="flex justify-between pt-2">
           {step > 0 ? (
@@ -362,13 +380,13 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
 
           {step < TOTAL_STEPS - 1 ? (
             <button type="button" onClick={() => setStep(s => s + 1)}
-              disabled={step === 0 && !selectedHackathon}
+              disabled={!isStepValid(step)}
               className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {t(lang, 'form.create_proposal.next')}
             </button>
           ) : (
             <button type="button" onClick={handleSubmit}
-              disabled={!isLoggedIn || !name || !tagline || !track || !repo || !selectedHackathon || techStack.length === 0 || !members[0]?.github?.trim()}
+              disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(3)}
               className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {t(lang, 'form.create_proposal.submit_pr')} {'\u2192'}
             </button>

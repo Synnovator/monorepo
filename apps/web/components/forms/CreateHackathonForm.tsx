@@ -147,6 +147,21 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
     setLangOptions(prev => prev.includes(l) ? prev.filter(x => x !== l) : [...prev, l]);
   }
 
+  // Step validation — returns true if all required fields for the step are filled
+  function isStepValid(s: number): boolean {
+    switch (s) {
+      case 0: return hackathonType !== '';
+      case 1: return name.trim() !== '';
+      case 2: return organizers.some(o => o.name.trim() !== '');
+      case 3: return true; // timeline is optional
+      case 4: return tracks.some(tr => tr.name.trim() !== '');
+      case 5: return true; // legal has defaults
+      case 6: return true; // settings have defaults
+      case 7: return true; // preview
+      default: return true;
+    }
+  }
+
   // Build YAML
   const yamlContent = useMemo(() => {
     const timelineObj: Record<string, unknown> = {};
@@ -245,9 +260,9 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
             <div className="flex flex-col items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
                 idx === step ? 'bg-lime-primary text-near-black'
-                  : idx < step ? 'bg-lime-primary/30 text-lime-primary' : 'bg-secondary-bg text-muted'
+                  : idx < step ? (isStepValid(idx) ? 'bg-lime-primary/30 text-lime-primary' : 'bg-warning/30 text-warning') : 'bg-secondary-bg text-muted'
               }`}>
-                {idx < step ? '\u2713' : idx + 1}
+                {idx < step ? (isStepValid(idx) ? '\u2713' : '!') : idx + 1}
               </div>
               <span className={`mt-1 text-xs whitespace-nowrap ${idx === step ? 'text-lime-primary' : 'text-muted'}`}>
                 {label}
@@ -600,6 +615,13 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
           </>
         )}
 
+        {/* Validation hint */}
+        {!isStepValid(step) && step < TOTAL_STEPS - 1 && (
+          <p className="text-xs text-warning">
+            {t(lang, 'form.create_hackathon.complete_required')}
+          </p>
+        )}
+
         {/* Navigation */}
         <div className="flex justify-between pt-2">
           {step > 0 ? (
@@ -611,11 +633,12 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
 
           {step < TOTAL_STEPS - 1 ? (
             <button type="button" onClick={() => setStep(s => s + 1)}
-              className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors">
+              disabled={!isStepValid(step)}
+              className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {t(lang, 'form.create_hackathon.next')}
             </button>
           ) : (
-            <button type="button" onClick={handleSubmit} disabled={!isLoggedIn || (!slug && !name)}
+            <button type="button" onClick={handleSubmit} disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(4)}
               className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {t(lang, 'form.create_hackathon.submit_pr')} {'\u2192'}
             </button>
