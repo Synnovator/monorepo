@@ -81,6 +81,18 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
     });
   }
 
+  // Step validation
+  function isStepValid(s: number): boolean {
+    switch (s) {
+      case 0: return name.trim() !== '';
+      case 1: return true; // identity is optional
+      case 2: return true; // skills are optional
+      case 3: return true; // more is optional
+      case 4: return true; // preview
+      default: return true;
+    }
+  }
+
   // Generate YAML
   const yamlContent = useMemo(() => {
     const profile: Record<string, unknown> = {
@@ -157,11 +169,11 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                   idx === step
                     ? 'bg-lime-primary text-near-black'
                     : idx < step
-                      ? 'bg-lime-primary/30 text-lime-primary'
+                      ? (isStepValid(idx) ? 'bg-lime-primary/30 text-lime-primary' : 'bg-warning/30 text-warning')
                       : 'bg-secondary-bg text-muted'
                 }`}
               >
-                {idx < step ? '\u2713' : idx + 1}
+                {idx < step ? (isStepValid(idx) ? '\u2713' : '!') : idx + 1}
               </div>
               <span className={`mt-1 text-xs whitespace-nowrap ${
                 idx === step ? 'text-lime-primary' : 'text-muted'
@@ -475,6 +487,13 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
           </>
         )}
 
+        {/* Validation hint */}
+        {!isStepValid(step) && step < TOTAL_STEPS - 1 && (
+          <p className="text-xs text-warning">
+            {t(lang, 'form.profile.complete_required')}
+          </p>
+        )}
+
         {/* Navigation */}
         <div className="flex justify-between pt-2">
           {step > 0 ? (
@@ -493,7 +512,8 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
             <button
               type="button"
               onClick={() => setStep(s => s + 1)}
-              className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors"
+              disabled={!isStepValid(step)}
+              className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t(lang, 'form.profile.next')}
             </button>
@@ -501,7 +521,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!isLoggedIn}
+              disabled={!isLoggedIn || !isStepValid(0)}
               className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t(lang, 'form.profile.submit_pr')} {'\u2192'}
