@@ -238,7 +238,7 @@
     "profile": {
       "sign_in_first": "Please sign in with GitHub first",
       "sign_in_github": "Sign in with GitHub",
-      "display_name_en": "Display Name (English)",
+      "display_name_en": "Display Name (English) *",
       "display_name_zh": "Display Name (Chinese)",
       "optional": "optional",
       "bio": "Bio",
@@ -274,7 +274,10 @@
       "back": "Back",
       "next": "Next",
       "submit_pr": "Submit PR on GitHub",
-      "name_placeholder": "Zhang San"
+      "name_placeholder": "Zhang San",
+      "required": "Required",
+      "complete_required": "Please complete required fields before proceeding",
+      "name_required": "Please enter a display name"
     },
     "nda": {
       "operation_failed": "Operation failed, please try again",
@@ -347,7 +350,13 @@
       "next": "Next",
       "submit_pr": "Submit PR on GitHub",
       "submit_hint": "Clicking submit will create a PR on GitHub with file path",
-      "tagline_placeholder_zh": ""
+      "tagline_placeholder_zh": "",
+      "required": "Required",
+      "complete_required": "Please complete required fields before proceeding",
+      "type_required": "Please select a hackathon type",
+      "name_required": "Please enter a name",
+      "organizer_required": "At least one organizer name is required",
+      "track_required": "At least one track name is required"
     },
     "create_proposal": {
       "sign_in_first": "Please sign in with GitHub first",
@@ -380,7 +389,16 @@
       "submit_hint": "Clicking submit will create a PR on GitHub with file path",
       "back": "Back",
       "next": "Next",
-      "submit_pr": "Submit PR on GitHub"
+      "submit_pr": "Submit PR on GitHub",
+      "required": "Required",
+      "complete_required": "Please complete required fields before proceeding",
+      "hackathon_required": "Please select a hackathon",
+      "name_required": "Please enter a project name",
+      "tagline_required": "Please enter a tagline",
+      "track_required": "Please select a track",
+      "tech_required": "At least one tech stack item is required",
+      "member_required": "At least one team member with GitHub username is required",
+      "repo_required": "Repository URL is required"
     },
     "team": {
       "title": "Team Formation",
