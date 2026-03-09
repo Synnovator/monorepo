@@ -1,0 +1,35 @@
+synnovator_version: "2.0"
+hackathon:
+  name: "test-youth-hackathon"
+  slug: "test-youth-hackathon"
+  type: "youth-league"
+  organizers:
+    - name: "H2OSLabs"
+      role: "organizer"
+  eligibility:
+    open_to: "all"
+    team_size:
+      min: 1
+      max: 5
+    allow_solo: true
+  legal:
+    license: "Apache-2.0"
+    ip_ownership: "participant"
+  tracks:
+    - name: "aaa"
+      slug: "a"
+      rewards:
+      - type: "prize"
+      rank: "1st"
+      amount: "$1,000"
+      judging:
+      mode: "weighted"
+      criteria:
+      - name: "Innovation"
+      weight: 0.3
+      score_range:
+  settings:
+    language:
+      - "zh"
+      - "en"
+    public_vote: "reactions"
