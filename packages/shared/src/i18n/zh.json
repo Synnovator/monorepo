@@ -233,6 +233,11 @@
       "profile_not_found": "GitHub 上未找到 Profile 文件，请确认 PR 已合并",
       "github_api_failed": "GitHub API 请求失败"
     },
+    "common": {
+      "submitting": "提交中...",
+      "submit_error": "提交失败，请重试。",
+      "submit_success": "PR 创建成功！"
+    },
     "profile": {
       "sign_in_first": "请先登录 GitHub",
       "sign_in_github": "登录 GitHub",

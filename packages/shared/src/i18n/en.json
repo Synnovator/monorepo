@@ -235,6 +235,11 @@
       "profile_not_found": "Profile file not found on GitHub. Make sure your profile PR is merged.",
       "github_api_failed": "GitHub API request failed"
     },
+    "common": {
+      "submitting": "Submitting...",
+      "submit_error": "Submission failed. Please try again.",
+      "submit_success": "PR created successfully!"
+    },
     "profile": {
       "sign_in_first": "Please sign in with GitHub first",
       "sign_in_github": "Sign in with GitHub",
