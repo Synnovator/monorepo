@@ -158,11 +158,17 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
           slug: teamSlug,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Unknown error');
+      const text = await res.text();
+      let data: { pr_url?: string; error?: string };
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(text.slice(0, 200) || `Server error (${res.status})`);
+      }
+      if (!res.ok) throw new Error(data.error || `Server error (${res.status})`);
       window.open(data.pr_url, '_blank', 'noopener,noreferrer');
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : 'Unknown error');
+      setSubmitError(e instanceof Error ? e.message : t(lang, 'form.common.submit_error'));
     } finally {
       setSubmitting(false);
     }
@@ -401,16 +407,25 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
               {t(lang, 'form.create_proposal.next')}
             </button>
           ) : (
-            <>
+            <div className="flex flex-col items-end gap-3">
               <button type="button" onClick={handleSubmit}
                 disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(3) || submitting}
                 className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {submitting ? t(lang, 'form.common.submitting') : t(lang, 'form.create_proposal.submit_pr')} {'\u2192'}
               </button>
               {submitError && (
-                <p className="text-xs text-error mt-2">{submitError}</p>
+                <div className="w-full rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-error">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-medium mb-1">{t(lang, 'form.common.submit_error')}</p>
+                      <p className="text-xs text-error/80 break-all">{submitError}</p>
+                    </div>
+                    <button type="button" onClick={() => setSubmitError('')}
+                      className="shrink-0 text-error/60 hover:text-error transition-colors text-lg leading-none">&times;</button>
+                  </div>
+                </div>
               )}
-            </>
+            </div>
           )}
         </div>
       </fieldset>
