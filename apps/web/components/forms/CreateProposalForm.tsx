@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { buildPRUrl, openGitHubUrl } from '@/lib/github-url';
+
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { formatYaml } from './form-utils';
@@ -63,6 +63,8 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
   const [demo, setDemo] = useState('');
   const [description, setDescription] = useState('');
   const [descriptionZh, setDescriptionZh] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const currentHackathon = hackathons.find(h => h.slug === selectedHackathon);
   const stepLabels = lang === 'zh' ? STEP_LABELS_ZH : STEP_LABELS_EN;
@@ -142,14 +144,28 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
     return formatYaml(data);
   }, [name, nameZh, tagline, taglineZh, track, members, repo, video, demo, techStack, description, descriptionZh]);
 
-  function handleSubmit() {
-    const filename = `hackathons/${selectedHackathon}/submissions/${teamSlug}/project.yml`;
-    const url = buildPRUrl({
-      filename,
-      value: yamlContent,
-      message: `feat(submissions): submit ${name || 'project'} to ${selectedHackathon}`,
-    });
-    openGitHubUrl(url);
+  async function handleSubmit() {
+    setSubmitting(true);
+    setSubmitError('');
+    try {
+      const res = await fetch('/api/submit-pr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'proposal',
+          filename: `hackathons/${selectedHackathon}/submissions/${teamSlug}/project.yml`,
+          content: yamlContent,
+          slug: teamSlug,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Unknown error');
+      window.open(data.pr_url, '_blank', 'noopener,noreferrer');
+    } catch (e) {
+      setSubmitError(e instanceof Error ? e.message : 'Unknown error');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   const inputClass = 'w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none';
@@ -386,10 +402,13 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
             </button>
           ) : (
             <button type="button" onClick={handleSubmit}
-              disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(3)}
+              disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(3) || submitting}
               className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              {t(lang, 'form.create_proposal.submit_pr')} {'\u2192'}
+              {submitting ? t(lang, 'form.common.submitting') : t(lang, 'form.create_proposal.submit_pr')} {'\u2192'}
             </button>
+            {submitError && (
+              <p className="text-xs text-error mt-2">{submitError}</p>
+            )}
           )}
         </div>
       </fieldset>
