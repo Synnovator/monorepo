@@ -1,4 +1,4 @@
-import { buildIssueUrl, buildPRUrl } from '@/lib/github-url';
+import { buildIssueUrl } from '@/lib/github-url';
 import { ExternalLinkIcon } from './icons';
 
 interface GitHubRedirectProps {
@@ -10,6 +10,7 @@ interface GitHubRedirectProps {
 
 export function GitHubRedirect({ action, hackathonSlug, label, className = '' }: GitHubRedirectProps) {
   let url = '#';
+  let isExternal = true;
 
   switch (action) {
     case 'register':
@@ -20,11 +21,8 @@ export function GitHubRedirect({ action, hackathonSlug, label, className = '' }:
       });
       break;
     case 'submit':
-      url = buildPRUrl({
-        filename: `hackathons/${hackathonSlug}/submissions/team-name/project.yml`,
-        value: '',
-        message: `[Submit] team-name — ${hackathonSlug}`,
-      });
+      url = `/create-proposal${hackathonSlug ? `?hackathon=${hackathonSlug}` : ''}`;
+      isExternal = false;
       break;
     case 'appeal':
       url = buildIssueUrl({
@@ -34,26 +32,28 @@ export function GitHubRedirect({ action, hackathonSlug, label, className = '' }:
       });
       break;
     case 'create-profile':
-      url = buildPRUrl({
-        filename: 'profiles/username.yml',
-        value: '',
-        message: '[Profile] Create profile',
-      });
+      url = '/create-profile';
+      isExternal = false;
       break;
     case 'edit-file':
       url = '#';
       break;
   }
 
+  if (isExternal) {
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer"
+        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${className}`}>
+        {label}
+        <ExternalLinkIcon size={12} />
+      </a>
+    );
+  }
+
   return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${className}`}
-    >
+    <a href={url}
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${className}`}>
       {label}
-      <ExternalLinkIcon size={12} />
     </a>
   );
 }

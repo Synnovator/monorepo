@@ -17,6 +17,9 @@ Thumbs.db
 # Git worktrees
 .worktrees/
 
+# Cloudflare dev secrets
+.dev.vars
+
 # Node.js
 node_modules/
 dist/

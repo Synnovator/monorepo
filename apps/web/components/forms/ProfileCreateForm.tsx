@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { buildPRUrl, openGitHubUrl } from '@/lib/github-url';
+
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { formatYaml } from './form-utils';
@@ -61,6 +61,8 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
   const [twitter, setTwitter] = useState('');
   const [linkedin, setLinkedin] = useState('');
   const [website, setWebsite] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const stepLabels = lang === 'zh' ? STEP_LABELS_ZH : STEP_LABELS_EN;
 
@@ -140,15 +142,30 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
     return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!user) return;
     const uuid = generateUUID8();
-    const url = buildPRUrl({
-      filename: `profiles/${user.login}-${uuid}.yml`,
-      value: yamlContent,
-      message: `feat(profiles): create profile for ${user.login}`,
-    });
-    openGitHubUrl(url);
+    setSubmitting(true);
+    setSubmitError('');
+    try {
+      const res = await fetch('/api/submit-pr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'profile',
+          filename: `profiles/${user.login}-${uuid}.yml`,
+          content: yamlContent,
+          slug: user.login,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Unknown error');
+      window.open(data.pr_url, '_blank', 'noopener,noreferrer');
+    } catch (e) {
+      setSubmitError(e instanceof Error ? e.message : 'Unknown error');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   // Shared CSS classes
@@ -518,14 +535,19 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               {t(lang, 'form.profile.next')}
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={!isLoggedIn || !isStepValid(0)}
-              className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {t(lang, 'form.profile.submit_pr')} {'\u2192'}
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={!isLoggedIn || !isStepValid(0) || submitting}
+                className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {submitting ? t(lang, 'form.common.submitting') : t(lang, 'form.profile.submit_pr')} {'\u2192'}
+              </button>
+              {submitError && (
+                <p className="text-xs text-error mt-2">{submitError}</p>
+              )}
+            </>
           )}
         </div>
       </fieldset>
