@@ -401,14 +401,16 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
               {t(lang, 'form.create_proposal.next')}
             </button>
           ) : (
-            <button type="button" onClick={handleSubmit}
-              disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(3) || submitting}
-              className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              {submitting ? t(lang, 'form.common.submitting') : t(lang, 'form.create_proposal.submit_pr')} {'\u2192'}
-            </button>
-            {submitError && (
-              <p className="text-xs text-error mt-2">{submitError}</p>
-            )}
+            <>
+              <button type="button" onClick={handleSubmit}
+                disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(3) || submitting}
+                className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                {submitting ? t(lang, 'form.common.submitting') : t(lang, 'form.create_proposal.submit_pr')} {'\u2192'}
+              </button>
+              {submitError && (
+                <p className="text-xs text-error mt-2">{submitError}</p>
+              )}
+            </>
           )}
         </div>
       </fieldset>
