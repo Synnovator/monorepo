@@ -10,13 +10,6 @@ export interface IssueUrlParams {
   fields?: Record<string, string>;
 }
 
-export interface PRUrlParams {
-  filename: string;
-  value: string;
-  branch?: string;
-  message?: string;
-}
-
 export function buildIssueUrl(params: IssueUrlParams): string {
   const url = new URL(`${BASE_URL}/issues/new`);
   if (params.template) url.searchParams.set('template', params.template);
@@ -28,15 +21,6 @@ export function buildIssueUrl(params: IssueUrlParams): string {
       if (value) url.searchParams.set(key, value);
     }
   }
-  return url.toString();
-}
-
-export function buildPRUrl(params: PRUrlParams): string {
-  const branch = params.branch || 'main';
-  const url = new URL(`${BASE_URL}/new/${branch}`);
-  url.searchParams.set('filename', params.filename);
-  url.searchParams.set('value', params.value);
-  if (params.message) url.searchParams.set('message', params.message);
   return url.toString();
 }
 

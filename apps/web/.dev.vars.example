@@ -1,0 +1,9 @@
+# GitHub App credentials (for /api/submit-pr)
+# Get these from: Settings → Developer settings → GitHub Apps → Synnovator
+GITHUB_APP_ID=2996003
+GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
+GITHUB_APP_INSTALLATION_ID=<your-installation-id>
+
+# Auth (existing)
+AUTH_SECRET=<random-secret-for-session-encryption>
+GITHUB_CLIENT_SECRET=<oauth-client-secret>
