@@ -56,8 +56,6 @@ const tokenMapSchema = z.record(
   oklchValue,
 );
 
-type TokenMap = z.infer<typeof tokenMapSchema>;
-
 // === Full Token Map (all tokens required) ===
 
 const fullTokenMapSchema = z.object(
@@ -83,8 +81,10 @@ export const themeConfigSchema = z.object({
   dark: fullTokenMapSchema,
   fonts: z
     .object({
+      heading: z.string().optional(),
       sans: z.string().optional(),
-      mono: z.string().optional(),
+      code: z.string().optional(),
+      zh: z.string().optional(),
     })
     .optional(),
   radius: z.string().optional(),
@@ -104,13 +104,15 @@ export type HackathonTheme = z.infer<typeof hackathonThemeSchema>;
 // === Theme Submission Schema (POST body) ===
 
 export const themeSubmissionSchema = z.object({
-  target: z.string(),
+  target: z.string().min(1),
   light: tokenMapSchema,
   dark: tokenMapSchema,
   fonts: z
     .object({
+      heading: z.string().optional(),
       sans: z.string().optional(),
-      mono: z.string().optional(),
+      code: z.string().optional(),
+      zh: z.string().optional(),
     })
     .optional(),
   radius: z.string().optional(),
