@@ -50,7 +50,7 @@ export function ProposalsViewToggle({
           <button
             onClick={() => setView('hot')}
             aria-pressed={view === 'hot'}
-            className={`text-sm px-4 py-1.5 rounded-full border transition-colors cursor-pointer ${
+            className={`text-sm px-4 py-1.5 min-h-11 rounded-full border transition-colors cursor-pointer ${
               view === 'hot'
                 ? 'border-lime-primary bg-lime-primary/20 text-lime-primary'
                 : 'border-secondary-bg text-muted hover:border-lime-primary hover:text-white'
@@ -61,7 +61,7 @@ export function ProposalsViewToggle({
           <button
             onClick={() => setView('activity')}
             aria-pressed={view === 'activity'}
-            className={`text-sm px-4 py-1.5 rounded-full border transition-colors cursor-pointer ${
+            className={`text-sm px-4 py-1.5 min-h-11 rounded-full border transition-colors cursor-pointer ${
               view === 'activity'
                 ? 'border-lime-primary bg-lime-primary/20 text-lime-primary'
                 : 'border-secondary-bg text-muted hover:border-lime-primary hover:text-white'

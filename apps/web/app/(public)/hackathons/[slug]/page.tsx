@@ -87,7 +87,7 @@ export default async function HackathonDetailPage({
           </span>
         </div>
 
-        <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-3">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white mb-3">
           {localize(lang, h.name, h.name_zh)}
         </h1>
 

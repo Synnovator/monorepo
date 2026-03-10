@@ -79,7 +79,7 @@ export function HackathonFilter({ hackathons, lang }: HackathonFilterProps) {
               key={filter}
               onClick={() => setCurrentFilter(filter)}
               aria-pressed={currentFilter === filter}
-              className={`text-sm px-4 py-1.5 rounded-full border transition-colors cursor-pointer ${
+              className={`text-sm px-4 py-1.5 min-h-11 rounded-full border transition-colors cursor-pointer ${
                 currentFilter === filter
                   ? 'border-lime-primary bg-lime-primary/20 text-lime-primary'
                   : 'border-secondary-bg text-muted hover:border-lime-primary hover:text-white'

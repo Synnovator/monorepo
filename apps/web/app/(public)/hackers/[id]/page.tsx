@@ -39,7 +39,7 @@ export default async function HackerProfilePage({
           loading="lazy"
         />
         <div>
-          <h1 className="text-2xl font-heading font-bold text-white">
+          <h1 className="text-xl sm:text-2xl font-heading font-bold text-white">
             {localize(lang, h.name, h.name_zh)}
           </h1>
           <p className="text-muted text-sm mt-1">@{h.github}</p>

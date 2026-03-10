@@ -300,7 +300,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               }`}>
                 {idx < step ? (isStepValid(idx) ? '\u2713' : '!') : idx + 1}
               </div>
-              <span className={`mt-1 text-xs whitespace-nowrap ${idx === step ? 'text-lime-primary' : 'text-muted'}`}>
+              <span className={`mt-1 text-xs whitespace-nowrap hidden sm:block ${idx === step ? 'text-lime-primary' : 'text-muted'}`}>
                 {label}
               </span>
             </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -17,6 +18,7 @@ export function NavBar() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const lang = getLangFromSearchParams(searchParams);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   function langHref(path: string) {
     if (lang === 'en') {
@@ -82,13 +84,57 @@ export function NavBar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <button type="button" onClick={handleLangSwitch} className="cursor-pointer py-2 px-1 text-muted hover:text-white text-sm transition-colors relative z-10" aria-label="Switch language">
+          <button type="button" onClick={handleLangSwitch} className="cursor-pointer py-2 px-2 min-h-11 min-w-11 text-muted hover:text-white text-sm transition-colors relative z-10 inline-flex items-center justify-center" aria-label="Switch language">
             {t(lang, 'nav.lang_switch')}
           </button>
 
           <OAuthButton />
+
+          {/* Hamburger button — mobile only */}
+          <button
+            type="button"
+            className="md:hidden inline-flex items-center justify-center min-h-11 min-w-11 text-muted hover:text-white transition-colors"
+            onClick={() => setMobileMenuOpen(prev => !prev)}
+            aria-expanded={mobileMenuOpen}
+            aria-label="Toggle navigation menu"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              {mobileMenuOpen ? (
+                <>
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </>
+              ) : (
+                <>
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </>
+              )}
+            </svg>
+          </button>
         </div>
       </div>
+
+      {/* Mobile menu panel */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-secondary-bg bg-near-black/95 backdrop-blur-md">
+          <div className="px-4 py-4 space-y-1">
+            <Link href={langHref('/')} onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-3 rounded-lg text-sm transition-colors ${pathname === '/' ? 'text-light-gray bg-secondary-bg' : 'text-muted hover:text-white hover:bg-secondary-bg'}`}>
+              {t(lang, 'nav.hackathons')}
+            </Link>
+            <Link href={langHref('/proposals')} onClick={() => setMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-sm text-muted hover:text-white hover:bg-secondary-bg transition-colors">
+              {t(lang, 'nav.proposals')}
+            </Link>
+            <Link href={langHref('/guides')} onClick={() => setMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-sm text-muted hover:text-white hover:bg-secondary-bg transition-colors">
+              {t(lang, 'nav.guides')}
+            </Link>
+            <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-sm text-muted hover:text-white hover:bg-secondary-bg transition-colors">
+              {t(lang, 'nav.admin')}
+            </Link>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
