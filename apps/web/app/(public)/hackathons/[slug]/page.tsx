@@ -138,74 +138,83 @@ export default async function HackathonDetailPage({
 
           {/* Tab 1: Details */}
           <div data-tab-panel="details" role="tabpanel" id="panel-details" aria-labelledby="tab-details">
-            <div className="space-y-12 pt-6">
-              <section>
+            <div className="pt-6">
+              <section className="mb-12">
                 <div className="prose prose-invert prose-sm max-w-none text-foreground">
                   <p>{localize(lang, h.description, h.description_zh)}</p>
                 </div>
               </section>
 
               {h.organizers && h.organizers.length > 0 && (
-                <section>
-                  <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.organizers')}</h2>
-                  <div className="flex flex-wrap gap-4">
-                    {h.organizers.map((org: { name?: string; name_zh?: string; role?: string }, i: number) => (
-                      <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-lg border border-border bg-card">
-                        <div>
-                          <p className="text-foreground text-sm font-medium">{localize(lang, org.name, org.name_zh)}</p>
-                          {org.role && <p className="text-muted-foreground text-xs">{org.role}</p>}
+                <>
+                  <hr className="border-border" />
+                  <section className="mt-12 mb-12">
+                    <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.organizers')}</h2>
+                    <div className="flex flex-wrap gap-4">
+                      {h.organizers.map((org: { name?: string; name_zh?: string; role?: string }, i: number) => (
+                        <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-lg bg-muted/50">
+                          <div>
+                            <p className="text-foreground text-sm font-medium">{localize(lang, org.name, org.name_zh)}</p>
+                            {org.role && <p className="text-muted-foreground text-xs">{org.role}</p>}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
+                      ))}
+                    </div>
+                  </section>
+                </>
               )}
 
               {h.tracks && h.tracks.length > 0 && (
-                <section>
-                  <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.tracks')}</h2>
-                  <div className="space-y-6">
-                    {h.tracks.map((track: any) => (
-                      <TrackSection key={track.slug} track={track} lang={lang} />
-                    ))}
-                  </div>
-                </section>
+                <>
+                  <hr className="border-border" />
+                  <section className="mt-12 mb-12">
+                    <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.tracks')}</h2>
+                    <div className="space-y-6">
+                      {h.tracks.map((track: any) => (
+                        <TrackSection key={track.slug} track={track} lang={lang} />
+                      ))}
+                    </div>
+                  </section>
+                </>
               )}
 
               {h.eligibility && (
-                <section>
-                  <h2 className="text-xl font-heading font-bold text-foreground mb-4 flex items-center gap-2">
-                    <ClipboardListIcon size={22} className="shrink-0" aria-hidden="true" />
-                    {t(lang, 'hackathon.eligibility')}
-                  </h2>
-                  <div className="rounded-lg border border-border bg-card p-6 space-y-3">
-                    {h.eligibility.team_size && (
-                      <p className="text-sm text-foreground">
-                        {t(lang, 'hackathon.team_size_label')}: {h.eligibility.team_size.min}–{h.eligibility.team_size.max}
-                        {h.eligibility.allow_solo && ` ${t(lang, 'hackathon.solo_allowed')}`}
-                      </p>
-                    )}
-                    {h.eligibility.restrictions?.map((r: string, i: number) => (
-                      <p key={i} className="text-sm text-muted-foreground">{r}</p>
-                    ))}
-                  </div>
-                </section>
+                <>
+                  <hr className="border-border" />
+                  <section className="mt-8 mb-8">
+                    <h2 className="text-xl font-heading font-bold text-foreground mb-4 flex items-center gap-2">
+                      <ClipboardListIcon size={22} className="shrink-0" aria-hidden="true" />
+                      {t(lang, 'hackathon.eligibility')}
+                    </h2>
+                    <div className="space-y-3">
+                      {h.eligibility.team_size && (
+                        <p className="text-sm text-foreground">
+                          {t(lang, 'hackathon.team_size_label')}: {h.eligibility.team_size.min}–{h.eligibility.team_size.max}
+                          {h.eligibility.allow_solo && ` ${t(lang, 'hackathon.solo_allowed')}`}
+                        </p>
+                      )}
+                      {h.eligibility.restrictions?.map((r: string, i: number) => (
+                        <p key={i} className="text-sm text-muted-foreground">{r}</p>
+                      ))}
+                    </div>
+                  </section>
+                </>
               )}
 
               {h.datasets && h.datasets.length > 0 && (
-                <section>
+                <section className="mt-8 mb-8">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.datasets')}</h2>
                   <DatasetSection datasets={h.datasets as any} hackathonSlug={h.slug} lang={lang} />
                 </section>
               )}
 
               {h.legal && (
-                <section>
+                <section className="mt-8 mb-8">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4 flex items-center gap-2">
                     <ShieldCheckIcon size={22} className="shrink-0" aria-hidden="true" />
                     {t(lang, 'hackathon.legal')}
                   </h2>
-                  <div className="rounded-lg border border-border bg-card p-6 space-y-3">
+                  <div className="space-y-3">
                     {h.legal.license && <p className="text-sm text-foreground">{t(lang, 'hackathon.license_label')}: {h.legal.license}</p>}
                     {h.legal.ip_ownership && <p className="text-sm text-foreground">{t(lang, 'hackathon.ip_label')}: {h.legal.ip_ownership}</p>}
                     {h.legal.compliance_notes?.map((note: string, i: number) => (
@@ -216,15 +225,18 @@ export default async function HackathonDetailPage({
               )}
 
               {h.faq && h.faq.length > 0 && (
-                <section>
-                  <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.faq')}</h2>
-                  <FAQAccordion items={h.faq} lang={lang} />
-                </section>
+                <>
+                  <hr className="border-border" />
+                  <section className="mt-12 mb-8">
+                    <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.faq')}</h2>
+                    <FAQAccordion items={h.faq} lang={lang} />
+                  </section>
+                </>
               )}
 
               {stage === 'judging' && h.tracks?.map((track: any) => (
                 track.judging?.criteria && track.judging.criteria.length > 0 && (
-                  <section key={track.slug}>
+                  <section key={track.slug} className="mt-12 mb-8">
                     <h2 className="text-xl font-heading font-bold text-foreground mb-4">
                       {t(lang, 'score.title')} — {localize(lang, track.name, track.name_zh)}
                     </h2>
@@ -235,7 +247,7 @@ export default async function HackathonDetailPage({
 
               {/* NDA Sign Form */}
               {h.legal?.nda?.required && (
-                <section>
+                <section className="mt-12">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4">
                     {t(lang, 'hackathon.nda_sign')}
                   </h2>
@@ -250,7 +262,7 @@ export default async function HackathonDetailPage({
 
               {/* Register Form (during registration stage) */}
               {stage === 'registration' && (
-                <section id="register-section">
+                <section id="register-section" className="mt-12">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.register')}</h2>
                   <RegisterForm
                     hackathonSlug={h.slug}
@@ -264,7 +276,7 @@ export default async function HackathonDetailPage({
 
               {/* Team Formation (during registration/development stages) */}
               {(['registration', 'development'].includes(stage)) && (
-                <section id="team-formation-section">
+                <section id="team-formation-section" className="mt-12">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4">
                     {t(lang, 'hackathon.team_formation')}
                   </h2>
@@ -278,7 +290,7 @@ export default async function HackathonDetailPage({
 
               {/* Appeal Form (during announcement stage) */}
               {stage === 'announcement' && (
-                <section id="appeal-section">
+                <section id="appeal-section" className="mt-12">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.appeal')}</h2>
                   <AppealForm
                     hackathonSlug={h.slug}
