@@ -1,96 +1,146 @@
-@theme {
-  /* === Neon Forge Color Palette === */
+@custom-variant dark (&:is(.dark *));
 
-  /* Accent Colors */
-  --color-lime-primary: #BBFD3B;
-  --color-yellow-neon: #F0FF31;
-  --color-light-green: #8AFF80;
-  --color-mint: #74FFBB;
-  --color-cyan: #41FAF4;
-  --color-pink: #FF74A7;
-  --color-neon-blue: #4C78FF;
-  --color-orange: #FB7A38;
+@theme inline {
+  /* shadcn standard semantic tokens */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
-  /* Background Colors */
-  --color-surface: #181818;
-  --color-near-black: #00000E;
-  --color-dark-bg: #222222;
-  --color-secondary-bg: #333333;
+  /* Synnovator brand extensions */
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
 
-  /* Semantic Colors */
-  --color-success: #00B42A;
-  --color-error: #FA541C;
-  --color-warning: #FAAD14;
-
-  /* Text Colors */
-  --color-muted: #A0A0A0;
-  --color-light-gray: #DCDCDC;
-  --color-white: #FFFFFF;
-
-  /* === Border Radius === */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 20px;
-  --radius-pill: 50px;
-
-  /* === Font Families === */
-  --font-heading: 'Space Grotesk', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-code: 'Poppins', sans-serif;
-  --font-zh: 'Noto Sans SC', sans-serif;
+  /* Radius */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* === shadcn/ui CSS Variables (mapped to Neon Forge palette) === */
 :root {
-  --background: var(--color-surface);
-  --foreground: var(--color-light-gray);
-  --card: var(--color-dark-bg);
-  --card-foreground: var(--color-light-gray);
-  --popover: var(--color-dark-bg);
-  --popover-foreground: var(--color-light-gray);
-  --primary: var(--color-lime-primary);
-  --primary-foreground: var(--color-near-black);
-  --secondary: var(--color-secondary-bg);
-  --secondary-foreground: var(--color-white);
-  --muted: var(--color-secondary-bg);
-  --muted-foreground: var(--color-muted);
-  --accent: var(--color-secondary-bg);
-  --accent-foreground: var(--color-white);
-  --destructive: var(--color-error);
-  --destructive-foreground: var(--color-white);
-  --border: var(--color-secondary-bg);
-  --input: var(--color-secondary-bg);
-  --ring: var(--color-lime-primary);
-  --radius: 0.5rem;
+  --radius: 0.75rem;
+
+  /* Surfaces — warm white system */
+  --background: oklch(0.98 0.005 80);
+  --foreground: oklch(0.15 0.01 70);
+  --card: oklch(1 0.003 80);
+  --card-foreground: oklch(0.15 0.01 70);
+  --popover: oklch(1 0.003 80);
+  --popover-foreground: oklch(0.15 0.01 70);
+  --primary: oklch(0.62 0.2 35);
+  --primary-foreground: oklch(0.98 0.005 80);
+  --secondary: oklch(0.95 0.005 75);
+  --secondary-foreground: oklch(0.15 0.01 70);
+  --muted: oklch(0.95 0.005 75);
+  --muted-foreground: oklch(0.52 0.015 60);
+  --accent: oklch(0.95 0.005 75);
+  --accent-foreground: oklch(0.15 0.01 70);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.98 0.005 80);
+  --border: oklch(0.92 0.005 75);
+  --input: oklch(0.92 0.005 75);
+  --ring: oklch(0.62 0.2 35);
+  --brand: oklch(0.62 0.2 35);
+  --brand-foreground: oklch(0.98 0.005 80);
+  --highlight: oklch(0.75 0.2 128);
+  --highlight-foreground: oklch(0.40 0.12 128);
+  --info: oklch(0.48 0.2 270);
+  --info-foreground: oklch(0.35 0.15 270);
 }
 
-/* === Base Styles === */
-html {
-  background-color: var(--color-surface);
-  color: var(--color-light-gray);
-  font-family: var(--font-body);
+.dark {
+  --background: oklch(0.16 0.008 60);
+  --foreground: oklch(0.94 0.005 70);
+  --card: oklch(0.20 0.008 60);
+  --card-foreground: oklch(0.94 0.005 70);
+  --popover: oklch(0.20 0.008 60);
+  --popover-foreground: oklch(0.94 0.005 70);
+  --primary: oklch(0.68 0.19 38);
+  --primary-foreground: oklch(0.16 0.008 60);
+  --secondary: oklch(0.24 0.008 55);
+  --secondary-foreground: oklch(0.94 0.005 70);
+  --muted: oklch(0.24 0.008 55);
+  --muted-foreground: oklch(0.60 0.01 60);
+  --accent: oklch(0.24 0.008 55);
+  --accent-foreground: oklch(0.94 0.005 70);
+  --destructive: oklch(0.62 0.2 22);
+  --destructive-foreground: oklch(0.98 0.005 80);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.68 0.19 38);
+  --brand: oklch(0.68 0.19 38);
+  --brand-foreground: oklch(0.16 0.008 60);
+  --highlight: oklch(0.88 0.25 125);
+  --highlight-foreground: oklch(0.16 0.008 60);
+  --info: oklch(0.58 0.18 270);
+  --info-foreground: oklch(0.94 0.005 70);
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  color: var(--color-white);
+/* Hackathon Type Overrides */
+[data-hackathon-type="enterprise"] {
+  --brand: oklch(0.48 0.2 270);
+  --brand-foreground: oklch(0.98 0.005 80);
+}
+.dark [data-hackathon-type="enterprise"] {
+  --brand: oklch(0.58 0.18 270);
+  --brand-foreground: oklch(0.16 0.008 60);
+}
+[data-hackathon-type="youth-league"] {
+  --brand: oklch(0.75 0.2 128);
+  --brand-foreground: oklch(0.15 0.01 70);
+}
+.dark [data-hackathon-type="youth-league"] {
+  --brand: oklch(0.88 0.25 125);
+  --brand-foreground: oklch(0.16 0.008 60);
 }
 
-/* Scrollbar styling for dark theme */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-dark-bg);
+  background: var(--secondary);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-secondary-bg);
-  border-radius: var(--radius-pill);
+  background: var(--muted-foreground);
+  border-radius: 50px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground);
 }
 
-/* Selection color */
+/* Selection */
 ::selection {
-  background-color: color-mix(in srgb, var(--color-lime-primary) 30%, transparent);
-  color: var(--color-white);
+  background-color: oklch(from var(--primary) l c h / 0.3);
+  color: var(--foreground);
 }
