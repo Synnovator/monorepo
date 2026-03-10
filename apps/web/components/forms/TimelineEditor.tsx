@@ -23,12 +23,12 @@ interface TimelineEditorProps {
 }
 
 const DEFAULT_STAGES: Stage[] = [
-  { key: 'draft', label: 'Draft', labelZh: '草案', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-muted/20 text-muted border-muted/30' },
-  { key: 'registration', label: 'Registration', labelZh: '报名', start: '', end: '', description: '', descriptionZh: '', removable: false, color: 'bg-lime-primary/20 text-lime-primary border-lime-primary/30' },
-  { key: 'development', label: 'Development', labelZh: '开发', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-cyan/20 text-cyan border-cyan/30' },
+  { key: 'draft', label: 'Draft', labelZh: '草案', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-muted/20 text-muted-foreground border-muted/30' },
+  { key: 'registration', label: 'Registration', labelZh: '报名', start: '', end: '', description: '', descriptionZh: '', removable: false, color: 'bg-primary/20 text-primary border-primary/30' },
+  { key: 'development', label: 'Development', labelZh: '开发', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-cyan/20 text-info border-cyan/30' },
   { key: 'submission', label: 'Submission', labelZh: '提交', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-orange/20 text-orange border-orange/30' },
-  { key: 'judging', label: 'Judging', labelZh: '评审', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-neon-blue/20 text-neon-blue border-neon-blue/30' },
-  { key: 'announcement', label: 'Announcement', labelZh: '公告', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-pink/20 text-pink border-pink/30' },
+  { key: 'judging', label: 'Judging', labelZh: '评审', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-neon-blue/20 text-info border-neon-blue/30' },
+  { key: 'announcement', label: 'Announcement', labelZh: '公告', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-pink/20 text-destructive border-pink/30' },
   { key: 'award', label: 'Award', labelZh: '颁奖', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-mint/20 text-mint border-mint/30' },
 ];
 
@@ -83,7 +83,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
       description: '',
       descriptionZh: '',
       removable: true,
-      color: CUSTOM_STAGE_COLORS[colorIdx] || 'bg-muted/20 text-muted border-muted/30',
+      color: CUSTOM_STAGE_COLORS[colorIdx] || 'bg-muted/20 text-muted-foreground border-muted/30',
     };
     onChange([...stages, newStage]);
     setCustomStageName('');
@@ -113,10 +113,10 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
     <div className="space-y-4">
       {/* Preset buttons */}
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-xs text-muted">{t(lang, 'form.timeline.presets')}</span>
+        <span className="text-xs text-muted-foreground">{t(lang, 'form.timeline.presets')}</span>
         {PRESETS.map((p, idx) => (
           <button key={idx} type="button" onClick={() => applyPreset(idx)}
-            className="text-xs px-3 py-1 rounded-full border border-secondary-bg text-muted hover:border-lime-primary hover:text-lime-primary transition-colors">
+            className="text-xs px-3 py-1 rounded-full border border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors">
             {lang === 'zh' ? p.labelZh : p.label}
           </button>
         ))}
@@ -130,7 +130,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
               type="button"
               onClick={() => setEditingIdx(editingIdx === idx ? null : idx)}
               className={`relative px-3 py-2 rounded-lg border text-xs font-medium transition-all min-w-[80px] text-center ${stage.color} ${
-                editingIdx === idx ? 'ring-2 ring-lime-primary' : ''
+                editingIdx === idx ? 'ring-2 ring-ring' : ''
               }`}
             >
               <div>{lang === 'zh' ? stage.labelZh : stage.label}</div>
@@ -143,14 +143,14 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); removeStage(idx); }}
-                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-error/80 text-white text-xs flex items-center justify-center hover:bg-error"
+                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-destructive/80 text-foreground text-xs flex items-center justify-center hover:bg-destructive"
                 >
                   ×
                 </button>
               )}
             </button>
             {idx < stages.length - 1 && (
-              <div className="w-4 h-px bg-secondary-bg mx-0.5" />
+              <div className="w-4 h-px bg-muted mx-0.5" />
             )}
           </div>
         ))}
@@ -158,55 +158,55 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
 
       {/* Date editor for selected stage */}
       {editingIdx !== null && editingIdx < stages.length && (
-        <div className="p-4 rounded-lg border border-secondary-bg bg-surface/50 space-y-3">
+        <div className="p-4 rounded-lg border border-border bg-muted space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-white font-medium">
+            <span className="text-sm text-foreground font-medium">
               {lang === 'zh' ? stages[editingIdx].labelZh : stages[editingIdx].label}
             </span>
-            <button type="button" onClick={() => setEditingIdx(null)} className="text-xs text-muted hover:text-white">
+            <button type="button" onClick={() => setEditingIdx(null)} className="text-xs text-muted-foreground hover:text-foreground">
               {t(lang, 'form.timeline.close')}
             </button>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor={`timeline-start-${editingIdx}`} className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.start')}</label>
+              <label htmlFor={`timeline-start-${editingIdx}`} className="block text-xs text-muted-foreground mb-1">{t(lang, 'form.timeline.start')}</label>
               <input
                 id={`timeline-start-${editingIdx}`}
                 type="datetime-local"
                 value={stages[editingIdx].start.replace('Z', '')}
                 onChange={e => updateStage(editingIdx, 'start', e.target.value)}
-                className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none"
+                className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none"
               />
             </div>
             <div>
-              <label htmlFor={`timeline-end-${editingIdx}`} className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.end')}</label>
+              <label htmlFor={`timeline-end-${editingIdx}`} className="block text-xs text-muted-foreground mb-1">{t(lang, 'form.timeline.end')}</label>
               <input
                 id={`timeline-end-${editingIdx}`}
                 type="datetime-local"
                 value={stages[editingIdx].end.replace('Z', '')}
                 onChange={e => updateStage(editingIdx, 'end', e.target.value)}
-                className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none"
+                className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none"
               />
             </div>
           </div>
           <div>
-            <label className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.description')}</label>
+            <label className="block text-xs text-muted-foreground mb-1">{t(lang, 'form.timeline.description')}</label>
             <input
               type="text"
               value={stages[editingIdx].description}
               onChange={e => updateStageField(editingIdx, 'description', e.target.value)}
               placeholder={t(lang, 'form.timeline.description_placeholder')}
-              className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none"
+              className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none"
             />
           </div>
           <div>
-            <label className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.description_zh')}</label>
+            <label className="block text-xs text-muted-foreground mb-1">{t(lang, 'form.timeline.description_zh')}</label>
             <input
               type="text"
               value={stages[editingIdx].descriptionZh}
               onChange={e => updateStageField(editingIdx, 'descriptionZh', e.target.value)}
               placeholder={t(lang, 'form.timeline.description_placeholder_zh')}
-              className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none"
+              className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none"
             />
           </div>
         </div>
@@ -220,13 +220,13 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
           onChange={e => setCustomStageName(e.target.value)}
           placeholder={t(lang, 'form.timeline.custom_stage')}
           aria-label={t(lang, 'form.timeline.custom_stage')}
-          className="flex-1 bg-surface border border-secondary-bg rounded-md px-3 py-1.5 text-white text-sm focus:border-lime-primary focus:outline-none"
+          className="flex-1 bg-background border border-border rounded-md px-3 py-1.5 text-foreground text-sm focus:border-ring focus:outline-none"
         />
         <button
           type="button"
           onClick={addStage}
           disabled={!customStageName.trim()}
-          className="text-sm text-lime-primary hover:text-lime-primary/80 transition-colors disabled:opacity-50"
+          className="text-sm text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
         >
           + {t(lang, 'form.timeline.add_stage')}
         </button>

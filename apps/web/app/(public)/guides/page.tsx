@@ -19,10 +19,10 @@ export default async function GuidesIndexPage({
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="text-center mb-12">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white mb-3">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
           {t(lang, 'guide.index_title')}
         </h1>
-        <p className="text-lg text-muted">
+        <p className="text-lg text-muted-foreground">
           {t(lang, 'guide.index_subtitle')}
         </p>
       </div>
@@ -32,19 +32,19 @@ export default async function GuidesIndexPage({
           <Link
             key={role.href}
             href={role.href}
-            className="group block rounded-lg border border-secondary-bg bg-secondary-bg/50 p-6 transition-colors hover:border-lime-primary"
+            className="group block rounded-lg border border-border bg-muted/50 p-6 transition-colors hover:border-primary"
           >
             <div className="text-3xl mb-3">{role.emoji}</div>
-            <h2 className="text-xl font-heading font-bold text-white mb-1 group-hover:text-lime-primary transition-colors">
+            <h2 className="text-xl font-heading font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
               {t(lang, role.titleKey)}
             </h2>
-            <p className="text-sm text-muted mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               {t(lang, role.subtitleKey)}
             </p>
             <ul className="space-y-1.5">
               {t(lang, role.bulletsKey).split('|').map((bullet: string) => (
-                <li key={bullet} className="text-sm text-light-gray flex items-start gap-2">
-                  <span className="text-lime-primary mt-0.5">&rsaquo;</span>
+                <li key={bullet} className="text-sm text-foreground flex items-start gap-2">
+                  <span className="text-primary mt-0.5">&rsaquo;</span>
                   {bullet}
                 </li>
               ))}

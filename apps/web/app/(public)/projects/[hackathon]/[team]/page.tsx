@@ -48,21 +48,21 @@ export default async function ProjectDetailPage({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Link href={`/hackathons/${hackathon}#submissions`} className="text-sm text-muted hover:text-white mb-6 inline-block">
+      <Link href={`/hackathons/${hackathon}#submissions`} className="text-sm text-muted-foreground hover:text-foreground mb-6 inline-block">
         ← {hackathonName}
       </Link>
 
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-heading font-bold text-white mb-2">
+          <h1 className="text-3xl font-heading font-bold text-foreground mb-2">
             {localize(lang, project.name, project.name_zh)}
           </h1>
           {project.tagline && (
-            <p className="text-lg text-muted">{localize(lang, project.tagline, project.tagline_zh)}</p>
+            <p className="text-lg text-muted-foreground">{localize(lang, project.tagline, project.tagline_zh)}</p>
           )}
         </div>
         {trackName && (
-          <span className="text-xs px-3 py-1.5 rounded-full bg-secondary-bg text-muted whitespace-nowrap">
+          <span className="text-xs px-3 py-1.5 rounded-full bg-muted text-muted-foreground whitespace-nowrap">
             {localize(lang, trackName.name, trackName.name_zh)}
           </span>
         )}
@@ -71,19 +71,19 @@ export default async function ProjectDetailPage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           {project.description ? (
-            <div className="prose prose-invert prose-sm max-w-none text-light-gray">
+            <div className="prose prose-sm max-w-none text-foreground">
               <p>{localize(lang, project.description, project.description_zh)}</p>
             </div>
           ) : (
-            <div className="rounded-lg border border-secondary-bg bg-dark-bg p-12 text-center">
-              <p className="text-muted">{t(lang, 'project.no_readme')}</p>
+            <div className="rounded-lg border border-border bg-card p-12 text-center">
+              <p className="text-muted-foreground">{t(lang, 'project.no_readme')}</p>
             </div>
           )}
         </div>
 
         <aside className="space-y-6">
           <section>
-            <h3 className="text-sm font-medium text-muted mb-3">{t(lang, 'project.team_members')}</h3>
+            <h3 className="text-sm font-medium text-muted-foreground mb-3">{t(lang, 'project.team_members')}</h3>
             <div className="space-y-2">
               {project.team.map((member: { github: string; role?: string }) => {
                 const profileId = githubToProfile.get(member.github);
@@ -96,17 +96,17 @@ export default async function ProjectDetailPage({
                       loading="lazy"
                     />
                     <div>
-                      <p className="text-white text-sm">{member.github}</p>
-                      {member.role && <p className="text-muted text-xs">{member.role}</p>}
+                      <p className="text-foreground text-sm">{member.github}</p>
+                      {member.role && <p className="text-muted-foreground text-xs">{member.role}</p>}
                     </div>
                   </>
                 );
                 return profileId ? (
-                  <Link key={member.github} href={`/hackers/${profileId}`} className="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary-bg/50 transition-colors">
+                  <Link key={member.github} href={`/hackers/${profileId}`} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                     {inner}
                   </Link>
                 ) : (
-                  <span key={member.github} className="flex items-center gap-3 p-2 rounded-lg text-muted/70">
+                  <span key={member.github} className="flex items-center gap-3 p-2 rounded-lg text-muted-foreground/70">
                     {inner}
                   </span>
                 );
@@ -116,10 +116,10 @@ export default async function ProjectDetailPage({
 
           {project.tech_stack && project.tech_stack.length > 0 && (
             <section>
-              <h3 className="text-sm font-medium text-muted mb-3">{t(lang, 'project.tech_stack')}</h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-3">{t(lang, 'project.tech_stack')}</h3>
               <div className="flex flex-wrap gap-1.5">
                 {project.tech_stack.map((tech: string) => (
-                  <span key={tech} className="text-xs px-2 py-1 rounded-full bg-neon-blue/10 text-neon-blue">{tech}</span>
+                  <span key={tech} className="text-xs px-2 py-1 rounded-full bg-info/10 text-info">{tech}</span>
                 ))}
               </div>
             </section>
@@ -127,21 +127,21 @@ export default async function ProjectDetailPage({
 
           {project.deliverables && (
             <section>
-              <h3 className="text-sm font-medium text-muted mb-3">{t(lang, 'project.deliverables')}</h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-3">{t(lang, 'project.deliverables')}</h3>
               <div className="space-y-2">
                 {project.deliverables.repo && (
-                  <a href={project.deliverables.repo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded-lg border border-secondary-bg hover:border-lime-primary/30 transition-colors text-sm text-white">
-                    <span className="text-lime-primary">→</span> {t(lang, 'project.view_repo')}
+                  <a href={project.deliverables.repo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded-lg border border-border hover:border-primary/30 transition-colors text-sm text-foreground">
+                    <span className="text-primary">→</span> {t(lang, 'project.view_repo')}
                   </a>
                 )}
                 {project.deliverables.demo && (
-                  <a href={project.deliverables.demo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded-lg border border-secondary-bg hover:border-neon-blue/30 transition-colors text-sm text-white">
-                    <span className="text-neon-blue">→</span> Demo
+                  <a href={project.deliverables.demo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded-lg border border-border hover:border-info/30 transition-colors text-sm text-foreground">
+                    <span className="text-info">→</span> Demo
                   </a>
                 )}
                 {project.deliverables.video && (
-                  <a href={project.deliverables.video} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded-lg border border-secondary-bg hover:border-pink/30 transition-colors text-sm text-white">
-                    <span className="text-pink">→</span> Video
+                  <a href={project.deliverables.video} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded-lg border border-border hover:border-destructive/30 transition-colors text-sm text-foreground">
+                    <span className="text-destructive">→</span> Video
                   </a>
                 )}
               </div>

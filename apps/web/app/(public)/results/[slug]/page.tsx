@@ -37,21 +37,21 @@ export default async function ResultsPage({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Link href={`/hackathons/${h.slug}`} className="text-sm text-muted hover:text-white mb-6 inline-block">
+      <Link href={`/hackathons/${h.slug}`} className="text-sm text-muted-foreground hover:text-foreground mb-6 inline-block">
         ← {localize(lang, h.name, h.name_zh)}
       </Link>
 
-      <h1 className="text-3xl font-heading font-bold text-white mb-8">
+      <h1 className="text-3xl font-heading font-bold text-foreground mb-8">
         {t(lang, 'result.title')}
       </h1>
 
       {!showResults ? (
-        <div className="rounded-lg border border-secondary-bg bg-dark-bg p-12 text-center">
-          <p className="text-muted text-lg">{t(lang, 'result.pending')}</p>
+        <div className="rounded-lg border border-border bg-card p-12 text-center">
+          <p className="text-muted-foreground text-lg">{t(lang, 'result.pending')}</p>
         </div>
       ) : !trackResults || trackResults.length === 0 ? (
-        <div className="rounded-lg border border-secondary-bg bg-dark-bg p-12 text-center">
-          <p className="text-muted text-lg">{t(lang, 'result.no_results')}</p>
+        <div className="rounded-lg border border-border bg-card p-12 text-center">
+          <p className="text-muted-foreground text-lg">{t(lang, 'result.no_results')}</p>
         </div>
       ) : (
         <div className="space-y-12">
@@ -59,11 +59,11 @@ export default async function ResultsPage({
             const trackInfo = trackNameMap[tr.track];
             return (
               <section key={tr.track}>
-                <h2 className="text-xl font-heading font-bold text-white mb-4">
+                <h2 className="text-xl font-heading font-bold text-foreground mb-4">
                   {trackInfo ? localize(lang, trackInfo.name, trackInfo.name_zh) : tr.track}
                 </h2>
                 {tr.data?.calculated_at && (
-                  <div className="text-xs text-muted mb-4">
+                  <div className="text-xs text-muted-foreground mb-4">
                     {t(lang, 'result.calculated')}: {new Date(tr.data.calculated_at).toLocaleString()} ·
                     {tr.data.total_judges} {t(lang, 'result.judges_count')} ·
                     {tr.data.total_teams} {t(lang, 'result.teams_count')}
@@ -72,7 +72,7 @@ export default async function ResultsPage({
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-secondary-bg text-muted">
+                      <tr className="border-b border-border text-muted-foreground">
                         <th className="text-left py-3 px-2">{t(lang, 'result.rank')}</th>
                         <th className="text-left py-3 px-2">{t(lang, 'result.team')}</th>
                         <th className="text-right py-3 px-2">{t(lang, 'result.final_score')}</th>
@@ -80,14 +80,14 @@ export default async function ResultsPage({
                     </thead>
                     <tbody>
                       {tr.data?.rankings?.map((r: any) => (
-                        <tr key={r.rank} className="border-b border-secondary-bg/50 hover:bg-secondary-bg/20">
+                        <tr key={r.rank} className="border-b border-border/50 hover:bg-muted/20">
                           <td className="py-3 px-2">
-                            <span className={`font-code font-bold ${r.rank <= 3 ? 'text-lime-primary' : 'text-white'}`}>
+                            <span className={`font-code font-bold ${r.rank <= 3 ? 'text-primary' : 'text-foreground'}`}>
                               #{r.rank}
                             </span>
                           </td>
-                          <td className="py-3 px-2 text-white font-medium">{r.team}</td>
-                          <td className="py-3 px-2 text-right font-code text-lime-primary font-bold">
+                          <td className="py-3 px-2 text-foreground font-medium">{r.team}</td>
+                          <td className="py-3 px-2 text-right font-code text-primary font-bold">
                             {r.final_score?.toFixed(1)}
                           </td>
                         </tr>

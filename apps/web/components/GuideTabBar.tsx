@@ -16,15 +16,15 @@ const tabs = [
 export function GuideTabBar({ activeRole, lang }: GuideTabBarProps) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-      <nav className="flex gap-6 border-b border-secondary-bg" aria-label="Guide tabs">
+      <nav className="flex gap-6 border-b border-border" aria-label="Guide tabs">
         {tabs.map((tab) => (
           <Link
             key={tab.role}
             href={tab.href}
             className={`pb-3 text-sm transition-colors ${
               activeRole === tab.role
-                ? 'border-b-2 border-lime-primary text-lime-primary font-medium'
-                : 'text-muted hover:text-white'
+                ? 'border-b-2 border-primary text-primary font-medium'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
             aria-current={activeRole === tab.role ? 'page' : undefined}
           >

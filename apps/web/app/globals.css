@@ -1,2 +1,3 @@
 @import "tailwindcss";
 @import "@synnovator/ui/styles";
+@import "../components/sketch/sketch-anim.css";

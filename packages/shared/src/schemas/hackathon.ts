@@ -25,6 +25,7 @@ export const criterionSchema = z.object({
   score_range: z.array(z.number()).optional(),
   hard_constraint: z.boolean().optional(),
   constraint_rule: z.string().optional(),
+  constraint_rule_zh: z.string().optional(),
 });
 
 export const deliverableItemSchema = z.object({

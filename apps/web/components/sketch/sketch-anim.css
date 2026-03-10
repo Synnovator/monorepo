@@ -1,0 +1,25 @@
+@keyframes sketch-draw {
+  from { stroke-dashoffset: var(--path-length); }
+  to   { stroke-dashoffset: 0; }
+}
+
+.sketch-mark {
+  stroke: var(--muted-foreground);
+  opacity: 0.3;
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  pointer-events: none;
+}
+
+.sketch-mark[data-visible="true"] {
+  animation: sketch-draw 0.4s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sketch-mark[data-visible="true"] {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

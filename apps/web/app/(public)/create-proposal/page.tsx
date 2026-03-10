@@ -27,7 +27,7 @@ export default async function CreateProposalPage({
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-heading font-bold text-white mb-8">
+      <h1 className="text-3xl font-heading font-bold text-foreground mb-8">
         {lang === 'zh' ? '提交项目提案' : 'Submit Project Proposal'}
       </h1>
       <CreateProposalForm hackathons={hackathons} lang={lang} />

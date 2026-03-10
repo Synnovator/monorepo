@@ -43,12 +43,12 @@ export default async function AdminDashboard({
 
   return (
     <div>
-      <h1 className="text-2xl font-heading text-white mb-8">{t(lang, 'admin.dashboard')}</h1>
+      <h1 className="text-2xl font-heading text-foreground mb-8">{t(lang, 'admin.dashboard')}</h1>
       <div className="grid grid-cols-3 gap-6">
         {cardKeys.map(type => (
-          <div key={type} className="bg-dark-bg border border-secondary-bg rounded-lg p-6">
-            <p className="text-muted text-sm">{t(lang, labelMap[type])} — {t(lang, 'admin.pending')}</p>
-            <p className="text-3xl font-heading text-lime-primary mt-2">{counts[type]}</p>
+          <div key={type} className="bg-card border border-border rounded-lg p-6">
+            <p className="text-muted-foreground text-sm">{t(lang, labelMap[type])} — {t(lang, 'admin.pending')}</p>
+            <p className="text-3xl font-heading text-primary mt-2">{counts[type]}</p>
           </div>
         ))}
       </div>

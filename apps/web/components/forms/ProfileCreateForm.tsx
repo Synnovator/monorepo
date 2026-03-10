@@ -175,13 +175,13 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
   }
 
   // Shared CSS classes
-  const inputClass = 'w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none';
-  const readOnlyClass = 'w-full bg-surface/50 border border-secondary-bg rounded-md px-3 py-2 text-muted text-sm cursor-not-allowed';
-  const labelClass = 'block text-sm text-muted mb-2';
-  const selectClass = 'w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none';
+  const inputClass = 'w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none';
+  const readOnlyClass = 'w-full bg-muted border border-border rounded-md px-3 py-2 text-muted-foreground text-sm cursor-not-allowed';
+  const labelClass = 'block text-sm text-muted-foreground mb-2';
+  const selectClass = 'w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none';
 
   return (
-    <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6">
+    <div className="rounded-lg border border-border bg-card p-6">
       {/* Step indicators */}
       <div aria-label="Progress" className="flex items-center justify-between mb-8">
         {stepLabels.map((label, idx) => (
@@ -190,23 +190,23 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
                   idx === step
-                    ? 'bg-lime-primary text-near-black'
+                    ? 'bg-primary text-primary-foreground'
                     : idx < step
-                      ? (isStepValid(idx) ? 'bg-lime-primary/30 text-lime-primary' : 'bg-warning/30 text-warning')
-                      : 'bg-secondary-bg text-muted'
+                      ? (isStepValid(idx) ? 'bg-primary/30 text-primary' : 'bg-warning/30 text-warning')
+                      : 'bg-muted text-muted-foreground'
                 }`}
               >
                 {idx < step ? (isStepValid(idx) ? '\u2713' : '!') : idx + 1}
               </div>
               <span className={`mt-1 text-xs whitespace-nowrap ${
-                idx === step ? 'text-lime-primary' : 'text-muted'
+                idx === step ? 'text-primary' : 'text-muted-foreground'
               }`}>
                 {label}
               </span>
             </div>
             {idx < TOTAL_STEPS - 1 && (
               <div className={`hidden sm:block w-8 h-px mx-1 mt-[-1rem] ${
-                idx < step ? 'bg-lime-primary/30' : 'bg-secondary-bg'
+                idx < step ? 'bg-primary/30' : 'bg-muted'
               }`} />
             )}
           </div>
@@ -221,7 +221,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
           </p>
           <a
             href={`/api/auth/login?returnTo=${typeof window !== 'undefined' ? encodeURIComponent(window.location.pathname) : ''}`}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/80 transition-colors"
           >
             {t(lang, 'form.profile.sign_in_github')}
           </a>
@@ -379,7 +379,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
         {/* Step 2: Skills */}
         {step === 2 && (
           <>
-            <p className="text-sm text-muted">
+            <p className="text-sm text-muted-foreground">
               {t(lang, 'form.profile.skills_hint')}
             </p>
             <div className="space-y-3">
@@ -405,7 +405,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                     <button
                       type="button"
                       onClick={() => removeSkill(idx)}
-                      className="mt-2 px-2 text-muted hover:text-error transition-colors"
+                      className="mt-2 px-2 text-muted-foreground hover:text-destructive transition-colors"
                     >
                       {'\u2715'}
                     </button>
@@ -416,7 +416,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
             <button
               type="button"
               onClick={addSkill}
-              className="text-sm text-lime-primary hover:text-lime-primary/80 transition-colors"
+              className="text-sm text-primary hover:text-primary/80 transition-colors"
             >
               + {t(lang, 'form.profile.add_skill_category')}
             </button>
@@ -471,8 +471,8 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               />
             </div>
 
-            <div className="border-t border-secondary-bg pt-4 mt-4">
-              <p className="text-sm text-muted mb-4">{t(lang, 'form.profile.social_links')}</p>
+            <div className="border-t border-border pt-4 mt-4">
+              <p className="text-sm text-muted-foreground mb-4">{t(lang, 'form.profile.social_links')}</p>
               <div className="space-y-4">
                 <div>
                   <label htmlFor="prof-twitter" className={labelClass}>Twitter</label>
@@ -517,15 +517,15 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
           <>
             <div>
               <label className={labelClass}>{t(lang, 'form.profile.preview_yaml')}</label>
-              <pre className="w-full bg-surface border border-secondary-bg rounded-md px-4 py-3 text-lime-primary text-sm font-mono overflow-x-auto whitespace-pre-wrap">
+              <pre className="w-full bg-background border border-border rounded-md px-4 py-3 text-primary text-sm font-mono overflow-x-auto whitespace-pre-wrap">
                 {yamlContent}
               </pre>
             </div>
-            <p className="text-xs text-muted">
+            <p className="text-xs text-muted-foreground">
               {lang === 'zh'
                 ? '点击提交后将在 GitHub 上创建 PR，文件路径为 '
                 : 'Clicking submit will create a PR on GitHub with file path '}
-              <code className="text-lime-primary">profiles/{user?.login ?? '{username}'}-{'<uuid>'}.yml</code>
+              <code className="text-primary">profiles/{user?.login ?? '{username}'}-{'<uuid>'}.yml</code>
             </p>
           </>
         )}
@@ -543,7 +543,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
             <button
               type="button"
               onClick={() => setStep(s => s - 1)}
-              className="px-4 py-2 rounded-lg border border-secondary-bg text-muted text-sm hover:text-white hover:border-light-gray transition-colors"
+              className="px-4 py-2 rounded-lg border border-border text-muted-foreground text-sm hover:text-foreground hover:border-foreground transition-colors"
             >
               {t(lang, 'form.profile.back')}
             </button>
@@ -556,7 +556,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               type="button"
               onClick={() => setStep(s => s + 1)}
               disabled={!isStepValid(step)}
-              className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t(lang, 'form.profile.next')}
             </button>
@@ -567,19 +567,19 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                 onClick={handleSubmit}
                 disabled={!isLoggedIn || !isStepValid(0) || submitting}
                 aria-describedby={submitError ? 'profile-submit-error' : undefined}
-                className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? t(lang, 'form.common.submitting') : t(lang, 'form.profile.submit_pr')} {'\u2192'}
               </button>
               {submitError && (
-                <div id="profile-submit-error" role="alert" className="w-full rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-error">
+                <div id="profile-submit-error" role="alert" className="w-full rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="font-medium mb-1">{t(lang, 'form.common.submit_error')}</p>
-                      <p className="text-xs text-error/80 break-all">{submitError}</p>
+                      <p className="text-xs text-destructive/80 break-all">{submitError}</p>
                     </div>
                     <button type="button" onClick={() => setSubmitError('')}
-                      className="shrink-0 text-error/60 hover:text-error transition-colors text-lg leading-none">&times;</button>
+                      className="shrink-0 text-destructive/60 hover:text-destructive transition-colors text-lg leading-none">&times;</button>
                   </div>
                 </div>
               )}
