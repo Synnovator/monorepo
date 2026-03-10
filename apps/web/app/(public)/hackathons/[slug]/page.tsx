@@ -140,7 +140,7 @@ export default async function HackathonDetailPage({
           <div data-tab-panel="details" role="tabpanel" id="panel-details" aria-labelledby="tab-details">
             <div className="pt-6">
               <section className="mb-12">
-                <div className="prose prose-invert prose-sm max-w-none text-foreground">
+                <div className="prose prose-sm max-w-none text-foreground">
                   <p>{localize(lang, h.description, h.description_zh)}</p>
                 </div>
               </section>
@@ -181,7 +181,7 @@ export default async function HackathonDetailPage({
               {h.eligibility && (
                 <>
                   <hr className="border-border" />
-                  <section className="mt-8 mb-8">
+                  <section className="mt-12 mb-8">
                     <h2 className="text-xl font-heading font-bold text-foreground mb-4 flex items-center gap-2">
                       <ClipboardListIcon size={22} className="shrink-0" aria-hidden="true" />
                       {t(lang, 'hackathon.eligibility')}
@@ -202,14 +202,19 @@ export default async function HackathonDetailPage({
               )}
 
               {h.datasets && h.datasets.length > 0 && (
-                <section className="mt-8 mb-8">
+                <>
+                <hr className="border-border" />
+                <section className="mt-12 mb-8">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.datasets')}</h2>
                   <DatasetSection datasets={h.datasets as any} hackathonSlug={h.slug} lang={lang} />
                 </section>
+                </>
               )}
 
               {h.legal && (
-                <section className="mt-8 mb-8">
+                <>
+                <hr className="border-border" />
+                <section className="mt-12 mb-8">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4 flex items-center gap-2">
                     <ShieldCheckIcon size={22} className="shrink-0" aria-hidden="true" />
                     {t(lang, 'hackathon.legal')}
@@ -222,12 +227,13 @@ export default async function HackathonDetailPage({
                     ))}
                   </div>
                 </section>
+                </>
               )}
 
               {h.faq && h.faq.length > 0 && (
                 <>
                   <hr className="border-border" />
-                  <section className="mt-12 mb-8">
+                  <section className="mt-12 mb-12">
                     <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.faq')}</h2>
                     <FAQAccordion items={h.faq} lang={lang} />
                   </section>
@@ -320,7 +326,7 @@ export default async function HackathonDetailPage({
               )}
 
               {submissions.length === 0 ? (
-                <div className="rounded-lg border border-border bg-card p-12 text-center">
+                <div className="rounded-lg bg-muted/30 p-12 text-center">
                   <SketchDoodle variant="question" className="mx-auto mb-4" />
                   <p className="text-muted-foreground text-lg">{t(lang, 'project.no_submissions')}</p>
                 </div>
@@ -344,11 +350,11 @@ export default async function HackathonDetailPage({
           <div data-tab-panel="leaderboard" role="tabpanel" id="panel-leaderboard" aria-labelledby="tab-leaderboard" className="hidden">
             <div className="space-y-8 pt-6">
               {!showLeaderboard ? (
-                <div className="rounded-lg border border-border bg-card p-12 text-center">
+                <div className="rounded-lg bg-muted/30 p-12 text-center">
                   <p className="text-muted-foreground text-lg">{t(lang, 'project.leaderboard_pending')}</p>
                 </div>
               ) : (
-                <div className="rounded-lg border border-border bg-card p-12 text-center">
+                <div className="rounded-lg bg-muted/30 p-12 text-center">
                   <p className="text-muted-foreground text-lg">{t(lang, 'result.pending')}</p>
                 </div>
               )}
