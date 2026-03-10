@@ -1,0 +1,41 @@
+synnovator_version: "2.0"
+hackathon:
+  name: "test-create-youth-hackathons"
+  slug: "test-create-youth-hackathons"
+  type: "youth-league"
+  organizers:
+    - name: "OneSyn"
+      role: "organizer"
+  eligibility:
+    open_to: "all"
+    team_size:
+      min: 1
+      max: 5
+    allow_solo: true
+  legal:
+    license: "Apache-2.0"
+    ip_ownership: "participant"
+  timeline:
+    registration:
+      start: "2026-03-09T16:00Z"
+      end: "2026-03-09T20:00Z"
+      description: "test-create-youth-hackathons"
+      description_zh: "test-create-youth-hackathons"
+  tracks:
+    - name: "test-create-youth-hackathons"
+      slug: "test-create-youth-hackathons"
+      rewards:
+      - type: "prize"
+      rank: "1st"
+      amount: "$1,000"
+      judging:
+      mode: "weighted"
+      criteria:
+      - name: "Innovation"
+      weight: 0.3
+      score_range:
+  settings:
+    language:
+      - "zh"
+      - "en"
+    public_vote: "reactions"
