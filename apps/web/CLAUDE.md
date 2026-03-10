@@ -2,7 +2,7 @@
 
 ## 概述
 
-Synnovator 官网，基于 Next.js 15 App Router，通过 OpenNext 适配部署到 Cloudflare Pages。
+Synnovator 官网，基于 Next.js 15 App Router，通过 OpenNext 适配部署到 Cloudflare Workers。
 
 ## 目录结构
 
@@ -31,13 +31,47 @@ hooks/                # 自定义 React Hooks
 | `@synnovator/ui` | 共享 UI 组件（Button、Card、Badge 等） |
 | `@synnovator/shared` | Schema（Zod）、数据读取、i18n 翻译、Auth session |
 
+## API Routes
+
+| Route | 用途 |
+|-------|------|
+| `/api/auth/login` | GitHub OAuth 登录跳转 |
+| `/api/auth/callback` | OAuth 回调处理 |
+| `/api/auth/me` | 当前用户信息 |
+| `/api/submit-pr` | 表单提交 → 通过 GitHub App 创建 PR |
+| `/api/presign` | R2 presigned URL（文件上传） |
+| `/api/check-profile` | 检查用户是否已创建 Profile |
+| `/api/admin/review` | 管理员审批操作 |
+
 ## 开发
 
 ```bash
-pnpm dev              # 启动 Turbopack 开发服务器
+pnpm dev              # 启动 Turbopack 开发服务器（自动运行 prebuild 生成静态数据）
 pnpm build            # 构建生产版本（OpenNext + Cloudflare）
 ```
 
+### 本地 Secrets 配置
+
+复制 `.dev.vars.example` → `.dev.vars`，填入敏感值：
+
+```bash
+cp .dev.vars.example .dev.vars
+# 编辑 .dev.vars 填入 GITHUB_APP_PRIVATE_KEY、AUTH_SECRET、GITHUB_CLIENT_SECRET
+```
+
+> `.dev.vars` 已 gitignore。Wrangler 开发服务器会自动读取此文件注入 Worker 环境变量。
+
 ## 部署
 
-推送到 `main` 分支后，通过 OpenNext 适配器构建并自动部署到 Cloudflare Pages。
+推送到 `main` 分支后，GitHub Actions（`.github/workflows/deploy.yml`）自动构建并通过 `wrangler deploy` 部署到 Cloudflare Workers。
+
+- **触发条件**：仅 `push` 到 `main`（`data/*` 等分支不会触发部署）
+- **构建命令**：`pnpm run deploy`（= `opennextjs-cloudflare build && wrangler deploy`）
+- **所需 Secrets**：`CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID`（GitHub repo Secrets）
+- **Worker 配置**：`wrangler.jsonc`（Worker 名 `synnovator`，运行时变量和 Secrets 在 Cloudflare dashboard 配置）
+
+## 注意事项
+
+- `prebuild` 脚本（`scripts/generate-static-data.mjs`）在 `dev` 和 `build` 前自动运行，将 YAML 数据转为 JSON
+- 使用 `pnpm run deploy` 而非 `pnpm deploy`（后者是 pnpm 内置命令）
+- 无测试框架（测试在 `@synnovator/shared` 包中，使用 Vitest）
