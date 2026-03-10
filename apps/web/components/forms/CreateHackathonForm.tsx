@@ -51,7 +51,7 @@ function toSlug(name: string): string {
 // Shared CSS classes — hoisted outside components to avoid re-creation
 const inputClass = 'w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none';
 const selectClass = 'w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none';
-const btnRemove = 'px-2 text-muted hover:text-destructive transition-colors';
+const btnRemove = 'px-2 text-muted-foreground hover:text-destructive transition-colors';
 const btnAdd = 'text-sm text-primary hover:text-primary/80 transition-colors';
 
 /* ------------------------------------------------------------------ */
@@ -69,7 +69,7 @@ interface OrganizerListProps {
 const OrganizerList = memo(function OrganizerList({ organizers, onAdd, onRemove, onUpdate, lang }: OrganizerListProps) {
   return (
     <>
-      <p className="text-sm text-muted">{t(lang, 'form.create_hackathon.add_organizers')}</p>
+      <p className="text-sm text-muted-foreground">{t(lang, 'form.create_hackathon.add_organizers')}</p>
       <div className="space-y-4">
         {organizers.map((org, idx) => (
           <div key={idx} className="flex gap-2 items-start">
@@ -114,7 +114,7 @@ const TrackEditor = memo(function TrackEditor({
 }: TrackEditorProps) {
   return (
     <>
-      <p className="text-sm text-muted">{t(lang, 'form.create_hackathon.add_tracks')}</p>
+      <p className="text-sm text-muted-foreground">{t(lang, 'form.create_hackathon.add_tracks')}</p>
       <div className="space-y-6">
         {tracks.map((tr, tIdx) => {
           const weightSum = tr.criteria.reduce((s, c) => s + (parseFloat(c.weight) || 0), 0);
@@ -136,7 +136,7 @@ const TrackEditor = memo(function TrackEditor({
                 placeholder={toSlug(tr.name) || 'track-slug'} className={inputClass} />
 
               <div>
-                <label className="block text-xs text-muted mb-1">
+                <label className="block text-xs text-muted-foreground mb-1">
                   {t(lang, 'form.create_hackathon.rewards_hint')}
                 </label>
                 <textarea value={tr.rewards} onChange={e => onUpdateTrack(tIdx, 'rewards', e.target.value)}
@@ -146,7 +146,7 @@ const TrackEditor = memo(function TrackEditor({
 
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <label className="text-xs text-muted">{t(lang, 'form.create_hackathon.judging_criteria')}</label>
+                  <label className="text-xs text-muted-foreground">{t(lang, 'form.create_hackathon.judging_criteria')}</label>
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${weightOk ? 'bg-primary/20 text-primary' : 'bg-warning/20 text-warning'}`}>
                     {t(lang, 'form.create_hackathon.weight_total')}: {weightSum.toFixed(2)} {weightOk ? '\u2713' : t(lang, 'form.create_hackathon.should_be_one')}
                   </span>
@@ -157,12 +157,12 @@ const TrackEditor = memo(function TrackEditor({
                   {tr.criteria.map((c, cIdx) => (
                     <div key={cIdx} className="p-3 rounded-lg border border-border bg-muted/30 space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-xs text-muted">
+                        <span className="text-xs text-muted-foreground">
                           {t(lang, 'form.create_hackathon.criterion_n')} {cIdx + 1}
                         </span>
                         {tr.criteria.length > 1 && (
                           <button type="button" onClick={() => onRemoveCriterion(tIdx, cIdx)}
-                            className="text-xs text-muted hover:text-destructive transition-colors">
+                            className="text-xs text-muted-foreground hover:text-destructive transition-colors">
                             {t(lang, 'form.create_hackathon.remove')}
                           </button>
                         )}
@@ -172,7 +172,7 @@ const TrackEditor = memo(function TrackEditor({
                         placeholder={t(lang, 'form.create_hackathon.criterion_placeholder')}
                         className={inputClass} />
                       <div className="flex items-center gap-3">
-                        <label className="text-xs text-muted whitespace-nowrap">{t(lang, 'form.create_hackathon.weight')}:</label>
+                        <label className="text-xs text-muted-foreground whitespace-nowrap">{t(lang, 'form.create_hackathon.weight')}:</label>
                         <input type="range" min="0" max="1" step="0.05"
                           value={c.weight}
                           onChange={e => onUpdateCriterion(tIdx, cIdx, 'weight', e.target.value)}
@@ -447,7 +447,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
     }
   }
 
-  const labelClass = 'block text-sm text-muted mb-2';
+  const labelClass = 'block text-sm text-muted-foreground mb-2';
 
   return (
     <div className="rounded-lg border border-border bg-card p-6">
@@ -458,11 +458,11 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
             <div className="flex flex-col items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
                 idx === step ? 'bg-primary text-primary-foreground'
-                  : idx < step ? (isStepValid(idx) ? 'bg-primary/30 text-primary' : 'bg-warning/30 text-warning') : 'bg-muted text-muted'
+                  : idx < step ? (isStepValid(idx) ? 'bg-primary/30 text-primary' : 'bg-warning/30 text-warning') : 'bg-muted text-muted-foreground'
               }`}>
                 {idx < step ? (isStepValid(idx) ? '\u2713' : '!') : idx + 1}
               </div>
-              <span className={`mt-1 text-xs whitespace-nowrap hidden sm:block ${idx === step ? 'text-primary' : 'text-muted'}`}>
+              <span className={`mt-1 text-xs whitespace-nowrap hidden sm:block ${idx === step ? 'text-primary' : 'text-muted-foreground'}`}>
                 {label}
               </span>
             </div>
@@ -492,7 +492,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {/* Step 0: Type Selection */}
         {step === 0 && (
           <>
-            <p className="text-sm text-muted mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               {t(lang, 'form.create_hackathon.choose_type')}
             </p>
             <div className="grid gap-3">
@@ -510,7 +510,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
                   <div className={`font-medium ${hackathonType === opt.value ? 'text-primary' : 'text-foreground'}`}>
                     {lang === 'zh' ? opt.zh : opt.en}
                   </div>
-                  <div className="text-xs text-muted mt-1">
+                  <div className="text-xs text-muted-foreground mt-1">
                     {lang === 'zh' ? opt.desc_zh : opt.desc_en}
                   </div>
                 </button>
@@ -538,7 +538,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
                 onChange={e => { setSlug(e.target.value); setSlugManual(true); }}
                 placeholder={toSlug(name) || 'community-hackathon-2026'}
                 className={inputClass} />
-              <p className="text-xs text-muted mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {t(lang, 'form.create_hackathon.slug_hint')}
               </p>
             </div>
@@ -569,7 +569,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {/* Step 3: Timeline */}
         {step === 3 && (
           <>
-            <p className="text-sm text-muted mb-2">
+            <p className="text-sm text-muted-foreground mb-2">
               {t(lang, 'form.create_hackathon.timeline_hint')}
             </p>
             <TimelineEditor
@@ -617,7 +617,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
             {hackathonType === 'enterprise' && (
               <div className="border-t border-border pt-4 mt-4 space-y-4">
                 <p className="text-sm text-foreground font-medium">NDA {t(lang, 'form.create_hackathon.nda_config')}</p>
-                <label className="flex items-center gap-2 text-sm text-muted cursor-pointer">
+                <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
                   <input type="checkbox" checked={ndaRequired} onChange={e => setNdaRequired(e.target.checked)}
                     className="rounded border-border bg-background" />
                   {t(lang, 'form.create_hackathon.require_nda')}
@@ -662,7 +662,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
                 <input id="hack-max-team" type="number" min="1" value={teamMax} onChange={e => setTeamMax(e.target.value)} className={inputClass} />
               </div>
             </div>
-            <label className="flex items-center gap-2 text-sm text-muted cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
               <input type="checkbox" checked={allowSolo} onChange={e => setAllowSolo(e.target.checked)}
                 className="rounded border-border bg-background" />
               {t(lang, 'form.create_hackathon.allow_solo')}
@@ -671,7 +671,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               <label className={labelClass}>{t(lang, 'form.create_hackathon.languages')}</label>
               <div className="flex gap-3">
                 {['zh', 'en'].map(l => (
-                  <label key={l} className="flex items-center gap-2 text-sm text-muted cursor-pointer">
+                  <label key={l} className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
                     <input type="checkbox" checked={langOptions.includes(l)} onChange={() => toggleLang(l)}
                       className="rounded border-border bg-background" />
                     {l === 'zh' ? t(lang, 'form.create_hackathon.chinese') : t(lang, 'form.create_hackathon.english')}
@@ -698,7 +698,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
                 {yamlContent}
               </pre>
             </div>
-            <p className="text-xs text-muted">
+            <p className="text-xs text-muted-foreground">
               {t(lang, 'form.create_hackathon.submit_hint')}{' '}
               <code className="text-primary">hackathons/{slug || toSlug(name) || '{slug}'}/hackathon.yml</code>
             </p>
@@ -716,7 +716,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         <div className="flex justify-between pt-2">
           {step > 0 ? (
             <button type="button" onClick={() => setStep(s => s - 1)}
-              className="px-4 py-2 rounded-lg border border-border text-muted text-sm hover:text-foreground hover:border-foreground transition-colors">
+              className="px-4 py-2 rounded-lg border border-border text-muted-foreground text-sm hover:text-foreground hover:border-foreground transition-colors">
               {t(lang, 'form.create_hackathon.back')}
             </button>
           ) : <div />}

@@ -22,7 +22,7 @@ export function EditProfileButton({ profileUsername, lang }: EditProfileButtonPr
       href={`https://github.com/Synnovator/monorepo/edit/main/profiles/${profileUsername}.yml`}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 text-xs text-muted hover:text-primary transition-colors"
+      className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
     >
       {t(lang, 'profile.edit')}
       <ExternalLinkIcon size={12} aria-hidden="true" />

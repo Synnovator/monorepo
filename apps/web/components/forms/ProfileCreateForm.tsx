@@ -176,8 +176,8 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
 
   // Shared CSS classes
   const inputClass = 'w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none';
-  const readOnlyClass = 'w-full bg-muted border border-border rounded-md px-3 py-2 text-muted text-sm cursor-not-allowed';
-  const labelClass = 'block text-sm text-muted mb-2';
+  const readOnlyClass = 'w-full bg-muted border border-border rounded-md px-3 py-2 text-muted-foreground text-sm cursor-not-allowed';
+  const labelClass = 'block text-sm text-muted-foreground mb-2';
   const selectClass = 'w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none';
 
   return (
@@ -193,13 +193,13 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                     ? 'bg-primary text-primary-foreground'
                     : idx < step
                       ? (isStepValid(idx) ? 'bg-primary/30 text-primary' : 'bg-warning/30 text-warning')
-                      : 'bg-muted text-muted'
+                      : 'bg-muted text-muted-foreground'
                 }`}
               >
                 {idx < step ? (isStepValid(idx) ? '\u2713' : '!') : idx + 1}
               </div>
               <span className={`mt-1 text-xs whitespace-nowrap ${
-                idx === step ? 'text-primary' : 'text-muted'
+                idx === step ? 'text-primary' : 'text-muted-foreground'
               }`}>
                 {label}
               </span>
@@ -379,7 +379,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
         {/* Step 2: Skills */}
         {step === 2 && (
           <>
-            <p className="text-sm text-muted">
+            <p className="text-sm text-muted-foreground">
               {t(lang, 'form.profile.skills_hint')}
             </p>
             <div className="space-y-3">
@@ -405,7 +405,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                     <button
                       type="button"
                       onClick={() => removeSkill(idx)}
-                      className="mt-2 px-2 text-muted hover:text-destructive transition-colors"
+                      className="mt-2 px-2 text-muted-foreground hover:text-destructive transition-colors"
                     >
                       {'\u2715'}
                     </button>
@@ -472,7 +472,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
             </div>
 
             <div className="border-t border-border pt-4 mt-4">
-              <p className="text-sm text-muted mb-4">{t(lang, 'form.profile.social_links')}</p>
+              <p className="text-sm text-muted-foreground mb-4">{t(lang, 'form.profile.social_links')}</p>
               <div className="space-y-4">
                 <div>
                   <label htmlFor="prof-twitter" className={labelClass}>Twitter</label>
@@ -521,7 +521,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                 {yamlContent}
               </pre>
             </div>
-            <p className="text-xs text-muted">
+            <p className="text-xs text-muted-foreground">
               {lang === 'zh'
                 ? '点击提交后将在 GitHub 上创建 PR，文件路径为 '
                 : 'Clicking submit will create a PR on GitHub with file path '}
@@ -543,7 +543,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
             <button
               type="button"
               onClick={() => setStep(s => s - 1)}
-              className="px-4 py-2 rounded-lg border border-border text-muted text-sm hover:text-foreground hover:border-foreground transition-colors"
+              className="px-4 py-2 rounded-lg border border-border text-muted-foreground text-sm hover:text-foreground hover:border-foreground transition-colors"
             >
               {t(lang, 'form.profile.back')}
             </button>

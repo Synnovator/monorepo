@@ -86,7 +86,7 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
       <fieldset disabled={!isLoggedIn || loading} className="space-y-5">
         {/* Team name */}
         <div>
-          <label htmlFor="team-name" className="block text-sm text-muted mb-2">{t(lang, 'form.team.team_name')}</label>
+          <label htmlFor="team-name" className="block text-sm text-muted-foreground mb-2">{t(lang, 'form.team.team_name')}</label>
           <input id="team-name" type="text" value={teamNameVal} onChange={e => setTeamNameVal(e.target.value)}
             placeholder="team-alpha"
             aria-required="true"
@@ -95,7 +95,7 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
 
         {/* Track */}
         <div>
-          <label htmlFor="team-track" className="block text-sm text-muted mb-2">{t(lang, 'form.team.track')}</label>
+          <label htmlFor="team-track" className="block text-sm text-muted-foreground mb-2">{t(lang, 'form.team.track')}</label>
           <select id="team-track" value={track} onChange={e => setTrack(e.target.value)}
             aria-required="true"
             className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none">
@@ -110,7 +110,7 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
 
         {/* Purpose */}
         <div>
-          <label htmlFor="team-purpose" className="block text-sm text-muted mb-2">{t(lang, 'form.team.purpose')}</label>
+          <label htmlFor="team-purpose" className="block text-sm text-muted-foreground mb-2">{t(lang, 'form.team.purpose')}</label>
           <select id="team-purpose" value={purpose} onChange={e => setPurpose(e.target.value)}
             aria-required="true"
             className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none">
@@ -125,7 +125,7 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
 
         {/* Members */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t(lang, 'form.team.members')}</label>
+          <label className="block text-sm text-muted-foreground mb-2">{t(lang, 'form.team.members')}</label>
           <div className="space-y-2">
             {members.map((m, idx) => (
               <div key={idx} className="flex gap-2">
@@ -137,7 +137,7 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
                   className="w-32 bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none" />
                 {members.length > 1 && (
                   <button type="button" onClick={() => removeMember(idx)}
-                    className="px-2 text-muted hover:text-destructive transition-colors">✕</button>
+                    className="px-2 text-muted-foreground hover:text-destructive transition-colors">✕</button>
                 )}
               </div>
             ))}
@@ -151,7 +151,7 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
         {/* Looking for */}
         {purpose === 'looking' && (
           <div>
-            <label htmlFor="team-looking-for" className="block text-sm text-muted mb-2">{t(lang, 'form.team.looking_for')}</label>
+            <label htmlFor="team-looking-for" className="block text-sm text-muted-foreground mb-2">{t(lang, 'form.team.looking_for')}</label>
             <textarea id="team-looking-for" value={lookingFor} onChange={e => setLookingFor(e.target.value)}
               placeholder={t(lang, 'form.team.looking_for_placeholder')}
               className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm resize-none h-20 focus:border-ring focus:outline-none" />
@@ -160,7 +160,7 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
 
         {/* Project idea */}
         <div>
-          <label htmlFor="team-project-idea" className="block text-sm text-muted mb-2">{t(lang, 'form.team.project_idea')} ({t(lang, 'form.team.optional')})</label>
+          <label htmlFor="team-project-idea" className="block text-sm text-muted-foreground mb-2">{t(lang, 'form.team.project_idea')} ({t(lang, 'form.team.optional')})</label>
           <textarea id="team-project-idea" value={projectIdea} onChange={e => setProjectIdea(e.target.value)}
             placeholder={t(lang, 'form.team.project_idea_placeholder')}
             className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm resize-none h-20 focus:border-ring focus:outline-none" />

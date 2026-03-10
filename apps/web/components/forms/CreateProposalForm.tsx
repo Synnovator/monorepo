@@ -175,9 +175,9 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
   }
 
   const inputClass = 'w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none';
-  const labelClass = 'block text-sm text-muted mb-2';
+  const labelClass = 'block text-sm text-muted-foreground mb-2';
   const selectClass = 'w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none';
-  const btnRemove = 'px-2 text-muted hover:text-destructive transition-colors';
+  const btnRemove = 'px-2 text-muted-foreground hover:text-destructive transition-colors';
   const btnAdd = 'text-sm text-primary hover:text-primary/80 transition-colors';
 
   return (
@@ -189,11 +189,11 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
             <div className="flex flex-col items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
                 idx === step ? 'bg-primary text-primary-foreground'
-                  : idx < step ? (isStepValid(idx) ? 'bg-primary/30 text-primary' : 'bg-warning/30 text-warning') : 'bg-muted text-muted'
+                  : idx < step ? (isStepValid(idx) ? 'bg-primary/30 text-primary' : 'bg-warning/30 text-warning') : 'bg-muted text-muted-foreground'
               }`}>
                 {idx < step ? (isStepValid(idx) ? '\u2713' : '!') : idx + 1}
               </div>
-              <span className={`mt-1 text-xs whitespace-nowrap hidden sm:block ${idx === step ? 'text-primary' : 'text-muted'}`}>
+              <span className={`mt-1 text-xs whitespace-nowrap hidden sm:block ${idx === step ? 'text-primary' : 'text-muted-foreground'}`}>
                 {label}
               </span>
             </div>
@@ -223,11 +223,11 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
         {/* Step 0: Select Hackathon */}
         {step === 0 && (
           <>
-            <p className="text-sm text-muted mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               {t(lang, 'form.create_proposal.select_hackathon')}
             </p>
             {hackathons.length === 0 ? (
-              <p className="text-muted text-sm">{t(lang, 'form.create_proposal.no_hackathons')}</p>
+              <p className="text-muted-foreground text-sm">{t(lang, 'form.create_proposal.no_hackathons')}</p>
             ) : (
               <div className="grid gap-3">
                 {hackathons.map(h => (
@@ -244,7 +244,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
                     <div className={`font-medium ${selectedHackathon === h.slug ? 'text-primary' : 'text-foreground'}`}>
                       {lang === 'zh' ? (h.name_zh || h.name) : h.name}
                     </div>
-                    <div className="text-xs text-muted mt-1">
+                    <div className="text-xs text-muted-foreground mt-1">
                       {h.tracks.length} {lang === 'zh' ? '个赛道' : 'track(s)'}
                     </div>
                   </button>
@@ -292,7 +292,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
             )}
             <div>
               <label className={labelClass}>{t(lang, 'form.create_proposal.tech_stack')}</label>
-              <p className="text-xs text-muted mb-2">{t(lang, 'form.create_proposal.tech_stack_hint')}</p>
+              <p className="text-xs text-muted-foreground mb-2">{t(lang, 'form.create_proposal.tech_stack_hint')}</p>
               <div className="flex flex-wrap gap-2 mb-2">
                 {techStack.map((tag, idx) => (
                   <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/15 text-primary text-xs">
@@ -311,7 +311,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
         {/* Step 2: Team */}
         {step === 2 && (
           <>
-            <p className="text-sm text-muted">{t(lang, 'form.create_proposal.team_hint')}</p>
+            <p className="text-sm text-muted-foreground">{t(lang, 'form.create_proposal.team_hint')}</p>
             <div className="space-y-4">
               {members.map((m, idx) => (
                 <div key={idx} className="flex gap-2 items-start">
@@ -375,7 +375,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
                 {yamlContent}
               </pre>
             </div>
-            <p className="text-xs text-muted">
+            <p className="text-xs text-muted-foreground">
               {t(lang, 'form.create_proposal.submit_hint')}{' '}
               <code className="text-primary">
                 hackathons/{selectedHackathon}/submissions/{teamSlug}/project.yml
@@ -395,7 +395,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
         <div className="flex justify-between pt-2">
           {step > 0 ? (
             <button type="button" onClick={() => setStep(s => s - 1)}
-              className="px-4 py-2 rounded-lg border border-border text-muted text-sm hover:text-foreground hover:border-foreground transition-colors">
+              className="px-4 py-2 rounded-lg border border-border text-muted-foreground text-sm hover:text-foreground hover:border-foreground transition-colors">
               {t(lang, 'form.create_proposal.back')}
             </button>
           ) : <div />}

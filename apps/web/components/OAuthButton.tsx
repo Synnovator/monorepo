@@ -47,7 +47,7 @@ export function OAuthButton() {
 
   if (!isLoggedIn) {
     return (
-      <a href="/login" className="flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors">
+      <a href="/login" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
         <GitHubIcon size={16} aria-hidden="true" />
         <span className="hidden sm:inline">{t(lang, 'auth.login')}</span>
       </a>
@@ -83,7 +83,7 @@ export function OAuthButton() {
                 <GitHubIcon size={16} aria-hidden="true" />
                 {t(lang, 'auth.link_github')}
               </span>
-              <span className="text-xs text-muted block mt-0.5">{t(lang, 'auth.link_github_hint')}</span>
+              <span className="text-xs text-muted-foreground block mt-0.5">{t(lang, 'auth.link_github_hint')}</span>
             </a>
           </DropdownMenuItem>
         )}

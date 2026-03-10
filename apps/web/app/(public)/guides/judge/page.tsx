@@ -52,28 +52,28 @@ export default async function JudgeGuidePage({
       <GuideTabBar activeRole="judge" lang={lang} />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-10">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white mb-3">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
             {t(lang, 'guide.judge_title')}
           </h1>
-          <p className="text-lg text-muted">{t(lang, 'guide.judge_subtitle')}</p>
+          <p className="text-lg text-muted-foreground">{t(lang, 'guide.judge_subtitle')}</p>
         </div>
 
         <div className="space-y-8">
           {steps.map((step, idx) => (
             <div key={idx} className="flex gap-5">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-lime-primary/20 text-lime-primary flex items-center justify-center font-heading font-bold text-sm">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center font-heading font-bold text-sm">
                 {idx + 1}
               </div>
               <div className="flex-1 pt-1">
-                <h3 className="text-white font-heading font-bold text-lg mb-2">{step.title}</h3>
-                <p className="text-light-gray text-sm leading-relaxed">{step.content}</p>
+                <h3 className="text-foreground font-heading font-bold text-lg mb-2">{step.title}</h3>
+                <p className="text-foreground text-sm leading-relaxed">{step.content}</p>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-12 pt-8 border-t border-secondary-bg">
-          <Link href="/guides" className="text-lime-primary hover:underline text-sm">
+        <div className="mt-12 pt-8 border-t border-border">
+          <Link href="/guides" className="text-primary hover:underline text-sm">
             &larr; {t(lang, 'guide.back_to_guides')}
           </Link>
         </div>

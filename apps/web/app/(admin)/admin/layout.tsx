@@ -34,9 +34,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <Suspense><NavBar /></Suspense>
         <div className="min-h-screen pt-16 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-heading text-error mb-2">{t('zh', 'admin.access_denied')}</h1>
-            <p className="text-muted">{t('zh', 'admin.access_denied_desc')}</p>
-            <p className="text-muted text-sm mt-1">{t('en', 'admin.access_denied_desc')}</p>
+            <h1 className="text-2xl font-heading text-destructive mb-2">{t('zh', 'admin.access_denied')}</h1>
+            <p className="text-muted-foreground">{t('zh', 'admin.access_denied_desc')}</p>
+            <p className="text-muted-foreground text-sm mt-1">{t('en', 'admin.access_denied_desc')}</p>
           </div>
         </div>
         <Suspense><Footer /></Suspense>

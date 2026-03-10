@@ -64,7 +64,7 @@ export function LoginForm() {
             className={`flex-1 pb-2 text-sm font-medium transition-colors ${
               tab === 'password'
                 ? 'text-primary border-b-2 border-primary'
-                : 'text-muted hover:text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {t(lang, 'auth.login_password')}
@@ -79,7 +79,7 @@ export function LoginForm() {
             className={`flex-1 pb-2 text-sm font-medium transition-colors ${
               tab === 'github'
                 ? 'text-primary border-b-2 border-primary'
-                : 'text-muted hover:text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {t(lang, 'auth.login_github')}
@@ -90,7 +90,7 @@ export function LoginForm() {
           <div role="tabpanel" id="login-panel-password" aria-labelledby="login-tab-password">
             <form onSubmit={handlePasswordLogin} className="space-y-4" aria-describedby={error ? 'login-error' : undefined}>
               <div>
-                <label htmlFor="username" className="block text-sm text-muted mb-1">
+                <label htmlFor="username" className="block text-sm text-muted-foreground mb-1">
                   {t(lang, 'auth.username')}
                 </label>
                 <input
@@ -106,7 +106,7 @@ export function LoginForm() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm text-muted mb-1">
+                <label htmlFor="password" className="block text-sm text-muted-foreground mb-1">
                   {t(lang, 'auth.password')}
                 </label>
                 <input
@@ -132,13 +132,13 @@ export function LoginForm() {
               </button>
             </form>
 
-            <p className="text-muted text-xs text-center mt-4">
+            <p className="text-muted-foreground text-xs text-center mt-4">
               admin / 12345
             </p>
           </div>
         ) : (
           <div role="tabpanel" id="login-panel-github" aria-labelledby="login-tab-github" className="space-y-4">
-            <p className="text-muted text-sm text-center">
+            <p className="text-muted-foreground text-sm text-center">
               {t(lang, 'auth.sign_in_with_github')}
             </p>
             <button

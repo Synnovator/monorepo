@@ -40,7 +40,7 @@ export function ReviewActions({ prNumber, lang }: ReviewActionsProps) {
   }
 
   if (done) {
-    return <span className="text-lime-primary text-xs">✓</span>;
+    return <span className="text-primary text-xs">✓</span>;
   }
 
   return (
@@ -49,7 +49,7 @@ export function ReviewActions({ prNumber, lang }: ReviewActionsProps) {
         type="button"
         onClick={() => handleAction('approve')}
         disabled={!!loading}
-        className="px-3 py-1.5 text-xs rounded-md bg-lime-primary/20 text-lime-primary hover:bg-lime-primary/30 transition-colors disabled:opacity-50"
+        className="px-3 py-1.5 text-xs rounded-md bg-primary/20 text-primary hover:bg-primary/30 transition-colors disabled:opacity-50"
       >
         {loading === 'approve' ? '...' : t(lang, 'admin.approve')}
       </button>
@@ -57,7 +57,7 @@ export function ReviewActions({ prNumber, lang }: ReviewActionsProps) {
         type="button"
         onClick={() => handleAction('request_changes')}
         disabled={!!loading}
-        className="px-3 py-1.5 text-xs rounded-md bg-secondary-bg text-muted hover:text-white transition-colors disabled:opacity-50"
+        className="px-3 py-1.5 text-xs rounded-md bg-muted text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
       >
         {loading === 'request_changes' ? '...' : t(lang, 'admin.request_changes')}
       </button>
@@ -65,7 +65,7 @@ export function ReviewActions({ prNumber, lang }: ReviewActionsProps) {
         type="button"
         onClick={() => handleAction('reject')}
         disabled={!!loading}
-        className="px-3 py-1.5 text-xs rounded-md bg-error/20 text-error hover:bg-error/30 transition-colors disabled:opacity-50"
+        className="px-3 py-1.5 text-xs rounded-md bg-destructive/20 text-destructive hover:bg-destructive/30 transition-colors disabled:opacity-50"
       >
         {loading === 'reject' ? '...' : t(lang, 'admin.reject')}
       </button>

@@ -71,7 +71,7 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
       <fieldset disabled={!isLoggedIn || loading} className="space-y-5">
         {/* Team select */}
         <div>
-          <label htmlFor="appeal-team" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.team')}</label>
+          <label htmlFor="appeal-team" className="block text-sm text-muted-foreground mb-2">{t(lang, 'form.appeal.team')}</label>
           <select id="appeal-team" value={teamName} onChange={e => setTeamName(e.target.value)}
             aria-required="true"
             className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none">
@@ -85,15 +85,15 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
         {/* Track (auto-filled) */}
         {trackSlug && (
           <div>
-            <label htmlFor="appeal-track" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.track')}</label>
+            <label htmlFor="appeal-track" className="block text-sm text-muted-foreground mb-2">{t(lang, 'form.appeal.track')}</label>
             <input id="appeal-track" type="text" value={tracks.find(tr => tr.slug === trackSlug)?.name ?? trackSlug} readOnly
-              className="w-full bg-muted border border-border rounded-md px-3 py-2 text-muted text-sm cursor-not-allowed" />
+              className="w-full bg-muted border border-border rounded-md px-3 py-2 text-muted-foreground text-sm cursor-not-allowed" />
           </div>
         )}
 
         {/* Expected result */}
         <div>
-          <label htmlFor="appeal-result" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.expected_result')}</label>
+          <label htmlFor="appeal-result" className="block text-sm text-muted-foreground mb-2">{t(lang, 'form.appeal.expected_result')}</label>
           <select id="appeal-result" value={expectedResult} onChange={e => setExpectedResult(e.target.value)}
             aria-required="true"
             className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none">
@@ -104,7 +104,7 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
 
         {/* Appeal type */}
         <div>
-          <label htmlFor="appeal-type" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.appeal_type')}</label>
+          <label htmlFor="appeal-type" className="block text-sm text-muted-foreground mb-2">{t(lang, 'form.appeal.appeal_type')}</label>
           <select id="appeal-type" value={appealType} onChange={e => setAppealType(e.target.value)}
             aria-required="true"
             className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none">
@@ -115,7 +115,7 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
 
         {/* Description */}
         <div>
-          <label htmlFor="appeal-desc" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.description')} *</label>
+          <label htmlFor="appeal-desc" className="block text-sm text-muted-foreground mb-2">{t(lang, 'form.appeal.description')} *</label>
           <textarea id="appeal-desc" value={description} onChange={e => setDescription(e.target.value)}
             aria-required="true"
             placeholder={t(lang, 'form.appeal.description_placeholder')}
@@ -124,7 +124,7 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
 
         {/* Evidence */}
         <div>
-          <label htmlFor="appeal-evidence" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.evidence')}</label>
+          <label htmlFor="appeal-evidence" className="block text-sm text-muted-foreground mb-2">{t(lang, 'form.appeal.evidence')}</label>
           <textarea id="appeal-evidence" value={evidence} onChange={e => setEvidence(e.target.value)}
             placeholder={t(lang, 'form.appeal.evidence_placeholder')}
             className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm resize-none h-20 focus:border-ring focus:outline-none" />

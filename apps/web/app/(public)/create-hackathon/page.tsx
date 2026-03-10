@@ -12,7 +12,7 @@ export default async function CreateHackathonPage({
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-heading font-bold text-white mb-8">Create a Hackathon</h1>
+      <h1 className="text-3xl font-heading font-bold text-foreground mb-8">Create a Hackathon</h1>
       <CreateHackathonForm templates={{}} lang={lang} />
     </div>
   );

@@ -33,7 +33,7 @@ export default async function AdminProfilesPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-heading text-white mb-8">{t(lang, 'admin.profiles')}</h1>
+      <h1 className="text-2xl font-heading text-foreground mb-8">{t(lang, 'admin.profiles')}</h1>
       <ReviewList items={items} lang={lang} type="profile" />
     </div>
   );

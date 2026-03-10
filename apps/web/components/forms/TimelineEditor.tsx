@@ -23,7 +23,7 @@ interface TimelineEditorProps {
 }
 
 const DEFAULT_STAGES: Stage[] = [
-  { key: 'draft', label: 'Draft', labelZh: '草案', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-muted/20 text-muted border-muted/30' },
+  { key: 'draft', label: 'Draft', labelZh: '草案', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-muted/20 text-muted-foreground border-muted/30' },
   { key: 'registration', label: 'Registration', labelZh: '报名', start: '', end: '', description: '', descriptionZh: '', removable: false, color: 'bg-primary/20 text-primary border-primary/30' },
   { key: 'development', label: 'Development', labelZh: '开发', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-cyan/20 text-info border-cyan/30' },
   { key: 'submission', label: 'Submission', labelZh: '提交', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-orange/20 text-orange border-orange/30' },
@@ -83,7 +83,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
       description: '',
       descriptionZh: '',
       removable: true,
-      color: CUSTOM_STAGE_COLORS[colorIdx] || 'bg-muted/20 text-muted border-muted/30',
+      color: CUSTOM_STAGE_COLORS[colorIdx] || 'bg-muted/20 text-muted-foreground border-muted/30',
     };
     onChange([...stages, newStage]);
     setCustomStageName('');
@@ -113,10 +113,10 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
     <div className="space-y-4">
       {/* Preset buttons */}
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-xs text-muted">{t(lang, 'form.timeline.presets')}</span>
+        <span className="text-xs text-muted-foreground">{t(lang, 'form.timeline.presets')}</span>
         {PRESETS.map((p, idx) => (
           <button key={idx} type="button" onClick={() => applyPreset(idx)}
-            className="text-xs px-3 py-1 rounded-full border border-border text-muted hover:border-primary hover:text-primary transition-colors">
+            className="text-xs px-3 py-1 rounded-full border border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors">
             {lang === 'zh' ? p.labelZh : p.label}
           </button>
         ))}
@@ -163,13 +163,13 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
             <span className="text-sm text-foreground font-medium">
               {lang === 'zh' ? stages[editingIdx].labelZh : stages[editingIdx].label}
             </span>
-            <button type="button" onClick={() => setEditingIdx(null)} className="text-xs text-muted hover:text-foreground">
+            <button type="button" onClick={() => setEditingIdx(null)} className="text-xs text-muted-foreground hover:text-foreground">
               {t(lang, 'form.timeline.close')}
             </button>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor={`timeline-start-${editingIdx}`} className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.start')}</label>
+              <label htmlFor={`timeline-start-${editingIdx}`} className="block text-xs text-muted-foreground mb-1">{t(lang, 'form.timeline.start')}</label>
               <input
                 id={`timeline-start-${editingIdx}`}
                 type="datetime-local"
@@ -179,7 +179,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
               />
             </div>
             <div>
-              <label htmlFor={`timeline-end-${editingIdx}`} className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.end')}</label>
+              <label htmlFor={`timeline-end-${editingIdx}`} className="block text-xs text-muted-foreground mb-1">{t(lang, 'form.timeline.end')}</label>
               <input
                 id={`timeline-end-${editingIdx}`}
                 type="datetime-local"
@@ -190,7 +190,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
             </div>
           </div>
           <div>
-            <label className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.description')}</label>
+            <label className="block text-xs text-muted-foreground mb-1">{t(lang, 'form.timeline.description')}</label>
             <input
               type="text"
               value={stages[editingIdx].description}
@@ -200,7 +200,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
             />
           </div>
           <div>
-            <label className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.description_zh')}</label>
+            <label className="block text-xs text-muted-foreground mb-1">{t(lang, 'form.timeline.description_zh')}</label>
             <input
               type="text"
               value={stages[editingIdx].descriptionZh}

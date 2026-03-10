@@ -72,7 +72,7 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
 
       {ndaSummary && (
         <div>
-          <p className="text-xs text-muted mb-1">{t(lang, 'form.nda.nda_summary')}</p>
+          <p className="text-xs text-muted-foreground mb-1">{t(lang, 'form.nda.nda_summary')}</p>
           <p className="text-sm text-foreground">{ndaSummary}</p>
         </div>
       )}
@@ -89,7 +89,7 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
       )}
 
       {!loading && !isLoggedIn && (
-        <div className="p-3 rounded-lg bg-muted text-muted text-sm">
+        <div className="p-3 rounded-lg bg-muted text-muted-foreground text-sm">
           {t(lang, 'form.nda.sign_in_to_sign')}
         </div>
       )}
@@ -106,7 +106,7 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
       )}
 
       <fieldset disabled={!isLoggedIn || loading} className="space-y-3">
-        <p className="text-xs text-muted">{t(lang, 'form.nda.signer')}: {loading ? '...' : (user?.login ?? '—')}</p>
+        <p className="text-xs text-muted-foreground">{t(lang, 'form.nda.signer')}: {loading ? '...' : (user?.login ?? '—')}</p>
 
         {checkboxLabels.map((label, idx) => (
           <label key={idx} className="flex items-start gap-3 cursor-pointer">
