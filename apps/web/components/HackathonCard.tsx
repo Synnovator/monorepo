@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getCurrentStage, t, localize } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { TrophyIcon } from './icons';
+import { hackathonCardClass, hackathonTypeIcon } from '@/lib/hackathon-theme';
 
 interface HackathonCardProps {
   hackathon: {
@@ -30,15 +31,18 @@ const stageColors: Record<string, string> = {
 export function HackathonCard({ hackathon, lang }: HackathonCardProps) {
   const stage = hackathon.timeline ? getCurrentStage(hackathon.timeline) : 'draft';
   const typeKey = `hackathon.type_${hackathon.type.replace('-', '_')}`;
+  const TypeIcon = hackathonTypeIcon(hackathon.type);
 
   return (
     <Link
       href={`/hackathons/${hackathon.slug}`}
-      className="block group rounded-lg border border-border bg-card hover:border-primary/40 transition-all duration-200 p-6 h-full flex flex-col"
+      data-hackathon-type={hackathon.type}
+      className={`block group border border-border bg-card hover:border-primary/40 transition-all duration-200 p-6 h-full flex flex-col ${hackathonCardClass(hackathon.type)}`}
     >
       {/* Type + Stage badges */}
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+        <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+          <TypeIcon size={14} className="shrink-0" />
           {t(lang, typeKey)}
         </span>
         <span className={`text-xs px-2 py-0.5 rounded-full ${stageColors[stage] || stageColors.draft}`}>
