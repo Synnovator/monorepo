@@ -38,7 +38,7 @@ jobs:
       - name: Deploy Production
         if: github.event_name == 'push'
         working-directory: apps/web
-        run: pnpm exec wrangler deploy
+        run: pnpm exec wrangler deploy --message "deploy main@${GITHUB_SHA::7} by GitHub Actions"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -49,7 +49,7 @@ jobs:
         working-directory: apps/web
         run: |
           PREVIEW_NAME="synnovator-pr-${{ github.event.pull_request.number }}"
-          pnpm exec wrangler deploy --name "$PREVIEW_NAME"
+          pnpm exec wrangler deploy --name "$PREVIEW_NAME" --message "PR #${{ github.event.pull_request.number }} @ ${GITHUB_SHA::7} by GitHub Actions"
           echo "url=https://${PREVIEW_NAME}.synnovator.workers.dev" >> "$GITHUB_OUTPUT"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
