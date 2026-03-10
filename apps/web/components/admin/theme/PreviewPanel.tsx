@@ -12,9 +12,13 @@ export function PreviewPanel() {
   return (
     <div className="flex flex-col h-full">
       {/* Tab bar */}
-      <div className="flex border-b border-border mb-4">
+      <div role="tablist" aria-label="Preview mode" className="flex border-b border-border mb-4">
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'components'}
+          aria-controls="panel-components"
+          id="tab-components"
           onClick={() => setActiveTab('components')}
           className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
             activeTab === 'components'
@@ -26,6 +30,10 @@ export function PreviewPanel() {
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'page'}
+          aria-controls="panel-page"
+          id="tab-page"
           onClick={() => setActiveTab('page')}
           className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
             activeTab === 'page'
@@ -38,7 +46,12 @@ export function PreviewPanel() {
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-y-auto">
+      <div
+        role="tabpanel"
+        id={`panel-${activeTab}`}
+        aria-labelledby={`tab-${activeTab}`}
+        className="flex-1 overflow-y-auto"
+      >
         {activeTab === 'components' ? <ComponentPreview /> : <PagePreview />}
       </div>
     </div>

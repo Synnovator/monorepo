@@ -24,6 +24,7 @@ export function ThemeSelector({ value, onChange, lang }: ThemeSelectorProps) {
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      aria-label={lang === 'zh' ? '选择主题目标' : 'Select theme target'}
       className="h-9 rounded-md border border-border bg-card text-foreground px-3 py-1.5 text-sm shadow-xs transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 outline-none"
     >
       <option value="global">

@@ -28,11 +28,13 @@ export function ThemeEditorPage() {
   const [themeData, setThemeData] = useState<ThemeConfig | null>(null);
   const [overrides, setOverrides] = useState<HackathonTheme | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const injectedPropsRef = useRef<string[]>([]);
 
   // Fetch theme data when target changes
   useEffect(() => {
     setLoading(true);
+    setError(null);
     fetch(`/api/admin/theme?target=${encodeURIComponent(target)}`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -49,6 +51,7 @@ export function ThemeEditorPage() {
       })
       .catch((err) => {
         console.error('Failed to load theme:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load theme');
       })
       .finally(() => {
         setLoading(false);
@@ -276,10 +279,14 @@ export function ThemeEditorPage() {
         <div className="flex items-center justify-center flex-1">
           <p className="text-muted-foreground">Loading...</p>
         </div>
+      ) : error ? (
+        <div className="flex items-center justify-center flex-1">
+          <p className="text-destructive text-sm">{error}</p>
+        </div>
       ) : (
-        <div className="flex gap-6 flex-1 min-h-0">
+        <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
           {/* Left: editor panel */}
-          <div className="w-80 shrink-0 overflow-y-auto pr-2">
+          <div className="w-full lg:w-80 shrink-0 overflow-y-auto pr-2">
             {TOKEN_GROUPS.map((group) => (
               <TokenGroup
                 key={group.label}

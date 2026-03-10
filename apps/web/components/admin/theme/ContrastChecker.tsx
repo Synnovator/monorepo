@@ -54,8 +54,8 @@ export function ContrastChecker({ tokens }: ContrastCheckerProps) {
               <span
                 className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${
                   result.pass
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                    ? 'bg-highlight/15 text-highlight-foreground'
+                    : 'bg-destructive/15 text-destructive'
                 }`}
               >
                 {result.pass ? 'AA' : 'Fail'}

@@ -144,12 +144,14 @@ interface SliderRowProps {
 }
 
 function SliderRow({ label, value, min, max, step, onChange }: SliderRowProps) {
+  const id = `slider-${label}`;
   return (
     <div className="flex items-center gap-2">
-      <span className="w-4 text-xs text-muted-foreground font-mono shrink-0">
+      <label htmlFor={id} className="w-4 text-xs text-muted-foreground font-mono shrink-0">
         {label}
-      </span>
+      </label>
       <input
+        id={id}
         type="range"
         min={min}
         max={max}
