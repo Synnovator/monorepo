@@ -73,7 +73,7 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
       {ndaSummary && (
         <div>
           <p className="text-xs text-muted mb-1">{t(lang, 'form.nda.nda_summary')}</p>
-          <p className="text-sm text-light-gray">{ndaSummary}</p>
+          <p className="text-sm text-foreground">{ndaSummary}</p>
         </div>
       )}
 
@@ -82,23 +82,23 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
           href={ndaDocumentUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary-bg text-white text-sm hover:bg-secondary-bg/80 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted text-foreground text-sm hover:bg-muted/80 transition-colors"
         >
           {t(lang, 'form.nda.download_nda')}
         </a>
       )}
 
       {!loading && !isLoggedIn && (
-        <div className="p-3 rounded-lg bg-secondary-bg text-muted text-sm">
+        <div className="p-3 rounded-lg bg-muted text-muted text-sm">
           {t(lang, 'form.nda.sign_in_to_sign')}
         </div>
       )}
 
       {error && (
-        <div id="nda-submit-error" role="alert" className="p-3 rounded-lg bg-error/10 border border-error/30 text-error text-sm">
+        <div id="nda-submit-error" role="alert" className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
           {error}
           {error.includes('Profile') && (
-            <a href="/create-profile" className="ml-2 text-lime-primary hover:underline">
+            <a href="/create-profile" className="ml-2 text-primary hover:underline">
               {t(lang, 'form.nda.create_profile')}
             </a>
           )}
@@ -114,9 +114,9 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
               type="checkbox"
               checked={checks[idx]}
               onChange={() => toggleCheck(idx)}
-              className="mt-0.5 accent-lime-primary"
+              className="mt-0.5 accent-primary"
             />
-            <span className="text-sm text-light-gray">{label}</span>
+            <span className="text-sm text-foreground">{label}</span>
           </label>
         ))}
 
@@ -124,7 +124,7 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
           onClick={handleSubmit}
           disabled={!allChecked || submitting}
           aria-describedby={error ? 'nda-submit-error' : undefined}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary/20 text-lime-primary text-sm hover:bg-lime-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/20 text-primary text-sm hover:bg-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting
             ? t(lang, 'form.nda.processing')

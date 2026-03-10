@@ -42,12 +42,12 @@ export function OAuthButton() {
   }, [user, navigating]);
 
   if (loading) {
-    return <div className="w-8 h-8 rounded-full bg-secondary-bg animate-pulse" />;
+    return <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />;
   }
 
   if (!isLoggedIn) {
     return (
-      <a href="/login" className="flex items-center gap-2 text-sm text-muted hover:text-white transition-colors">
+      <a href="/login" className="flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors">
         <GitHubIcon size={16} aria-hidden="true" />
         <span className="hidden sm:inline">{t(lang, 'auth.login')}</span>
       </a>
@@ -58,17 +58,17 @@ export function OAuthButton() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 cursor-pointer" aria-label="User menu">
-          <img src={user!.avatar_url} alt={user!.login} className="w-8 h-8 rounded-full border border-secondary-bg" />
-          <span className="hidden sm:inline text-sm text-light-gray">{user!.login}</span>
+          <img src={user!.avatar_url} alt={user!.login} className="w-8 h-8 rounded-full border border-border" />
+          <span className="hidden sm:inline text-sm text-foreground">{user!.login}</span>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48 rounded-lg border border-secondary-bg bg-dark-bg shadow-xl">
+      <DropdownMenuContent align="end" className="w-48 rounded-lg border border-border bg-card shadow-xl">
         {user!.isGitHub ? (
           <DropdownMenuItem asChild>
             <button
               onClick={handleMyProfile}
               disabled={navigating}
-              className="block w-full text-left px-4 py-2 text-sm text-light-gray hover:bg-secondary-bg hover:text-white transition-colors disabled:opacity-50"
+              className="block w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
             >
               {navigating ? t(lang, 'auth.loading') : t(lang, 'auth.my_profile')}
             </button>
@@ -77,7 +77,7 @@ export function OAuthButton() {
           <DropdownMenuItem asChild>
             <a
               href={`/api/auth/login?returnTo=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/')}`}
-              className="block px-4 py-2 text-sm text-light-gray hover:bg-secondary-bg hover:text-white transition-colors"
+              className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground transition-colors"
             >
               <span className="flex items-center gap-2">
                 <GitHubIcon size={16} aria-hidden="true" />
@@ -88,7 +88,7 @@ export function OAuthButton() {
           </DropdownMenuItem>
         )}
         <DropdownMenuItem asChild>
-          <a href="/api/auth/logout" className="block px-4 py-2 text-sm text-light-gray hover:bg-secondary-bg hover:text-white transition-colors">
+          <a href="/api/auth/logout" className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground transition-colors">
             {t(lang, 'auth.logout')}
           </a>
         </DropdownMenuItem>

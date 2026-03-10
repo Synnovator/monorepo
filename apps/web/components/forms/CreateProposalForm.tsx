@@ -174,31 +174,31 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
     }
   }
 
-  const inputClass = 'w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none';
+  const inputClass = 'w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none';
   const labelClass = 'block text-sm text-muted mb-2';
-  const selectClass = 'w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none';
-  const btnRemove = 'px-2 text-muted hover:text-error transition-colors';
-  const btnAdd = 'text-sm text-lime-primary hover:text-lime-primary/80 transition-colors';
+  const selectClass = 'w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none';
+  const btnRemove = 'px-2 text-muted hover:text-destructive transition-colors';
+  const btnAdd = 'text-sm text-primary hover:text-primary/80 transition-colors';
 
   return (
-    <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6">
+    <div className="rounded-lg border border-border bg-card p-6">
       {/* Step indicators */}
       <div aria-label="Progress" className="flex items-center justify-between mb-8 overflow-x-auto">
         {stepLabels.map((label, idx) => (
           <div key={idx} className="flex items-center" aria-current={idx === step ? 'step' : undefined}>
             <div className="flex flex-col items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                idx === step ? 'bg-lime-primary text-near-black'
-                  : idx < step ? (isStepValid(idx) ? 'bg-lime-primary/30 text-lime-primary' : 'bg-warning/30 text-warning') : 'bg-secondary-bg text-muted'
+                idx === step ? 'bg-primary text-primary-foreground'
+                  : idx < step ? (isStepValid(idx) ? 'bg-primary/30 text-primary' : 'bg-warning/30 text-warning') : 'bg-muted text-muted'
               }`}>
                 {idx < step ? (isStepValid(idx) ? '\u2713' : '!') : idx + 1}
               </div>
-              <span className={`mt-1 text-xs whitespace-nowrap hidden sm:block ${idx === step ? 'text-lime-primary' : 'text-muted'}`}>
+              <span className={`mt-1 text-xs whitespace-nowrap hidden sm:block ${idx === step ? 'text-primary' : 'text-muted'}`}>
                 {label}
               </span>
             </div>
             {idx < TOTAL_STEPS - 1 && (
-              <div className={`hidden sm:block w-6 h-px mx-0.5 mt-[-1rem] ${idx < step ? 'bg-lime-primary/30' : 'bg-secondary-bg'}`} />
+              <div className={`hidden sm:block w-6 h-px mx-0.5 mt-[-1rem] ${idx < step ? 'bg-primary/30' : 'bg-muted'}`} />
             )}
           </div>
         ))}
@@ -212,7 +212,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
           </p>
           <a
             href={`/api/auth/login?returnTo=${typeof window !== 'undefined' ? encodeURIComponent(window.location.pathname) : ''}`}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/80 transition-colors"
           >
             {t(lang, 'form.create_proposal.sign_in_github')}
           </a>
@@ -237,11 +237,11 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
                     onClick={() => { setSelectedHackathon(h.slug); setTrack(''); }}
                     className={`text-left p-4 rounded-lg border transition-colors ${
                       selectedHackathon === h.slug
-                        ? 'border-lime-primary bg-lime-primary/10'
-                        : 'border-secondary-bg hover:border-light-gray'
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-foreground'
                     }`}
                   >
-                    <div className={`font-medium ${selectedHackathon === h.slug ? 'text-lime-primary' : 'text-white'}`}>
+                    <div className={`font-medium ${selectedHackathon === h.slug ? 'text-primary' : 'text-foreground'}`}>
                       {lang === 'zh' ? (h.name_zh || h.name) : h.name}
                     </div>
                     <div className="text-xs text-muted mt-1">
@@ -295,9 +295,9 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
               <p className="text-xs text-muted mb-2">{t(lang, 'form.create_proposal.tech_stack_hint')}</p>
               <div className="flex flex-wrap gap-2 mb-2">
                 {techStack.map((tag, idx) => (
-                  <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-lime-primary/15 text-lime-primary text-xs">
+                  <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/15 text-primary text-xs">
                     {tag}
-                    <button type="button" onClick={() => removeTech(idx)} className="hover:text-white">{'\u2715'}</button>
+                    <button type="button" onClick={() => removeTech(idx)} className="hover:text-foreground">{'\u2715'}</button>
                   </span>
                 ))}
               </div>
@@ -371,13 +371,13 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
           <>
             <div>
               <label className={labelClass}>{t(lang, 'form.create_proposal.preview_yaml')}</label>
-              <pre className="w-full bg-surface border border-secondary-bg rounded-md px-4 py-3 text-lime-primary text-sm font-mono overflow-x-auto whitespace-pre-wrap">
+              <pre className="w-full bg-background border border-border rounded-md px-4 py-3 text-primary text-sm font-mono overflow-x-auto whitespace-pre-wrap">
                 {yamlContent}
               </pre>
             </div>
             <p className="text-xs text-muted">
               {t(lang, 'form.create_proposal.submit_hint')}{' '}
-              <code className="text-lime-primary">
+              <code className="text-primary">
                 hackathons/{selectedHackathon}/submissions/{teamSlug}/project.yml
               </code>
             </p>
@@ -395,7 +395,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
         <div className="flex justify-between pt-2">
           {step > 0 ? (
             <button type="button" onClick={() => setStep(s => s - 1)}
-              className="px-4 py-2 rounded-lg border border-secondary-bg text-muted text-sm hover:text-white hover:border-light-gray transition-colors">
+              className="px-4 py-2 rounded-lg border border-border text-muted text-sm hover:text-foreground hover:border-foreground transition-colors">
               {t(lang, 'form.create_proposal.back')}
             </button>
           ) : <div />}
@@ -403,7 +403,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
           {step < TOTAL_STEPS - 1 ? (
             <button type="button" onClick={() => setStep(s => s + 1)}
               disabled={!isStepValid(step)}
-              className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {t(lang, 'form.create_proposal.next')}
             </button>
           ) : (
@@ -411,18 +411,18 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
               <button type="button" onClick={handleSubmit}
                 disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(3) || submitting}
                 aria-describedby={submitError ? 'proposal-submit-error' : undefined}
-                className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {submitting ? t(lang, 'form.common.submitting') : t(lang, 'form.create_proposal.submit_pr')} {'\u2192'}
               </button>
               {submitError && (
-                <div id="proposal-submit-error" role="alert" className="w-full rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-error">
+                <div id="proposal-submit-error" role="alert" className="w-full rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="font-medium mb-1">{t(lang, 'form.common.submit_error')}</p>
-                      <p className="text-xs text-error/80 break-all">{submitError}</p>
+                      <p className="text-xs text-destructive/80 break-all">{submitError}</p>
                     </div>
                     <button type="button" onClick={() => setSubmitError('')}
-                      className="shrink-0 text-error/60 hover:text-error transition-colors text-lg leading-none">&times;</button>
+                      className="shrink-0 text-destructive/60 hover:text-destructive transition-colors text-lg leading-none">&times;</button>
                   </div>
                 </div>
               )}

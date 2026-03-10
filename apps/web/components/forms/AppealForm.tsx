@@ -57,8 +57,8 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
   }
 
   return (
-    <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6">
-      <h3 className="text-lg font-heading font-bold text-white mb-6">
+    <div className="rounded-lg border border-border bg-card p-6">
+      <h3 className="text-lg font-heading font-bold text-foreground mb-6">
         {t(lang, 'form.appeal.title')}
       </h3>
 
@@ -74,7 +74,7 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
           <label htmlFor="appeal-team" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.team')}</label>
           <select id="appeal-team" value={teamName} onChange={e => setTeamName(e.target.value)}
             aria-required="true"
-            className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
+            className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none">
             <option value="">{t(lang, 'form.appeal.select_team')}</option>
             {myTeams.map(team => (
               <option key={team.name} value={team.name}>{team.name}</option>
@@ -87,7 +87,7 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
           <div>
             <label htmlFor="appeal-track" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.track')}</label>
             <input id="appeal-track" type="text" value={tracks.find(tr => tr.slug === trackSlug)?.name ?? trackSlug} readOnly
-              className="w-full bg-surface/50 border border-secondary-bg rounded-md px-3 py-2 text-muted text-sm cursor-not-allowed" />
+              className="w-full bg-muted border border-border rounded-md px-3 py-2 text-muted text-sm cursor-not-allowed" />
           </div>
         )}
 
@@ -96,7 +96,7 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
           <label htmlFor="appeal-result" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.expected_result')}</label>
           <select id="appeal-result" value={expectedResult} onChange={e => setExpectedResult(e.target.value)}
             aria-required="true"
-            className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
+            className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none">
             <option value="">{t(lang, 'form.appeal.select_result')}</option>
             {EXPECTED_RESULTS.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
@@ -107,7 +107,7 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
           <label htmlFor="appeal-type" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.appeal_type')}</label>
           <select id="appeal-type" value={appealType} onChange={e => setAppealType(e.target.value)}
             aria-required="true"
-            className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
+            className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none">
             <option value="">{t(lang, 'form.appeal.select_type')}</option>
             {APPEAL_TYPES.map(a => <option key={a} value={a}>{a}</option>)}
           </select>
@@ -119,7 +119,7 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
           <textarea id="appeal-desc" value={description} onChange={e => setDescription(e.target.value)}
             aria-required="true"
             placeholder={t(lang, 'form.appeal.description_placeholder')}
-            className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm resize-none h-32 focus:border-lime-primary focus:outline-none" />
+            className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm resize-none h-32 focus:border-ring focus:outline-none" />
         </div>
 
         {/* Evidence */}
@@ -127,17 +127,17 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
           <label htmlFor="appeal-evidence" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.evidence')}</label>
           <textarea id="appeal-evidence" value={evidence} onChange={e => setEvidence(e.target.value)}
             placeholder={t(lang, 'form.appeal.evidence_placeholder')}
-            className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm resize-none h-20 focus:border-lime-primary focus:outline-none" />
+            className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm resize-none h-20 focus:border-ring focus:outline-none" />
         </div>
 
         {/* Acknowledgment */}
         <label className="flex items-start gap-3 cursor-pointer">
-          <input type="checkbox" checked={acknowledged} onChange={e => setAcknowledged(e.target.checked)} className="mt-0.5 accent-lime-primary" />
-          <span className="text-sm text-light-gray">{t(lang, 'form.appeal.binding_decision')}</span>
+          <input type="checkbox" checked={acknowledged} onChange={e => setAcknowledged(e.target.checked)} className="mt-0.5 accent-primary" />
+          <span className="text-sm text-foreground">{t(lang, 'form.appeal.binding_decision')}</span>
         </label>
 
         <button onClick={handleSubmit} disabled={!canSubmit}
-          className="w-full bg-secondary-bg text-white px-6 py-3 rounded-lg font-medium text-sm hover:bg-secondary-bg/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          className="w-full bg-muted text-foreground px-6 py-3 rounded-lg font-medium text-sm hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           {t(lang, 'form.appeal.submit_appeal')} →
         </button>
       </fieldset>
