@@ -37,7 +37,7 @@ export function HackathonCard({ hackathon, lang }: HackathonCardProps) {
   return (
     <Link
       href={`/hackathons/${hackathon.slug}`}
-      data-hackathon-type={hackathon.type}
+      data-hackathon={hackathon.slug}
       className={`block group border border-border bg-card hover:border-primary/40 transition-all duration-200 p-6 h-full flex flex-col ${hackathonCardClass(hackathon.type)} ${hackathonHoverClass(hackathon.type)}`}
     >
       {/* Type + Stage badges */}
