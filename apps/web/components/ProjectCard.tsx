@@ -36,7 +36,7 @@ export function ProjectCard({ project, hackathonSlug, teamSlug, lang }: ProjectC
         <div className="flex items-center gap-2">
           {(project.likes != null && project.likes > 0) && (
             <span className="text-xs px-2 py-1 rounded-full bg-pink/10 text-pink whitespace-nowrap flex items-center gap-1">
-              <HeartIcon size={12} />
+              <HeartIcon size={12} aria-hidden="true" />
               {project.likes}
             </span>
           )}

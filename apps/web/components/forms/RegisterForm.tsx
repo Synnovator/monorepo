@@ -92,7 +92,7 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
       )}
 
       {error && (
-        <div className="mb-4 p-3 rounded-lg bg-error/10 border border-error/30 text-error text-sm">
+        <div id="register-error" role="alert" className="mb-4 p-3 rounded-lg bg-error/10 border border-error/30 text-error text-sm">
           {error}
           {error.includes('Profile') && (
             <a href="/create-profile" className="ml-2 text-lime-primary hover:underline">
@@ -102,22 +102,24 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
         </div>
       )}
 
-      <fieldset disabled={!isLoggedIn || loading} className="space-y-5">
+      <fieldset disabled={!isLoggedIn || loading} aria-describedby={error ? 'register-error' : undefined} className="space-y-5">
         <div>
-          <label className="block text-sm text-muted mb-2">{t(lang, 'form.register.hackathon')}</label>
-          <input type="text" value={hackathonName} readOnly
+          <label htmlFor="reg-hackathon" className="block text-sm text-muted mb-2">{t(lang, 'form.register.hackathon')}</label>
+          <input id="reg-hackathon" type="text" value={hackathonName} readOnly
             className="w-full bg-surface/50 border border-secondary-bg rounded-md px-3 py-2 text-muted text-sm cursor-not-allowed" />
         </div>
 
         <div>
-          <label className="block text-sm text-muted mb-2">GitHub Username</label>
-          <input type="text" value={loading ? '...' : (user?.login ?? '')} readOnly
+          <label htmlFor="reg-github" className="block text-sm text-muted mb-2">GitHub Username</label>
+          <input id="reg-github" type="text" value={loading ? '...' : (user?.login ?? '')} readOnly
             className="w-full bg-surface/50 border border-secondary-bg rounded-md px-3 py-2 text-muted text-sm cursor-not-allowed" />
         </div>
 
         <div>
-          <label className="block text-sm text-muted mb-2">{t(lang, 'form.register.track')}</label>
-          <select value={track} onChange={e => setTrack(e.target.value)}
+          <label htmlFor="reg-track" className="block text-sm text-muted mb-2">{t(lang, 'form.register.track')}</label>
+          <select id="reg-track" value={track} onChange={e => setTrack(e.target.value)}
+            aria-required="true"
+            aria-invalid={!!error}
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
             <option value="">{t(lang, 'form.register.select_track')}</option>
             {tracks.map(tr => (
@@ -129,8 +131,9 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
         </div>
 
         <div>
-          <label className="block text-sm text-muted mb-2">{t(lang, 'form.register.role')}</label>
-          <select value={role} onChange={e => setRole(e.target.value)}
+          <label htmlFor="reg-role" className="block text-sm text-muted mb-2">{t(lang, 'form.register.role')}</label>
+          <select id="reg-role" value={role} onChange={e => setRole(e.target.value)}
+            aria-required="true"
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
             <option value="">{t(lang, 'form.register.select_role')}</option>
             {ROLES.map(r => (
@@ -143,9 +146,10 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
 
         {role && !isSolo && (
           <div>
-            <label className="block text-sm text-muted mb-2">{t(lang, 'form.register.team_name')}</label>
-            <input type="text" value={teamName} onChange={e => setTeamName(e.target.value)}
+            <label htmlFor="reg-team-name" className="block text-sm text-muted mb-2">{t(lang, 'form.register.team_name')}</label>
+            <input id="reg-team-name" type="text" value={teamName} onChange={e => setTeamName(e.target.value)}
               placeholder="team-alpha"
+              aria-required="true"
               className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none" />
           </div>
         )}

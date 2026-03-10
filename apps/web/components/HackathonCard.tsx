@@ -48,7 +48,7 @@ export function HackathonCard({ hackathon, lang }: HackathonCardProps) {
 
       {/* Title */}
       <div className="flex items-center gap-2 mb-2">
-        <TrophyIcon size={20} className="shrink-0 opacity-60" />
+        <TrophyIcon size={20} className="shrink-0 opacity-60" aria-hidden="true" />
         <h3 className="text-white font-heading font-bold text-lg group-hover:text-lime-primary transition-colors">
           {localize(lang, hackathon.name, hackathon.name_zh)}
         </h3>

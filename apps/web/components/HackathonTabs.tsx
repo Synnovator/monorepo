@@ -32,7 +32,12 @@ export function HackathonTabs({ detailsLabel, submissionsLabel, leaderboardLabel
 
   const syncPanels = useCallback((tab: TabId) => {
     document.querySelectorAll<HTMLElement>('[data-tab-panel]').forEach(panel => {
-      panel.style.display = panel.dataset.tabPanel === tab ? '' : 'none';
+      const isActive = panel.dataset.tabPanel === tab;
+      if (isActive) {
+        panel.classList.remove('hidden');
+      } else {
+        panel.classList.add('hidden');
+      }
     });
   }, []);
 
@@ -85,10 +90,14 @@ export function HackathonTabs({ detailsLabel, submissionsLabel, leaderboardLabel
   }
 
   return (
-    <div className="inline-flex h-10 items-center gap-1 rounded-lg bg-secondary-bg/50 p-1">
+    <div role="tablist" className="inline-flex h-10 items-center gap-1 rounded-lg bg-secondary-bg/50 p-1">
       {TAB_IDS.map(tab => (
         <button
           key={tab}
+          role="tab"
+          id={`tab-${tab}`}
+          aria-selected={activeTab === tab}
+          aria-controls={`panel-${tab}`}
           onClick={() => handleTabClick(tab)}
           className={cn(
             "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all",

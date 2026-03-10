@@ -95,7 +95,7 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
       )}
 
       {error && (
-        <div className="p-3 rounded-lg bg-error/10 border border-error/30 text-error text-sm">
+        <div id="nda-submit-error" role="alert" className="p-3 rounded-lg bg-error/10 border border-error/30 text-error text-sm">
           {error}
           {error.includes('Profile') && (
             <a href="/create-profile" className="ml-2 text-lime-primary hover:underline">
@@ -123,6 +123,7 @@ export function NDASignForm({ hackathonSlug, ndaDocumentUrl, ndaSummary, lang }:
         <button
           onClick={handleSubmit}
           disabled={!allChecked || submitting}
+          aria-describedby={error ? 'nda-submit-error' : undefined}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-primary/20 text-lime-primary text-sm hover:bg-lime-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting

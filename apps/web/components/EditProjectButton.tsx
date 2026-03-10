@@ -29,7 +29,7 @@ export function EditProjectButton({ hackathonSlug, teamSlug, teamMembers, lang }
       className="inline-flex items-center gap-2 text-xs text-muted hover:text-lime-primary transition-colors"
     >
       {t(lang, 'project.edit')}
-      <ExternalLinkIcon size={12} />
+      <ExternalLinkIcon size={12} aria-hidden="true" />
     </a>
   );
 }

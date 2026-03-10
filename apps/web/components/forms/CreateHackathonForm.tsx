@@ -290,9 +290,9 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
   return (
     <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6">
       {/* Step indicators */}
-      <div className="flex items-center justify-between mb-8 overflow-x-auto">
+      <div aria-label="Progress" className="flex items-center justify-between mb-8 overflow-x-auto">
         {stepLabels.map((label, idx) => (
-          <div key={idx} className="flex items-center">
+          <div key={idx} className="flex items-center" aria-current={idx === step ? 'step' : undefined}>
             <div className="flex flex-col items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
                 idx === step ? 'bg-lime-primary text-near-black'
@@ -361,18 +361,18 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {step === 1 && (
           <>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.name_en')}</label>
-              <input type="text" value={name} onChange={e => handleNameChange(e.target.value)}
-                placeholder="Community Hackathon 2026" className={inputClass} />
+              <label htmlFor="hack-name" className={labelClass}>{t(lang, 'form.create_hackathon.name_en')}</label>
+              <input id="hack-name" type="text" value={name} onChange={e => handleNameChange(e.target.value)}
+                placeholder="Community Hackathon 2026" aria-required="true" aria-invalid={!!submitError} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.name_zh')}</label>
-              <input type="text" value={nameZh} onChange={e => setNameZh(e.target.value)}
+              <label htmlFor="hack-name-zh" className={labelClass}>{t(lang, 'form.create_hackathon.name_zh')}</label>
+              <input id="hack-name-zh" type="text" value={nameZh} onChange={e => setNameZh(e.target.value)}
                 placeholder="2026 社区 Hackathon" className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>Slug</label>
-              <input type="text" value={slug}
+              <label htmlFor="hack-slug" className={labelClass}>Slug</label>
+              <input id="hack-slug" type="text" value={slug}
                 onChange={e => { setSlug(e.target.value); setSlugManual(true); }}
                 placeholder={toSlug(name) || 'community-hackathon-2026'}
                 className={inputClass} />
@@ -381,13 +381,13 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               </p>
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.tagline_en')}</label>
-              <input type="text" value={tagline} onChange={e => setTagline(e.target.value)}
+              <label htmlFor="hack-tagline" className={labelClass}>{t(lang, 'form.create_hackathon.tagline_en')}</label>
+              <input id="hack-tagline" type="text" value={tagline} onChange={e => setTagline(e.target.value)}
                 placeholder="Build something amazing with AI" className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.tagline_zh')}</label>
-              <input type="text" value={taglineZh} onChange={e => setTaglineZh(e.target.value)}
+              <label htmlFor="hack-tagline-zh" className={labelClass}>{t(lang, 'form.create_hackathon.tagline_zh')}</label>
+              <input id="hack-tagline-zh" type="text" value={taglineZh} onChange={e => setTaglineZh(e.target.value)}
                 placeholder={t(lang, 'form.create_hackathon.tagline_placeholder_zh')} className={inputClass} />
             </div>
           </>
@@ -544,8 +544,8 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {step === 5 && (
           <>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.license')}</label>
-              <select value={license} onChange={e => setLicense(e.target.value)} className={selectClass}>
+              <label htmlFor="hack-license" className={labelClass}>{t(lang, 'form.create_hackathon.license')}</label>
+              <select id="hack-license" value={license} onChange={e => setLicense(e.target.value)} className={selectClass}>
                 <option value="Apache-2.0">Apache-2.0</option>
                 <option value="MIT">MIT</option>
                 <option value="GPL-3.0">GPL-3.0</option>
@@ -553,8 +553,8 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               </select>
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.ip_ownership')}</label>
-              <select value={ipOwnership} onChange={e => setIpOwnership(e.target.value)} className={selectClass}>
+              <label htmlFor="hack-ip" className={labelClass}>{t(lang, 'form.create_hackathon.ip_ownership')}</label>
+              <select id="hack-ip" value={ipOwnership} onChange={e => setIpOwnership(e.target.value)} className={selectClass}>
                 <option value="participant">{t(lang, 'form.create_hackathon.participant')}</option>
                 <option value="organizer">{t(lang, 'form.create_hackathon.organizer')}</option>
                 <option value="shared">{t(lang, 'form.create_hackathon.shared')}</option>
@@ -592,20 +592,20 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {step === 6 && (
           <>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.eligibility')}</label>
-              <select value={eligibilityOpen} onChange={e => setEligibilityOpen(e.target.value)} className={selectClass}>
+              <label htmlFor="hack-eligibility" className={labelClass}>{t(lang, 'form.create_hackathon.eligibility')}</label>
+              <select id="hack-eligibility" value={eligibilityOpen} onChange={e => setEligibilityOpen(e.target.value)} className={selectClass}>
                 <option value="all">{t(lang, 'form.create_hackathon.all')}</option>
                 <option value="invite-only">{t(lang, 'form.create_hackathon.invite_only')}</option>
               </select>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={labelClass}>{t(lang, 'form.create_hackathon.min_team_size')}</label>
-                <input type="number" min="1" value={teamMin} onChange={e => setTeamMin(e.target.value)} className={inputClass} />
+                <label htmlFor="hack-min-team" className={labelClass}>{t(lang, 'form.create_hackathon.min_team_size')}</label>
+                <input id="hack-min-team" type="number" min="1" value={teamMin} onChange={e => setTeamMin(e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>{t(lang, 'form.create_hackathon.max_team_size')}</label>
-                <input type="number" min="1" value={teamMax} onChange={e => setTeamMax(e.target.value)} className={inputClass} />
+                <label htmlFor="hack-max-team" className={labelClass}>{t(lang, 'form.create_hackathon.max_team_size')}</label>
+                <input id="hack-max-team" type="number" min="1" value={teamMax} onChange={e => setTeamMax(e.target.value)} className={inputClass} />
               </div>
             </div>
             <label className="flex items-center gap-2 text-sm text-muted cursor-pointer">
@@ -626,8 +626,8 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               </div>
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.public_voting')}</label>
-              <select value={publicVote} onChange={e => setPublicVote(e.target.value)} className={selectClass}>
+              <label htmlFor="hack-voting" className={labelClass}>{t(lang, 'form.create_hackathon.public_voting')}</label>
+              <select id="hack-voting" value={publicVote} onChange={e => setPublicVote(e.target.value)} className={selectClass}>
                 <option value="reactions">Reactions</option>
                 <option value="none">{t(lang, 'form.create_hackathon.none')}</option>
               </select>
@@ -677,11 +677,12 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
             <div className="flex flex-col items-end gap-3">
               <button type="button" onClick={handleSubmit}
                 disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(4) || submitting}
+                aria-describedby={submitError ? 'hackathon-submit-error' : undefined}
                 className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {submitting ? t(lang, 'form.common.submitting') : t(lang, 'form.create_hackathon.submit_pr')} {'\u2192'}
               </button>
               {submitError && (
-                <div className="w-full rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-error">
+                <div id="hackathon-submit-error" role="alert" className="w-full rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-error">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="font-medium mb-1">{t(lang, 'form.common.submit_error')}</p>

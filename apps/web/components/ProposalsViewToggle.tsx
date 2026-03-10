@@ -49,6 +49,7 @@ export function ProposalsViewToggle({
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setView('hot')}
+            aria-pressed={view === 'hot'}
             className={`text-sm px-4 py-1.5 rounded-full border transition-colors cursor-pointer ${
               view === 'hot'
                 ? 'border-lime-primary bg-lime-primary/20 text-lime-primary'
@@ -59,6 +60,7 @@ export function ProposalsViewToggle({
           </button>
           <button
             onClick={() => setView('activity')}
+            aria-pressed={view === 'activity'}
             className={`text-sm px-4 py-1.5 rounded-full border transition-colors cursor-pointer ${
               view === 'activity'
                 ? 'border-lime-primary bg-lime-primary/20 text-lime-primary'

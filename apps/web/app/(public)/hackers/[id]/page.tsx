@@ -56,7 +56,7 @@ export default async function HackerProfilePage({
           {h.skills && h.skills.length > 0 && (
             <section>
               <h2 className="text-lg font-heading font-bold text-white mb-4 flex items-center gap-2">
-                <SparklesIcon size={20} className="shrink-0" />
+                <SparklesIcon size={20} className="shrink-0" aria-hidden="true" />
                 {t(lang, 'profile.skills')}
               </h2>
               {h.skills.map((group: { category: string; items: string[] }, i: number) => (

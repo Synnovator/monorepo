@@ -35,7 +35,7 @@ export function TeamsTab({ hackathonSlug, stage, lang }: TeamsTabProps) {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary-bg text-white text-sm font-medium hover:bg-secondary-bg/80 transition-colors"
         >
           {t(lang, 'hackathon.teams_browse_link')}
-          <ExternalLinkIcon size={14} />
+          <ExternalLinkIcon size={14} aria-hidden="true" />
         </a>
 
         <a

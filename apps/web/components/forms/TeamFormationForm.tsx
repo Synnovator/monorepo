@@ -86,16 +86,18 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
       <fieldset disabled={!isLoggedIn || loading} className="space-y-5">
         {/* Team name */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t(lang, 'form.team.team_name')}</label>
-          <input type="text" value={teamNameVal} onChange={e => setTeamNameVal(e.target.value)}
+          <label htmlFor="team-name" className="block text-sm text-muted mb-2">{t(lang, 'form.team.team_name')}</label>
+          <input id="team-name" type="text" value={teamNameVal} onChange={e => setTeamNameVal(e.target.value)}
             placeholder="team-alpha"
+            aria-required="true"
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none" />
         </div>
 
         {/* Track */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t(lang, 'form.team.track')}</label>
-          <select value={track} onChange={e => setTrack(e.target.value)}
+          <label htmlFor="team-track" className="block text-sm text-muted mb-2">{t(lang, 'form.team.track')}</label>
+          <select id="team-track" value={track} onChange={e => setTrack(e.target.value)}
+            aria-required="true"
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
             <option value="">{t(lang, 'form.team.select_track')}</option>
             {tracks.map(tr => (
@@ -108,8 +110,9 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
 
         {/* Purpose */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t(lang, 'form.team.purpose')}</label>
-          <select value={purpose} onChange={e => setPurpose(e.target.value)}
+          <label htmlFor="team-purpose" className="block text-sm text-muted mb-2">{t(lang, 'form.team.purpose')}</label>
+          <select id="team-purpose" value={purpose} onChange={e => setPurpose(e.target.value)}
+            aria-required="true"
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
             <option value="">{t(lang, 'form.team.select_purpose')}</option>
             {PURPOSES.map(p => (
@@ -148,8 +151,8 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
         {/* Looking for */}
         {purpose === 'looking' && (
           <div>
-            <label className="block text-sm text-muted mb-2">{t(lang, 'form.team.looking_for')}</label>
-            <textarea value={lookingFor} onChange={e => setLookingFor(e.target.value)}
+            <label htmlFor="team-looking-for" className="block text-sm text-muted mb-2">{t(lang, 'form.team.looking_for')}</label>
+            <textarea id="team-looking-for" value={lookingFor} onChange={e => setLookingFor(e.target.value)}
               placeholder={t(lang, 'form.team.looking_for_placeholder')}
               className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm resize-none h-20 focus:border-lime-primary focus:outline-none" />
           </div>
@@ -157,8 +160,8 @@ export function TeamFormationForm({ hackathonSlug, tracks, lang }: TeamFormation
 
         {/* Project idea */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t(lang, 'form.team.project_idea')} ({t(lang, 'form.team.optional')})</label>
-          <textarea value={projectIdea} onChange={e => setProjectIdea(e.target.value)}
+          <label htmlFor="team-project-idea" className="block text-sm text-muted mb-2">{t(lang, 'form.team.project_idea')} ({t(lang, 'form.team.optional')})</label>
+          <textarea id="team-project-idea" value={projectIdea} onChange={e => setProjectIdea(e.target.value)}
             placeholder={t(lang, 'form.team.project_idea_placeholder')}
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm resize-none h-20 focus:border-lime-primary focus:outline-none" />
         </div>

@@ -133,7 +133,7 @@ export default async function HackathonDetailPage({
           />
 
           {/* Tab 1: Details */}
-          <div data-tab-panel="details">
+          <div data-tab-panel="details" role="tabpanel" id="panel-details" aria-labelledby="tab-details">
             <div className="space-y-12 pt-6">
               <section>
                 <div className="prose prose-invert prose-sm max-w-none text-light-gray">
@@ -171,7 +171,7 @@ export default async function HackathonDetailPage({
               {h.eligibility && (
                 <section>
                   <h2 className="text-xl font-heading font-bold text-white mb-4 flex items-center gap-2">
-                    <ClipboardListIcon size={22} className="shrink-0" />
+                    <ClipboardListIcon size={22} className="shrink-0" aria-hidden="true" />
                     {t(lang, 'hackathon.eligibility')}
                   </h2>
                   <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6 space-y-3">
@@ -198,7 +198,7 @@ export default async function HackathonDetailPage({
               {h.legal && (
                 <section>
                   <h2 className="text-xl font-heading font-bold text-white mb-4 flex items-center gap-2">
-                    <ShieldCheckIcon size={22} className="shrink-0" />
+                    <ShieldCheckIcon size={22} className="shrink-0" aria-hidden="true" />
                     {t(lang, 'hackathon.legal')}
                   </h2>
                   <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6 space-y-3">
@@ -288,7 +288,7 @@ export default async function HackathonDetailPage({
           </div>
 
           {/* Tab 2: Submissions */}
-          <div data-tab-panel="submissions" style={{ display: 'none' }}>
+          <div data-tab-panel="submissions" role="tabpanel" id="panel-submissions" aria-labelledby="tab-submissions" className="hidden">
             <div className="space-y-6 pt-6">
               {submissionTracks.length > 1 && (
                 <div className="flex flex-wrap gap-2">
@@ -324,7 +324,7 @@ export default async function HackathonDetailPage({
           </div>
 
           {/* Tab 3: Leaderboard */}
-          <div data-tab-panel="leaderboard" style={{ display: 'none' }}>
+          <div data-tab-panel="leaderboard" role="tabpanel" id="panel-leaderboard" aria-labelledby="tab-leaderboard" className="hidden">
             <div className="space-y-8 pt-6">
               {!showLeaderboard ? (
                 <div className="rounded-lg border border-secondary-bg bg-dark-bg p-12 text-center">
@@ -339,7 +339,7 @@ export default async function HackathonDetailPage({
           </div>
 
           {/* Tab 4: Teams */}
-          <div data-tab-panel="teams" style={{ display: 'none' }}>
+          <div data-tab-panel="teams" role="tabpanel" id="panel-teams" aria-labelledby="tab-teams" className="hidden">
             <div className="space-y-8 pt-6">
               <TeamsTab hackathonSlug={h.slug} stage={stage} lang={lang} />
             </div>

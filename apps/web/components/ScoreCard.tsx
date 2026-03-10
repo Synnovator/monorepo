@@ -37,8 +37,8 @@ export function ScoreCard({ hackathonSlug, trackSlug, criteria, lang }: ScoreCar
     <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6">
       <h3 className="text-lg font-heading font-bold text-white mb-6">{t(lang, 'score.title')}</h3>
       <div className="mb-6">
-        <label className="block text-sm text-muted mb-2">{t(lang, 'score.team_name')}</label>
-        <input type="text" value={team} onChange={e => setTeam(e.target.value)} placeholder="team-alpha" className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none" />
+        <label htmlFor="score-team" className="block text-sm text-muted mb-2">{t(lang, 'score.team_name')}</label>
+        <input id="score-team" type="text" value={team} onChange={e => setTeam(e.target.value)} placeholder="team-alpha" className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none" />
       </div>
       <div className="space-y-6">
         {criteria.map((c, idx) => {
@@ -52,17 +52,17 @@ export function ScoreCard({ hackathonSlug, trackSlug, criteria, lang }: ScoreCar
               </div>
               {c.description && <p className="text-xs text-muted mb-3">{c.description}</p>}
               <div className="flex items-center gap-4 mb-3">
-                <input type="range" min={min} max={max} value={scores[idx]} onChange={e => updateScore(idx, Number(e.target.value))} className="flex-1 accent-lime-primary" />
-                <input type="number" min={min} max={max} value={scores[idx]} onChange={e => updateScore(idx, Number(e.target.value))} className="w-16 bg-surface border border-secondary-bg rounded-md px-2 py-1 text-white text-sm text-center" />
+                <input type="range" min={min} max={max} value={scores[idx]} onChange={e => updateScore(idx, Number(e.target.value))} aria-label={lang === 'zh' && c.name_zh ? c.name_zh : c.name} className="flex-1 accent-lime-primary" />
+                <input type="number" min={min} max={max} value={scores[idx]} onChange={e => updateScore(idx, Number(e.target.value))} aria-label={`${lang === 'zh' && c.name_zh ? c.name_zh : c.name} score`} className="w-16 bg-surface border border-secondary-bg rounded-md px-2 py-1 text-white text-sm text-center" />
               </div>
-              <textarea value={comments[idx]} onChange={e => updateComment(idx, e.target.value)} placeholder={t(lang, 'form.score_card.comment_optional')} className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm resize-none h-16 focus:border-lime-primary focus:outline-none" />
+              <textarea value={comments[idx]} onChange={e => updateComment(idx, e.target.value)} aria-label={`${lang === 'zh' && c.name_zh ? c.name_zh : c.name} comment`} placeholder={t(lang, 'form.score_card.comment_optional')} className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm resize-none h-16 focus:border-lime-primary focus:outline-none" />
             </div>
           );
         })}
       </div>
       <div className="mt-6">
-        <label className="block text-sm text-muted mb-2">{t(lang, 'score.overall')}</label>
-        <textarea value={overall} onChange={e => setOverall(e.target.value)} placeholder={t(lang, 'form.score_card.overall_placeholder')} className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm resize-none h-24 focus:border-lime-primary focus:outline-none" />
+        <label htmlFor="score-overall" className="block text-sm text-muted mb-2">{t(lang, 'score.overall')}</label>
+        <textarea id="score-overall" value={overall} onChange={e => setOverall(e.target.value)} placeholder={t(lang, 'form.score_card.overall_placeholder')} className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm resize-none h-24 focus:border-lime-primary focus:outline-none" />
       </div>
       <div className="mt-6 p-4 rounded-lg border border-secondary-bg bg-surface">
         <label className="flex items-start gap-3 cursor-pointer">

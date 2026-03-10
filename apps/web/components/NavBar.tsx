@@ -1,10 +1,15 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@synnovator/ui';
 import { OAuthButton } from './OAuthButton';
 import { ChevronDownIcon } from './icons';
 
@@ -12,19 +17,6 @@ export function NavBar() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const lang = getLangFromSearchParams(searchParams);
-
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const wrapRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
-  }, []);
 
   function langHref(path: string) {
     if (lang === 'en') {
@@ -65,29 +57,30 @@ export function NavBar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="relative" ref={wrapRef}>
-            <button
-              type="button"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/90 transition-colors"
-              aria-haspopup="true"
-              aria-expanded={dropdownOpen}
-              aria-label={t(lang, 'nav.create_btn')}
-            >
-              <span>{t(lang, 'nav.create_btn')}</span>
-              <ChevronDownIcon size={16} className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-            </button>
-            {dropdownOpen && (
-              <div className="absolute right-0 top-full mt-1.5 min-w-[10rem] py-1 bg-dark-bg border border-secondary-bg rounded-lg shadow-lg z-50" role="menu">
-                <Link href={langHref('/create-hackathon')} className="block px-4 py-2.5 text-sm text-white hover:bg-secondary-bg hover:text-lime-primary transition-colors first:rounded-t-lg" role="menuitem">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/90 transition-colors"
+                aria-label={t(lang, 'nav.create_btn')}
+              >
+                <span>{t(lang, 'nav.create_btn')}</span>
+                <ChevronDownIcon size={16} aria-hidden="true" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[10rem] bg-dark-bg border border-secondary-bg rounded-lg shadow-lg">
+              <DropdownMenuItem asChild>
+                <Link href={langHref('/create-hackathon')} className="block px-4 py-2.5 text-sm text-white hover:bg-secondary-bg hover:text-lime-primary transition-colors">
                   {t(lang, 'nav.create_hackathon')}
                 </Link>
-                <Link href={langHref('/create-proposal')} className="block px-4 py-2.5 text-sm text-white hover:bg-secondary-bg hover:text-lime-primary transition-colors last:rounded-b-lg" role="menuitem">
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={langHref('/create-proposal')} className="block px-4 py-2.5 text-sm text-white hover:bg-secondary-bg hover:text-lime-primary transition-colors">
                   {t(lang, 'nav.create_proposal')}
                 </Link>
-              </div>
-            )}
-          </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <button type="button" onClick={handleLangSwitch} className="cursor-pointer py-2 px-1 text-muted hover:text-white text-sm transition-colors relative z-10" aria-label="Switch language">
             {t(lang, 'nav.lang_switch')}

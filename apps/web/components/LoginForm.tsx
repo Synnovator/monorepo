@@ -53,9 +53,13 @@ export function LoginForm() {
           {t(lang, 'auth.login')}
         </h1>
 
-        <div className="flex mb-6 border-b border-secondary-bg">
+        <div role="tablist" className="flex mb-6 border-b border-secondary-bg">
           <button
             type="button"
+            role="tab"
+            id="login-tab-password"
+            aria-selected={tab === 'password'}
+            aria-controls="login-panel-password"
             onClick={() => setTab('password')}
             className={`flex-1 pb-2 text-sm font-medium transition-colors ${
               tab === 'password'
@@ -67,6 +71,10 @@ export function LoginForm() {
           </button>
           <button
             type="button"
+            role="tab"
+            id="login-tab-github"
+            aria-selected={tab === 'github'}
+            aria-controls="login-panel-github"
             onClick={() => setTab('github')}
             className={`flex-1 pb-2 text-sm font-medium transition-colors ${
               tab === 'github'
@@ -79,8 +87,8 @@ export function LoginForm() {
         </div>
 
         {tab === 'password' ? (
-          <>
-            <form onSubmit={handlePasswordLogin} className="space-y-4">
+          <div role="tabpanel" id="login-panel-password" aria-labelledby="login-tab-password">
+            <form onSubmit={handlePasswordLogin} className="space-y-4" aria-describedby={error ? 'login-error' : undefined}>
               <div>
                 <label htmlFor="username" className="block text-sm text-muted mb-1">
                   {t(lang, 'auth.username')}
@@ -90,6 +98,8 @@ export function LoginForm() {
                   type="text"
                   value={username}
                   onChange={e => setUsername(e.target.value)}
+                  aria-required="true"
+                  aria-invalid={!!error}
                   className="w-full px-3 py-2 bg-near-black border border-secondary-bg rounded-md text-white text-sm focus:outline-none focus:border-lime-primary"
                   autoComplete="username"
                 />
@@ -104,12 +114,14 @@ export function LoginForm() {
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
+                  aria-required="true"
+                  aria-invalid={!!error}
                   className="w-full px-3 py-2 bg-near-black border border-secondary-bg rounded-md text-white text-sm focus:outline-none focus:border-lime-primary"
                   autoComplete="current-password"
                 />
               </div>
 
-              {error && <p className="text-error text-sm">{error}</p>}
+              {error && <p id="login-error" role="alert" className="text-error text-sm">{error}</p>}
 
               <button
                 type="submit"
@@ -123,9 +135,9 @@ export function LoginForm() {
             <p className="text-muted text-xs text-center mt-4">
               admin / 12345
             </p>
-          </>
+          </div>
         ) : (
-          <div className="space-y-4">
+          <div role="tabpanel" id="login-panel-github" aria-labelledby="login-tab-github" className="space-y-4">
             <p className="text-muted text-sm text-center">
               {t(lang, 'auth.sign_in_with_github')}
             </p>
@@ -134,7 +146,7 @@ export function LoginForm() {
               onClick={handleGitHubLogin}
               className="w-full py-2 px-4 bg-[#24292f] text-white font-medium rounded-md hover:bg-[#32383f] transition-colors text-sm flex items-center justify-center gap-2"
             >
-              <GitHubIcon size={20} />
+              <GitHubIcon size={20} aria-hidden="true" />
               GitHub
             </button>
           </div>

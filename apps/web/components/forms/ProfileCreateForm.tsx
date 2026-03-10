@@ -183,9 +183,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
   return (
     <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6">
       {/* Step indicators */}
-      <div className="flex items-center justify-between mb-8">
+      <div aria-label="Progress" className="flex items-center justify-between mb-8">
         {stepLabels.map((label, idx) => (
-          <div key={idx} className="flex items-center">
+          <div key={idx} className="flex items-center" aria-current={idx === step ? 'step' : undefined}>
             <div className="flex flex-col items-center">
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
@@ -233,8 +233,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
         {step === 0 && (
           <>
             <div>
-              <label className={labelClass}>GitHub Username</label>
+              <label htmlFor="prof-github" className={labelClass}>GitHub Username</label>
               <input
+                id="prof-github"
                 type="text"
                 value={loading ? '...' : (user?.login ?? '')}
                 readOnly
@@ -242,18 +243,22 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.profile.display_name_en')}</label>
+              <label htmlFor="prof-name" className={labelClass}>{t(lang, 'form.profile.display_name_en')}</label>
               <input
+                id="prof-name"
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="John Doe"
+                aria-required="true"
+                aria-invalid={!!submitError}
                 className={inputClass}
               />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.profile.display_name_zh')} ({t(lang, 'form.profile.optional')})</label>
+              <label htmlFor="prof-name-zh" className={labelClass}>{t(lang, 'form.profile.display_name_zh')} ({t(lang, 'form.profile.optional')})</label>
               <input
+                id="prof-name-zh"
                 type="text"
                 value={nameZh}
                 onChange={e => setNameZh(e.target.value)}
@@ -262,8 +267,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.profile.bio')}</label>
+              <label htmlFor="prof-bio" className={labelClass}>{t(lang, 'form.profile.bio')}</label>
               <textarea
+                id="prof-bio"
                 value={bio}
                 onChange={e => setBio(e.target.value)}
                 placeholder={t(lang, 'form.profile.bio_placeholder')}
@@ -271,8 +277,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.profile.location')}</label>
+              <label htmlFor="prof-location" className={labelClass}>{t(lang, 'form.profile.location')}</label>
               <input
+                id="prof-location"
                 type="text"
                 value={location}
                 onChange={e => setLocation(e.target.value)}
@@ -281,8 +288,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.profile.languages')} ({t(lang, 'form.profile.languages_placeholder')})</label>
+              <label htmlFor="prof-languages" className={labelClass}>{t(lang, 'form.profile.languages')} ({t(lang, 'form.profile.languages_placeholder')})</label>
               <input
+                id="prof-languages"
                 type="text"
                 value={languages}
                 onChange={e => setLanguages(e.target.value)}
@@ -297,8 +305,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
         {step === 1 && (
           <>
             <div>
-              <label className={labelClass}>{t(lang, 'form.profile.identity_type')}</label>
+              <label htmlFor="prof-identity" className={labelClass}>{t(lang, 'form.profile.identity_type')}</label>
               <select
+                id="prof-identity"
                 value={identityType}
                 onChange={e => setIdentityType(e.target.value)}
                 className={selectClass}
@@ -312,8 +321,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               </select>
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.profile.affiliation')}</label>
+              <label htmlFor="prof-affiliation" className={labelClass}>{t(lang, 'form.profile.affiliation')}</label>
               <input
+                id="prof-affiliation"
                 type="text"
                 value={affiliation}
                 onChange={e => setAffiliation(e.target.value)}
@@ -324,8 +334,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
             {identityType === 'student' && (
               <>
                 <div>
-                  <label className={labelClass}>{t(lang, 'form.profile.degree')}</label>
+                  <label htmlFor="prof-degree" className={labelClass}>{t(lang, 'form.profile.degree')}</label>
                   <select
+                    id="prof-degree"
                     value={degree}
                     onChange={e => setDegree(e.target.value)}
                     className={selectClass}
@@ -339,8 +350,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                   </select>
                 </div>
                 <div>
-                  <label className={labelClass}>{t(lang, 'form.profile.major')}</label>
+                  <label htmlFor="prof-major" className={labelClass}>{t(lang, 'form.profile.major')}</label>
                   <input
+                    id="prof-major"
                     type="text"
                     value={major}
                     onChange={e => setMajor(e.target.value)}
@@ -349,8 +361,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>{t(lang, 'form.profile.graduation_year')}</label>
+                  <label htmlFor="prof-grad-year" className={labelClass}>{t(lang, 'form.profile.graduation_year')}</label>
                   <input
+                    id="prof-grad-year"
                     type="number"
                     value={gradYear}
                     onChange={e => setGradYear(e.target.value)}
@@ -414,8 +427,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
         {step === 3 && (
           <>
             <div>
-              <label className={labelClass}>{t(lang, 'form.profile.interests')} ({t(lang, 'form.profile.languages_placeholder')})</label>
+              <label htmlFor="prof-interests" className={labelClass}>{t(lang, 'form.profile.interests')} ({t(lang, 'form.profile.languages_placeholder')})</label>
               <input
+                id="prof-interests"
                 type="text"
                 value={interests}
                 onChange={e => setInterests(e.target.value)}
@@ -424,8 +438,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.profile.looking_for_roles')} ({t(lang, 'form.profile.languages_placeholder')})</label>
+              <label htmlFor="prof-roles" className={labelClass}>{t(lang, 'form.profile.looking_for_roles')} ({t(lang, 'form.profile.languages_placeholder')})</label>
               <input
+                id="prof-roles"
                 type="text"
                 value={lookingForRoles}
                 onChange={e => setLookingForRoles(e.target.value)}
@@ -434,8 +449,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.profile.team_size')}</label>
+              <label htmlFor="prof-team-size" className={labelClass}>{t(lang, 'form.profile.team_size')}</label>
               <input
+                id="prof-team-size"
                 type="text"
                 value={teamSize}
                 onChange={e => setTeamSize(e.target.value)}
@@ -444,8 +460,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.profile.collaboration_style')}</label>
+              <label htmlFor="prof-collab" className={labelClass}>{t(lang, 'form.profile.collaboration_style')}</label>
               <input
+                id="prof-collab"
                 type="text"
                 value={collaborationStyle}
                 onChange={e => setCollaborationStyle(e.target.value)}
@@ -458,8 +475,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
               <p className="text-sm text-muted mb-4">{t(lang, 'form.profile.social_links')}</p>
               <div className="space-y-4">
                 <div>
-                  <label className={labelClass}>Twitter</label>
+                  <label htmlFor="prof-twitter" className={labelClass}>Twitter</label>
                   <input
+                    id="prof-twitter"
                     type="text"
                     value={twitter}
                     onChange={e => setTwitter(e.target.value)}
@@ -468,8 +486,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>LinkedIn</label>
+                  <label htmlFor="prof-linkedin" className={labelClass}>LinkedIn</label>
                   <input
+                    id="prof-linkedin"
                     type="text"
                     value={linkedin}
                     onChange={e => setLinkedin(e.target.value)}
@@ -478,8 +497,9 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>{t(lang, 'form.profile.website')}</label>
+                  <label htmlFor="prof-website" className={labelClass}>{t(lang, 'form.profile.website')}</label>
                   <input
+                    id="prof-website"
                     type="text"
                     value={website}
                     onChange={e => setWebsite(e.target.value)}
@@ -546,12 +566,13 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
                 type="button"
                 onClick={handleSubmit}
                 disabled={!isLoggedIn || !isStepValid(0) || submitting}
+                aria-describedby={submitError ? 'profile-submit-error' : undefined}
                 className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? t(lang, 'form.common.submitting') : t(lang, 'form.profile.submit_pr')} {'\u2192'}
               </button>
               {submitError && (
-                <div className="w-full rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-error">
+                <div id="profile-submit-error" role="alert" className="w-full rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-error">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="font-medium mb-1">{t(lang, 'form.common.submit_error')}</p>
