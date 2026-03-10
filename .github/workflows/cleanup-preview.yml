@@ -1,0 +1,19 @@
+name: Cleanup Preview Deploy
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pnpm/action-setup@v4
+
+      - name: Delete preview worker
+        run: |
+          pnpm dlx wrangler delete --name "synnovator-pr-${{ github.event.pull_request.number }}" --force
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
