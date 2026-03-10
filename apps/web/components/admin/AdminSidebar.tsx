@@ -10,6 +10,7 @@ const navItems = [
   { href: '/admin/hackathons', key: 'admin.hackathons' },
   { href: '/admin/profiles', key: 'admin.profiles' },
   { href: '/admin/submissions', key: 'admin.submissions' },
+  { href: '/admin/theme', key: 'admin.theme' },
 ] as const;
 
 export function AdminSidebar({ user }: { user: Session }) {
