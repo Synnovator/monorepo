@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import { TOKEN_NAMES, type TokenName } from '@synnovator/shared/schemas/theme';
 import type { ThemeConfig, HackathonTheme } from '@synnovator/shared/schemas/theme';
+import { ThemeSelector } from './ThemeSelector';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -119,6 +120,7 @@ export function ThemeEditorPage() {
         <h1 className="text-xl font-heading text-foreground">
           {t(lang, 'admin.theme')}
         </h1>
+        <ThemeSelector value={target} onChange={setTarget} lang={lang} />
         <div className="flex-1" />
         <button
           type="button"
