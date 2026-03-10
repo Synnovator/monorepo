@@ -445,7 +445,12 @@
       "start": "开始",
       "end": "结束",
       "custom_stage": "自定义阶段名称",
-      "add_stage": "添加阶段"
+      "add_stage": "添加阶段",
+      "description": "阶段说明 *",
+      "description_zh": "阶段说明（中文）",
+      "description_placeholder": "简述该阶段的目标和活动...",
+      "description_placeholder_zh": "简述该阶段的目标和活动...",
+      "registration_required": "报名时间为必填项"
     },
     "score_card": {
       "comment_optional": "评语（可选）",

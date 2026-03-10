@@ -446,7 +446,12 @@
       "start": "Start",
       "end": "End",
       "custom_stage": "Custom stage name",
-      "add_stage": "Add stage"
+      "add_stage": "Add stage",
+      "description": "Stage Description *",
+      "description_zh": "Stage Description (Chinese)",
+      "description_placeholder": "Briefly describe the goal and activities...",
+      "description_placeholder_zh": "Briefly describe this stage in Chinese...",
+      "registration_required": "Registration dates are required"
     },
     "score_card": {
       "comment_optional": "Comment (optional)",

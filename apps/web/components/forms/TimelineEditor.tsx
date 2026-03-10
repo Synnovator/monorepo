@@ -10,6 +10,8 @@ interface Stage {
   labelZh: string;
   start: string;
   end: string;
+  description: string;
+  descriptionZh: string;
   removable: boolean;
   color: string;
 }
@@ -21,13 +23,13 @@ interface TimelineEditorProps {
 }
 
 const DEFAULT_STAGES: Stage[] = [
-  { key: 'draft', label: 'Draft', labelZh: '草案', start: '', end: '', removable: true, color: 'bg-muted/20 text-muted border-muted/30' },
-  { key: 'registration', label: 'Registration', labelZh: '报名', start: '', end: '', removable: false, color: 'bg-lime-primary/20 text-lime-primary border-lime-primary/30' },
-  { key: 'development', label: 'Development', labelZh: '开发', start: '', end: '', removable: true, color: 'bg-cyan/20 text-cyan border-cyan/30' },
-  { key: 'submission', label: 'Submission', labelZh: '提交', start: '', end: '', removable: true, color: 'bg-orange/20 text-orange border-orange/30' },
-  { key: 'judging', label: 'Judging', labelZh: '评审', start: '', end: '', removable: true, color: 'bg-neon-blue/20 text-neon-blue border-neon-blue/30' },
-  { key: 'announcement', label: 'Announcement', labelZh: '公告', start: '', end: '', removable: true, color: 'bg-pink/20 text-pink border-pink/30' },
-  { key: 'award', label: 'Award', labelZh: '颁奖', start: '', end: '', removable: true, color: 'bg-mint/20 text-mint border-mint/30' },
+  { key: 'draft', label: 'Draft', labelZh: '草案', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-muted/20 text-muted border-muted/30' },
+  { key: 'registration', label: 'Registration', labelZh: '报名', start: '', end: '', description: '', descriptionZh: '', removable: false, color: 'bg-lime-primary/20 text-lime-primary border-lime-primary/30' },
+  { key: 'development', label: 'Development', labelZh: '开发', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-cyan/20 text-cyan border-cyan/30' },
+  { key: 'submission', label: 'Submission', labelZh: '提交', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-orange/20 text-orange border-orange/30' },
+  { key: 'judging', label: 'Judging', labelZh: '评审', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-neon-blue/20 text-neon-blue border-neon-blue/30' },
+  { key: 'announcement', label: 'Announcement', labelZh: '公告', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-pink/20 text-pink border-pink/30' },
+  { key: 'award', label: 'Award', labelZh: '颁奖', start: '', end: '', description: '', descriptionZh: '', removable: true, color: 'bg-mint/20 text-mint border-mint/30' },
 ];
 
 const PRESETS = [
@@ -58,6 +60,12 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
     onChange(next);
   }, [stages, onChange]);
 
+  const updateStageField = useCallback((idx: number, field: 'description' | 'descriptionZh', val: string) => {
+    const next = [...stages];
+    next[idx] = { ...next[idx], [field]: val };
+    onChange(next);
+  }, [stages, onChange]);
+
   const removeStage = useCallback((idx: number) => {
     onChange(stages.filter((_, i) => i !== idx));
   }, [stages, onChange]);
@@ -72,6 +80,8 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
       labelZh: customStageName,
       start: '',
       end: '',
+      description: '',
+      descriptionZh: '',
       removable: true,
       color: CUSTOM_STAGE_COLORS[colorIdx] || 'bg-muted/20 text-muted border-muted/30',
     };
@@ -113,7 +123,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
       </div>
 
       {/* Visual timeline bar */}
-      <div className="relative flex items-center gap-1 overflow-x-auto pb-2">
+      <div className="relative flex flex-wrap items-center gap-1 pb-2">
         {stages.map((stage, idx) => (
           <div key={stage.key} className="flex items-center">
             <button
@@ -176,6 +186,26 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
                 className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none"
               />
             </div>
+          </div>
+          <div>
+            <label className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.description')}</label>
+            <input
+              type="text"
+              value={stages[editingIdx].description}
+              onChange={e => updateStageField(editingIdx, 'description', e.target.value)}
+              placeholder={t(lang, 'form.timeline.description_placeholder')}
+              className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.description_zh')}</label>
+            <input
+              type="text"
+              value={stages[editingIdx].descriptionZh}
+              onChange={e => updateStageField(editingIdx, 'descriptionZh', e.target.value)}
+              placeholder={t(lang, 'form.timeline.description_placeholder_zh')}
+              className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none"
+            />
           </div>
         </div>
       )}

@@ -155,7 +155,15 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
       case 0: return hackathonType !== '';
       case 1: return name.trim() !== '';
       case 2: return organizers.some(o => o.name.trim() !== '');
-      case 3: return true; // timeline is optional
+      case 3: {
+        // Must match CI validation: registration start+end required, active stages need description
+        const reg = timelineStages.find(st => st.key === 'registration');
+        if (!reg || !reg.start || !reg.end) return false;
+        for (const st of timelineStages) {
+          if (st.start && !st.description) return false;
+        }
+        return true;
+      }
       case 4: return tracks.some(tr => tr.name.trim() !== '');
       case 5: return true; // legal has defaults
       case 6: return true; // settings have defaults
@@ -169,7 +177,12 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
     const timelineObj: Record<string, unknown> = {};
     for (const stage of timelineStages) {
       if (stage.start || stage.end) {
-        timelineObj[stage.key] = { start: stage.start || undefined, end: stage.end || undefined };
+        timelineObj[stage.key] = {
+          start: stage.start || undefined,
+          end: stage.end || undefined,
+          description: stage.description || undefined,
+          description_zh: stage.descriptionZh || undefined,
+        };
       }
     }
 
