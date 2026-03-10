@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { Button } from '@synnovator/ui';
+import { t } from '@synnovator/shared/i18n';
+import type { Lang } from '@synnovator/shared/i18n';
 
 type PublishState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -11,6 +13,7 @@ interface PublishButtonProps {
   dark: Record<string, string>;
   fonts?: Record<string, string>;
   radius?: string;
+  lang: Lang;
 }
 
 export function PublishButton({
@@ -19,6 +22,7 @@ export function PublishButton({
   dark,
   fonts,
   radius,
+  lang,
 }: PublishButtonProps) {
   const [state, setState] = useState<PublishState>('idle');
   const [prUrl, setPrUrl] = useState<string | null>(null);
@@ -63,7 +67,9 @@ export function PublishButton({
         onClick={handlePublish}
         disabled={state === 'loading'}
       >
-        {state === 'loading' ? 'Creating PR...' : 'Publish PR'}
+        {state === 'loading'
+          ? t(lang, 'admin.theme_publishing')
+          : t(lang, 'admin.theme_publish')}
       </Button>
       {state === 'success' && prUrl && (
         <a
@@ -72,7 +78,7 @@ export function PublishButton({
           rel="noopener noreferrer"
           className="text-xs text-primary underline hover:text-primary/80"
         >
-          PR Created
+          {t(lang, 'admin.theme_publish_success')}
         </a>
       )}
       {state === 'error' && errorMsg && (

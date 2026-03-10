@@ -271,6 +271,7 @@ export function ThemeEditorPage() {
           dark={publishDark}
           fonts={themeData?.fonts as Record<string, string> | undefined}
           radius={themeData?.radius}
+          lang={lang}
         />
       </div>
 
