@@ -148,6 +148,17 @@ if [ "$TRACK_COUNT" != "null" ] && [ "$TRACK_COUNT" -gt 0 ] 2>/dev/null; then
   done
 fi
 
+# --- Rule 12: Each active timeline stage must have a description ---
+for STAGE in "${STAGES[@]}"; do
+  START=$(yq ".hackathon.timeline.${STAGE}.start" "$FILE")
+  if [ "$START" != "null" ] && [ -n "$START" ]; then
+    DESC=$(yq ".hackathon.timeline.${STAGE}.description" "$FILE")
+    if [ "$DESC" = "null" ] || [ -z "$DESC" ]; then
+      err "timeline.${STAGE}: description is required for active stages"
+    fi
+  fi
+done
+
 # --- Report results ---
 if [ ${#ERRORS[@]} -eq 0 ]; then
   echo "✓ Validation passed: $FILE"
