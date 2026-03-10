@@ -5,6 +5,8 @@ import { z } from 'zod';
 export const timeRangeSchema = z.object({
   start: z.string(),
   end: z.string(),
+  description: z.string().optional(),
+  description_zh: z.string().optional(),
 });
 
 export const rewardSchema = z.object({

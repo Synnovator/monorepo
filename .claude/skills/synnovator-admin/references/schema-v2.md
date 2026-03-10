@@ -69,24 +69,38 @@ hackathon:
     draft:
       start: ""              # ISO 8601: YYYY-MM-DDTHH:MM:SSZ
       end: ""
+      description: ""        # Stage description (required for active stages)
+      description_zh: ""     # Chinese stage description (optional)
     registration:            # REQUIRED stage
       start: ""
       end: ""
+      description: ""
+      description_zh: ""
     development:
       start: ""
       end: ""
+      description: ""
+      description_zh: ""
     submission:
       start: ""
       end: ""
+      description: ""
+      description_zh: ""
     judging:
       start: ""
       end: ""
+      description: ""
+      description_zh: ""
     announcement:
       start: ""
       end: ""
+      description: ""
+      description_zh: ""
     award:
       start: ""
       end: ""
+      description: ""
+      description_zh: ""
   # Rule: Within each stage, start < end.
   # Rule: Stages should be in chronological order (no overlap between sequential stages).
 
@@ -195,6 +209,8 @@ hackathon:
 8. `tracks[].judging.criteria[].weight` sums to 1.0 (±0.01 tolerance)
 9. `hackathon.organizers` has at least one entry with `name`
 10. Enterprise + NDA required → `legal.nda.url` non-empty
+11. `tracks[].deliverables` entries must be objects with `{type, format, description}`, not plain strings
+12. Each active timeline stage (has `start` date) must have a `description`
 
 These rules are enforced by `scripts/validate-hackathon.sh` — always run it before committing.
 

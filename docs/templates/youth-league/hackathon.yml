@@ -36,18 +36,28 @@ hackathon:
     registration:
       start: "2026-04-01T00:00:00Z"
       end: "2026-04-20T23:59:59Z"
+      description: "Student team registration with edu-email verification"
+      description_zh: "学生团队注册（需教育邮箱验证）"
     development:
       start: "2026-04-21T00:00:00Z"
       end: "2026-05-20T23:59:59Z"
+      description: "Build your project with mentor guidance"
+      description_zh: "在导师指导下进行项目开发"
     submission:
       start: "2026-05-21T00:00:00Z"
       end: "2026-05-25T23:59:59Z"
+      description: "Submit your project for review"
+      description_zh: "提交项目作品"
     judging:
       start: "2026-05-26T00:00:00Z"
       end: "2026-06-05T23:59:59Z"
+      description: "Expert panel reviews and defense presentations"
+      description_zh: "专家评审及答辩展示"
     announcement:
       start: "2026-06-06T00:00:00Z"
       end: "2026-06-10T23:59:59Z"
+      description: "Results announcement and certificate distribution"
+      description_zh: "结果公示和证书颁发"
 
   tracks:
     - name: "AI for Social Good"
