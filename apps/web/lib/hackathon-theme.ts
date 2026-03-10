@@ -20,6 +20,24 @@ export function hackathonCardClass(type: string): string {
 }
 
 /**
+ * Returns Tailwind hover transform classes per hackathon type.
+ *
+ *  - community:    gentle lift
+ *  - enterprise:   precise scale
+ *  - youth-league: snap-back to level from the resting -0.3deg tilt
+ */
+export function hackathonHoverClass(type: string): string {
+  switch (type) {
+    case 'enterprise':
+      return 'hover:scale-[1.01]';
+    case 'youth-league':
+      return 'hover:rotate-0';
+    default:
+      return 'hover:-translate-y-0.5';
+  }
+}
+
+/**
  * Returns the icon component that represents the hackathon type.
  */
 export function hackathonTypeIcon(

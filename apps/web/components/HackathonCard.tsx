@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { getCurrentStage, t, localize } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { TrophyIcon } from './icons';
-import { hackathonCardClass, hackathonTypeIcon } from '@/lib/hackathon-theme';
+import { hackathonCardClass, hackathonHoverClass, hackathonTypeIcon } from '@/lib/hackathon-theme';
 
 interface HackathonCardProps {
   hackathon: {
@@ -37,7 +37,7 @@ export function HackathonCard({ hackathon, lang }: HackathonCardProps) {
     <Link
       href={`/hackathons/${hackathon.slug}`}
       data-hackathon-type={hackathon.type}
-      className={`block group border border-border bg-card hover:border-primary/40 transition-all duration-200 p-6 h-full flex flex-col ${hackathonCardClass(hackathon.type)}`}
+      className={`block group border border-border bg-card hover:border-primary/40 transition-all duration-200 p-6 h-full flex flex-col ${hackathonCardClass(hackathon.type)} ${hackathonHoverClass(hackathon.type)}`}
     >
       {/* Type + Stage badges */}
       <div className="flex items-center gap-2 mb-3">
