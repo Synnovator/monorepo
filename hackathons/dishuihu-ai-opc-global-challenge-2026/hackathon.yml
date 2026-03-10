@@ -199,6 +199,7 @@ hackathon:
             score_range: [0, 100]
             hard_constraint: true
             constraint_rule: "Must demonstrate measurable improvement over baseline"
+            constraint_rule_zh: "须证明相较基线有可衡量的提升"
           - name: "Solution Innovation"
             name_zh: "方案创新性"
             weight: 0.30

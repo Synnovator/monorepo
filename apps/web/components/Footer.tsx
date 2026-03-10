@@ -26,7 +26,8 @@ export function Footer() {
           {/* Brand */}
           <div>
             <Link href={langHref('/')}>
-              <Image src="/logo-light.svg" alt="Synnovator" width={72} height={36} />
+              <Image src="/logo-dark.svg" alt="Synnovator" width={72} height={36} className="dark:hidden" />
+              <Image src="/logo-light.svg" alt="Synnovator" width={72} height={36} className="hidden dark:block" />
             </Link>
             <p className="text-muted-foreground text-sm mt-2 max-w-xs">
               {t(lang, 'site.tagline')}

@@ -9,7 +9,7 @@ interface TrackSectionProps {
     description?: string;
     description_zh?: string;
     rewards?: Array<{ type: string; rank?: string; amount?: string; description?: string; count?: number }>;
-    judging?: { mode: string; criteria?: Array<{ name: string; name_zh?: string; weight: number; description?: string; hard_constraint?: boolean; constraint_rule?: string }> };
+    judging?: { mode: string; criteria?: Array<{ name: string; name_zh?: string; weight: number; description?: string; hard_constraint?: boolean; constraint_rule?: string; constraint_rule_zh?: string }> };
     deliverables?: { required?: Array<{ type: string; description?: string }>; optional?: Array<{ type: string; description?: string }> };
   };
   lang: Lang;
@@ -32,11 +32,13 @@ export function TrackSection({ track, lang }: TrackSectionProps) {
           <h4 className="text-sm font-medium text-foreground mb-3">{t(lang, 'hackathon.rewards')}</h4>
           <div className="space-y-2">
             {track.rewards.map((r, i) => (
-              <div key={i} className="flex items-center gap-3 text-sm">
-                {r.rank && <span className="text-primary font-code font-medium w-12">{r.rank}</span>}
-                {r.amount && <span className="text-foreground">{r.amount}</span>}
-                {r.description && <span className="text-muted-foreground">{r.description}</span>}
-                {r.count && r.count > 1 && <span className="text-muted-foreground">x{r.count}</span>}
+              <div key={i} className="flex items-start gap-3 text-sm">
+                {r.rank && <span className="text-primary font-code font-medium shrink-0 min-w-[120px]">{r.rank}</span>}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {r.amount && <span className="text-foreground font-medium">{r.amount}</span>}
+                  {r.description && <span className="text-muted-foreground">{r.description}</span>}
+                  {r.count && r.count > 1 && <span className="text-muted-foreground">x{r.count}</span>}
+                </div>
               </div>
             ))}
           </div>
@@ -52,10 +54,10 @@ export function TrackSection({ track, lang }: TrackSectionProps) {
                 <span className="text-primary font-code font-medium w-10 shrink-0">{c.weight}%</span>
                 <div>
                   <span className="text-foreground">{localize(lang, c.name, c.name_zh)}</span>
-                  {c.description && <p className="text-muted-foreground text-xs mt-0.5">{c.description}</p>}
+                  {c.description && <p className="text-muted-foreground text-xs mt-1">{c.description}</p>}
                   {c.hard_constraint && (
-                    <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-full bg-destructive/20 text-destructive">
-                      {c.constraint_rule || 'Hard constraint'}
+                    <span className="inline-block mt-2 text-xs px-2 py-0.5 rounded-full bg-destructive/20 text-destructive">
+                      {localize(lang, c.constraint_rule, c.constraint_rule_zh) || t(lang, 'score.hard_constraint_warning')}
                     </span>
                   )}
                 </div>
