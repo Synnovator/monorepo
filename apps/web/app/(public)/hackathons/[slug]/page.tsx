@@ -18,6 +18,7 @@ import { NDASignForm } from '@/components/forms/NDASignForm';
 import { AppealForm } from '@/components/forms/AppealForm';
 import { TeamFormationForm } from '@/components/forms/TeamFormationForm';
 import { TeamsTab } from '@/components/TeamsTab';
+import { SketchUnderline, SketchDoodle } from '@/components/sketch';
 
 export const dynamic = 'force-static';
 
@@ -97,9 +98,12 @@ export default async function HackathonDetailPage({
 
         <div className="flex flex-wrap gap-3">
           {stage === 'registration' && (
-            <a href="#register-section" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/80 transition-colors">
-              {t(lang, 'hackathon.register')}
-            </a>
+            <div className="relative inline-block">
+              <a href="#register-section" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/80 transition-colors">
+                {t(lang, 'hackathon.register')}
+              </a>
+              <SketchUnderline className="absolute -bottom-2 left-0" width={120} delay={400} />
+            </div>
           )}
           {stage === 'submission' && (
             <GitHubRedirect action="submit" hackathonSlug={h.slug} label={t(lang, 'hackathon.submit')} className="bg-primary text-primary-foreground hover:bg-primary/80" />
@@ -305,6 +309,7 @@ export default async function HackathonDetailPage({
 
               {submissions.length === 0 ? (
                 <div className="rounded-lg border border-border bg-card p-12 text-center">
+                  <SketchDoodle variant="question" className="mx-auto mb-4" />
                   <p className="text-muted-foreground text-lg">{t(lang, 'project.no_submissions')}</p>
                 </div>
               ) : (

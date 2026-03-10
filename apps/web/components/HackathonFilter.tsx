@@ -5,6 +5,7 @@ import { getCurrentStage, t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { HackathonCard } from './HackathonCard';
 import { SearchIcon } from './icons';
+import { SketchDoodle } from '@/components/sketch';
 
 interface HackathonData {
   hackathon: {
@@ -100,6 +101,7 @@ export function HackathonFilter({ hackathons, lang }: HackathonFilterProps) {
         </div>
       ) : hackathons.length > 0 ? (
         <div className="text-center py-24">
+          <SketchDoodle variant="lightbulb" className="mx-auto mb-4" />
           <p className="text-muted-foreground text-lg">{t(lang, 'home.no_matching')}</p>
         </div>
       ) : (

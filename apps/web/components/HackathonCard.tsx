@@ -3,6 +3,7 @@ import { getCurrentStage, t, localize } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { TrophyIcon } from './icons';
 import { hackathonCardClass, hackathonHoverClass, hackathonTypeIcon } from '@/lib/hackathon-theme';
+import { SketchCircle } from '@/components/sketch';
 
 interface HackathonCardProps {
   hackathon: {
@@ -45,8 +46,13 @@ export function HackathonCard({ hackathon, lang }: HackathonCardProps) {
           <TypeIcon size={14} className="shrink-0" />
           {t(lang, typeKey)}
         </span>
-        <span className={`text-xs px-2 py-0.5 rounded-full ${stageColors[stage] || stageColors.draft}`}>
-          {t(lang, `stage.${stage}`)}
+        <span className="relative">
+          <span className={`text-xs px-2 py-0.5 rounded-full ${stageColors[stage] || stageColors.draft}`}>
+            {t(lang, `stage.${stage}`)}
+          </span>
+          {['registration', 'development', 'submission'].includes(stage) && (
+            <SketchCircle className="absolute -inset-1" delay={200} />
+          )}
         </span>
       </div>
 
