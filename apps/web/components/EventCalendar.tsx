@@ -27,7 +27,7 @@ export function EventCalendar({ events, lang }: EventCalendarProps) {
   return (
     <ul className="space-y-3">
       {events.map((event, i) => (
-        <li key={i} className="flex items-start gap-4 p-4 rounded-lg border border-border bg-card">
+        <li key={i} className="flex items-start gap-4 px-4 py-3 rounded-lg bg-muted/50">
           <div className="text-center shrink-0 w-14">
             <div className="text-xs text-muted-foreground">{new Date(event.datetime).toLocaleDateString(undefined, { month: 'short' })}</div>
             <div className="text-xl font-code font-medium text-foreground">{new Date(event.datetime).getDate()}</div>
