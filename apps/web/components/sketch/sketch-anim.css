@@ -16,3 +16,10 @@
 .sketch-mark[data-visible="true"] {
   animation: sketch-draw 0.4s ease-out forwards;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .sketch-mark[data-visible="true"] {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
