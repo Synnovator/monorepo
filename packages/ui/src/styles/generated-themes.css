@@ -58,3 +58,21 @@
   --info: oklch(0.58 0.18 270);
   --info-foreground: oklch(0.94 0.005 70);
 }
+
+[data-hackathon="enterprise-fintech-risk-2025"] {
+  --brand: oklch(0.48 0.2 270);
+  --brand-foreground: oklch(0.98 0.005 80);
+}
+.dark [data-hackathon="enterprise-fintech-risk-2025"] {
+  --brand: oklch(0.58 0.18 270);
+  --brand-foreground: oklch(0.16 0.008 60);
+}
+
+[data-hackathon="test-youth-hackathon"] {
+  --brand: oklch(0.75 0.2 128);
+  --brand-foreground: oklch(0.15 0.01 70);
+}
+.dark [data-hackathon="test-youth-hackathon"] {
+  --brand: oklch(0.88 0.25 125);
+  --brand-foreground: oklch(0.16 0.008 60);
+}

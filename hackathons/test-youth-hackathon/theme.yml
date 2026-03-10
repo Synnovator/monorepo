@@ -1,0 +1,7 @@
+light:
+  brand: "oklch(0.75 0.2 128)"
+  brand-foreground: "oklch(0.15 0.01 70)"
+
+dark:
+  brand: "oklch(0.88 0.25 125)"
+  brand-foreground: "oklch(0.16 0.008 60)"
