@@ -77,21 +77,21 @@ function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; h
   }
 
   return (
-    <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6">
+    <div className="rounded-lg border border-border bg-card p-6">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-white font-medium text-sm">{localize(lang, ds.name, ds.name_zh)}</p>
-        {ds.version && <span className="text-xs text-muted">v{ds.version}</span>}
+        <p className="text-foreground font-medium text-sm">{localize(lang, ds.name, ds.name_zh)}</p>
+        {ds.version && <span className="text-xs text-muted-foreground">v{ds.version}</span>}
       </div>
-      {ds.description && <p className="text-muted text-sm mt-1">{ds.description}</p>}
-      <div className="flex flex-wrap gap-4 mt-3 text-xs text-muted">
+      {ds.description && <p className="text-muted-foreground text-sm mt-1">{ds.description}</p>}
+      <div className="flex flex-wrap gap-4 mt-3 text-xs text-muted-foreground">
         {ds.format && (
-          <span className="px-2 py-0.5 rounded bg-secondary-bg text-light-gray font-code">
+          <span className="px-2 py-0.5 rounded bg-muted text-foreground font-code">
             {ds.format.toUpperCase()}
           </span>
         )}
         {ds.size && <span>{ds.size}</span>}
         {ds.access_control && (
-          <span className={isNdaRequired ? 'px-2 py-0.5 rounded bg-warning/20 text-warning' : 'px-2 py-0.5 rounded bg-lime-primary/20 text-lime-primary'}>
+          <span className={isNdaRequired ? 'px-2 py-0.5 rounded bg-warning/20 text-warning' : 'px-2 py-0.5 rounded bg-primary/20 text-primary'}>
             {isNdaRequired ? t(lang, 'dataset.nda_required') : t(lang, 'dataset.public')}
           </span>
         )}
@@ -100,7 +100,7 @@ function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; h
       {/* Public datasets: direct download link */}
       {isPublic && ds.download_url && (
         <a href={ds.download_url} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg bg-secondary-bg text-white text-sm hover:bg-secondary-bg/80 transition-colors">
+          className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg bg-muted text-foreground text-sm hover:bg-muted/80 transition-colors">
           {t(lang, 'dataset.download')}
         </a>
       )}
@@ -108,7 +108,7 @@ function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; h
       {/* NDA-required datasets: presign flow */}
       {isNdaRequired && (
         <button onClick={handlePresign} disabled={loading}
-          className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg bg-lime-primary/20 text-lime-primary text-sm hover:bg-lime-primary/30 transition-colors cursor-pointer disabled:opacity-50">
+          className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg bg-primary/20 text-primary text-sm hover:bg-primary/30 transition-colors cursor-pointer disabled:opacity-50">
           {loading ? '...' : t(lang, 'dataset.get_download_link')}
         </button>
       )}
@@ -116,7 +116,7 @@ function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; h
       {error && (
         <div className="mt-3 p-3 rounded-lg bg-warning/10 border border-warning/30 text-warning text-sm">
           {error}
-          {ndaUrl && <a href={ndaUrl} target="_blank" rel="noopener" className="underline ml-2 font-medium hover:text-white">{t(lang, 'dataset.sign_nda_link')}</a>}
+          {ndaUrl && <a href={ndaUrl} target="_blank" rel="noopener" className="underline ml-2 font-medium hover:text-foreground">{t(lang, 'dataset.sign_nda_link')}</a>}
         </div>
       )}
     </div>

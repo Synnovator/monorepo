@@ -23,24 +23,24 @@ export function ProjectCard({ project, hackathonSlug, teamSlug, lang }: ProjectC
   const detailUrl = `/projects/${hackathonSlug}/${teamSlug}`;
 
   return (
-    <Link href={detailUrl} className="block rounded-lg border border-secondary-bg bg-dark-bg p-5 hover:border-lime-primary/30 transition-colors group">
+    <Link href={detailUrl} className="block rounded-lg border border-border bg-card p-5 hover:border-primary/30 transition-colors group">
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h4 className="text-white font-medium text-sm group-hover:text-lime-primary transition-colors">
+          <h4 className="text-foreground font-medium text-sm group-hover:text-primary transition-colors">
             {localize(lang, project.name, project.name_zh)}
           </h4>
           {project.tagline && (
-            <p className="text-muted text-xs mt-1">{localize(lang, project.tagline, project.tagline_zh)}</p>
+            <p className="text-muted-foreground text-xs mt-1">{localize(lang, project.tagline, project.tagline_zh)}</p>
           )}
         </div>
         <div className="flex items-center gap-2">
           {(project.likes != null && project.likes > 0) && (
-            <span className="text-xs px-2 py-1 rounded-full bg-pink/10 text-pink whitespace-nowrap flex items-center gap-1">
+            <span className="text-xs px-2 py-1 rounded-full bg-destructive/10 text-destructive whitespace-nowrap flex items-center gap-1">
               <HeartIcon size={12} aria-hidden="true" />
               {project.likes}
             </span>
           )}
-          <span className="text-xs px-2 py-1 rounded-full bg-secondary-bg text-muted whitespace-nowrap">
+          <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground whitespace-nowrap">
             {project.track}
           </span>
         </div>
@@ -48,7 +48,7 @@ export function ProjectCard({ project, hackathonSlug, teamSlug, lang }: ProjectC
 
       <div className="flex flex-wrap gap-2 mb-3">
         {project.team.map(member => (
-          <span key={member.github} className="flex items-center gap-1 text-xs text-muted">
+          <span key={member.github} className="flex items-center gap-1 text-xs text-muted-foreground">
             <img
               src={`https://github.com/${member.github}.png?size=20`}
               alt={member.github}
@@ -63,7 +63,7 @@ export function ProjectCard({ project, hackathonSlug, teamSlug, lang }: ProjectC
       {project.tech_stack && project.tech_stack.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {project.tech_stack.map(tech => (
-            <span key={tech} className="text-xs px-2 py-0.5 rounded-full bg-neon-blue/10 text-neon-blue">
+            <span key={tech} className="text-xs px-2 py-0.5 rounded-full bg-info/10 text-info">
               {tech}
             </span>
           ))}
