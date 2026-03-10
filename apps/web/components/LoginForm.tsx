@@ -144,7 +144,7 @@ export function LoginForm() {
             <button
               type="button"
               onClick={handleGitHubLogin}
-              className="w-full py-2 px-4 bg-[#24292f] text-white font-medium rounded-md hover:bg-[#32383f] transition-colors text-sm flex items-center justify-center gap-2"
+              className="w-full py-2 px-4 bg-secondary-bg text-white font-medium rounded-md hover:bg-dark-bg transition-colors text-sm flex items-center justify-center gap-2"
             >
               <GitHubIcon size={20} aria-hidden="true" />
               GitHub

@@ -135,7 +135,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
             >
               <div>{lang === 'zh' ? stage.labelZh : stage.label}</div>
               {stage.start && (
-                <div className="text-[10px] opacity-70 mt-0.5">
+                <div className="text-xs opacity-70 mt-0.5">
                   {new Date(stage.start).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                 </div>
               )}
@@ -143,7 +143,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); removeStage(idx); }}
-                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-error/80 text-white text-[10px] flex items-center justify-center hover:bg-error"
+                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-error/80 text-white text-xs flex items-center justify-center hover:bg-error"
                 >
                   ×
                 </button>
