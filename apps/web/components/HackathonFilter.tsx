@@ -62,14 +62,14 @@ export function HackathonFilter({ hackathons, lang }: HackathonFilterProps) {
       {/* Search + Filters */}
       <div className="mb-8 space-y-4">
         <div className="relative max-w-md">
-          <SearchIcon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" aria-hidden="true" />
+          <SearchIcon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t(lang, 'home.search_placeholder')}
             aria-label={t(lang, 'home.search_placeholder')}
-            className="w-full bg-dark-bg border border-secondary-bg rounded-lg pl-10 pr-4 py-2.5 text-white text-sm placeholder-muted focus:border-lime-primary focus:outline-none transition-colors"
+            className="w-full bg-card border border-border rounded-lg pl-10 pr-4 py-2.5 text-foreground text-sm placeholder-muted-foreground focus:border-ring focus:outline-none transition-colors"
           />
         </div>
 
@@ -81,8 +81,8 @@ export function HackathonFilter({ hackathons, lang }: HackathonFilterProps) {
               aria-pressed={currentFilter === filter}
               className={`text-sm px-4 py-1.5 min-h-11 rounded-full border transition-colors cursor-pointer ${
                 currentFilter === filter
-                  ? 'border-lime-primary bg-lime-primary/20 text-lime-primary'
-                  : 'border-secondary-bg text-muted hover:border-lime-primary hover:text-white'
+                  ? 'border-primary bg-primary/20 text-primary'
+                  : 'border-border text-muted-foreground hover:border-primary hover:text-foreground'
               }`}
             >
               {t(lang, filterI18nKeys[filter])}
@@ -100,12 +100,12 @@ export function HackathonFilter({ hackathons, lang }: HackathonFilterProps) {
         </div>
       ) : hackathons.length > 0 ? (
         <div className="text-center py-24">
-          <p className="text-muted text-lg">{t(lang, 'home.no_matching')}</p>
+          <p className="text-muted-foreground text-lg">{t(lang, 'home.no_matching')}</p>
         </div>
       ) : (
         <div className="text-center py-24">
-          <p className="text-muted text-lg mb-4">{t(lang, 'home.empty')}</p>
-          <a href="/guides/organizer" className="text-lime-primary hover:underline">
+          <p className="text-muted-foreground text-lg mb-4">{t(lang, 'home.empty')}</p>
+          <a href="/guides/organizer" className="text-primary hover:underline">
             {t(lang, 'home.empty_cta')}
           </a>
         </div>

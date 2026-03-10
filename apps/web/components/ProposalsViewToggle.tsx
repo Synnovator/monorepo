@@ -52,8 +52,8 @@ export function ProposalsViewToggle({
             aria-pressed={view === 'hot'}
             className={`text-sm px-4 py-1.5 min-h-11 rounded-full border transition-colors cursor-pointer ${
               view === 'hot'
-                ? 'border-lime-primary bg-lime-primary/20 text-lime-primary'
-                : 'border-secondary-bg text-muted hover:border-lime-primary hover:text-white'
+                ? 'border-primary bg-primary/20 text-primary'
+                : 'border-border text-muted-foreground hover:border-primary hover:text-foreground'
             }`}
           >
             {hotLabel}
@@ -63,8 +63,8 @@ export function ProposalsViewToggle({
             aria-pressed={view === 'activity'}
             className={`text-sm px-4 py-1.5 min-h-11 rounded-full border transition-colors cursor-pointer ${
               view === 'activity'
-                ? 'border-lime-primary bg-lime-primary/20 text-lime-primary'
-                : 'border-secondary-bg text-muted hover:border-lime-primary hover:text-white'
+                ? 'border-primary bg-primary/20 text-primary'
+                : 'border-border text-muted-foreground hover:border-primary hover:text-foreground'
             }`}
           >
             {activityLabel}
@@ -91,9 +91,9 @@ export function ProposalsViewToggle({
             const name = hackathon ? localize(lang, hackathon.name, hackathon.name_zh) : slug;
             return (
               <div key={slug} className="mb-10">
-                <h2 className="text-xl font-heading font-bold text-white mb-4 flex items-center gap-3">
-                  <span className="w-1 h-6 bg-lime-primary rounded-full inline-block" />
-                  <Link href={`/hackathons/${slug}`} className="hover:text-lime-primary transition-colors">
+                <h2 className="text-xl font-heading font-bold text-foreground mb-4 flex items-center gap-3">
+                  <span className="w-1 h-6 bg-primary rounded-full inline-block" />
+                  <Link href={`/hackathons/${slug}`} className="hover:text-primary transition-colors">
                     {name}
                   </Link>
                 </h2>

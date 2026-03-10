@@ -25,15 +25,15 @@ export function Timeline({ timeline, lang }: TimelineProps) {
         const isCurrent = stage === currentStage;
         const past = isPast(stage);
         return (
-          <li key={stage} className={`flex items-center gap-3 py-2 px-3 rounded-md ${isCurrent ? 'bg-lime-primary/10 border border-lime-primary/30' : ''}`}>
-            <div className={`w-3 h-3 rounded-full shrink-0 ${isCurrent ? 'bg-lime-primary' : past ? 'bg-muted' : 'bg-secondary-bg border border-muted'}`} />
+          <li key={stage} className={`flex items-center gap-3 py-2 px-3 rounded-md ${isCurrent ? 'bg-primary/10 border border-primary/30' : ''}`}>
+            <div className={`w-3 h-3 rounded-full shrink-0 ${isCurrent ? 'bg-primary' : past ? 'bg-muted-foreground' : 'bg-muted border border-muted-foreground'}`} />
             <div className="flex-1 min-w-0">
-              <span className={`text-sm font-medium ${isCurrent ? 'text-lime-primary' : past ? 'text-muted' : 'text-light-gray'}`}>
+              <span className={`text-sm font-medium ${isCurrent ? 'text-primary' : past ? 'text-muted-foreground' : 'text-foreground'}`}>
                 {t(lang, `stage.${stage}`)}
               </span>
             </div>
             {range && (
-              <span className="text-xs text-muted shrink-0">
+              <span className="text-xs text-muted-foreground shrink-0">
                 {new Date(range.start).toLocaleDateString()} — {new Date(range.end).toLocaleDateString()}
               </span>
             )}

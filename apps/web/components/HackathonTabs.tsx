@@ -90,7 +90,7 @@ export function HackathonTabs({ detailsLabel, submissionsLabel, leaderboardLabel
   }
 
   return (
-    <div role="tablist" className="inline-flex h-10 items-center gap-1 rounded-lg bg-secondary-bg/50 p-1">
+    <div role="tablist" className="inline-flex h-10 items-center gap-1 rounded-lg bg-muted p-1">
       {TAB_IDS.map(tab => (
         <button
           key={tab}
@@ -101,10 +101,10 @@ export function HackathonTabs({ detailsLabel, submissionsLabel, leaderboardLabel
           onClick={() => handleTabClick(tab)}
           className={cn(
             "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all",
-            "hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-primary/50",
+            "hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
             activeTab === tab
-              ? "bg-surface text-lime-primary shadow-sm"
-              : "text-muted"
+              ? "bg-background text-primary shadow-sm"
+              : "text-muted-foreground"
           )}
         >
           {labels[tab]}
