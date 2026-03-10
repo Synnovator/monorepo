@@ -58,7 +58,7 @@ export function JudgeCard({ judge, lang, profileSlug }: JudgeCardProps) {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 mt-2 text-xs text-lime-primary hover:underline"
           >
-            <ShieldCheckIcon size={14} className="shrink-0" />
+            <ShieldCheckIcon size={14} className="shrink-0" aria-hidden="true" />
             {t(lang, 'conflict.confirmed')}
           </a>
         )}

@@ -25,9 +25,9 @@ const typeColors: Record<string, string> = {
 
 export function EventCalendar({ events, lang }: EventCalendarProps) {
   return (
-    <div className="space-y-3">
+    <ul className="space-y-3">
       {events.map((event, i) => (
-        <div key={i} className="flex items-start gap-4 p-4 rounded-lg border border-secondary-bg bg-dark-bg">
+        <li key={i} className="flex items-start gap-4 p-4 rounded-lg border border-secondary-bg bg-dark-bg">
           <div className="text-center shrink-0 w-14">
             <div className="text-xs text-muted">{new Date(event.datetime).toLocaleDateString(undefined, { month: 'short' })}</div>
             <div className="text-xl font-code font-medium text-white">{new Date(event.datetime).getDate()}</div>
@@ -47,8 +47,8 @@ export function EventCalendar({ events, lang }: EventCalendarProps) {
             {event.description && <p className="text-muted text-xs mt-1">{event.description}</p>}
             {event.location && <p className="text-muted text-xs mt-1">{event.location}</p>}
           </div>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

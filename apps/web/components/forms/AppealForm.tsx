@@ -71,8 +71,9 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
       <fieldset disabled={!isLoggedIn || loading} className="space-y-5">
         {/* Team select */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.team')}</label>
-          <select value={teamName} onChange={e => setTeamName(e.target.value)}
+          <label htmlFor="appeal-team" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.team')}</label>
+          <select id="appeal-team" value={teamName} onChange={e => setTeamName(e.target.value)}
+            aria-required="true"
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
             <option value="">{t(lang, 'form.appeal.select_team')}</option>
             {myTeams.map(team => (
@@ -84,16 +85,17 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
         {/* Track (auto-filled) */}
         {trackSlug && (
           <div>
-            <label className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.track')}</label>
-            <input type="text" value={tracks.find(tr => tr.slug === trackSlug)?.name ?? trackSlug} readOnly
+            <label htmlFor="appeal-track" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.track')}</label>
+            <input id="appeal-track" type="text" value={tracks.find(tr => tr.slug === trackSlug)?.name ?? trackSlug} readOnly
               className="w-full bg-surface/50 border border-secondary-bg rounded-md px-3 py-2 text-muted text-sm cursor-not-allowed" />
           </div>
         )}
 
         {/* Expected result */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.expected_result')}</label>
-          <select value={expectedResult} onChange={e => setExpectedResult(e.target.value)}
+          <label htmlFor="appeal-result" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.expected_result')}</label>
+          <select id="appeal-result" value={expectedResult} onChange={e => setExpectedResult(e.target.value)}
+            aria-required="true"
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
             <option value="">{t(lang, 'form.appeal.select_result')}</option>
             {EXPECTED_RESULTS.map(r => <option key={r} value={r}>{r}</option>)}
@@ -102,8 +104,9 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
 
         {/* Appeal type */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.appeal_type')}</label>
-          <select value={appealType} onChange={e => setAppealType(e.target.value)}
+          <label htmlFor="appeal-type" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.appeal_type')}</label>
+          <select id="appeal-type" value={appealType} onChange={e => setAppealType(e.target.value)}
+            aria-required="true"
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none">
             <option value="">{t(lang, 'form.appeal.select_type')}</option>
             {APPEAL_TYPES.map(a => <option key={a} value={a}>{a}</option>)}
@@ -112,16 +115,17 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
 
         {/* Description */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.description')} *</label>
-          <textarea value={description} onChange={e => setDescription(e.target.value)}
+          <label htmlFor="appeal-desc" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.description')} *</label>
+          <textarea id="appeal-desc" value={description} onChange={e => setDescription(e.target.value)}
+            aria-required="true"
             placeholder={t(lang, 'form.appeal.description_placeholder')}
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm resize-none h-32 focus:border-lime-primary focus:outline-none" />
         </div>
 
         {/* Evidence */}
         <div>
-          <label className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.evidence')}</label>
-          <textarea value={evidence} onChange={e => setEvidence(e.target.value)}
+          <label htmlFor="appeal-evidence" className="block text-sm text-muted mb-2">{t(lang, 'form.appeal.evidence')}</label>
+          <textarea id="appeal-evidence" value={evidence} onChange={e => setEvidence(e.target.value)}
             placeholder={t(lang, 'form.appeal.evidence_placeholder')}
             className="w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm resize-none h-20 focus:border-lime-primary focus:outline-none" />
         </div>

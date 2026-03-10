@@ -183,9 +183,9 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
   return (
     <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6">
       {/* Step indicators */}
-      <div className="flex items-center justify-between mb-8 overflow-x-auto">
+      <div aria-label="Progress" className="flex items-center justify-between mb-8 overflow-x-auto">
         {stepLabels.map((label, idx) => (
-          <div key={idx} className="flex items-center">
+          <div key={idx} className="flex items-center" aria-current={idx === step ? 'step' : undefined}>
             <div className="flex flex-col items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
                 idx === step ? 'bg-lime-primary text-near-black'
@@ -193,7 +193,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
               }`}>
                 {idx < step ? (isStepValid(idx) ? '\u2713' : '!') : idx + 1}
               </div>
-              <span className={`mt-1 text-xs whitespace-nowrap ${idx === step ? 'text-lime-primary' : 'text-muted'}`}>
+              <span className={`mt-1 text-xs whitespace-nowrap hidden sm:block ${idx === step ? 'text-lime-primary' : 'text-muted'}`}>
                 {label}
               </span>
             </div>
@@ -258,29 +258,29 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
         {step === 1 && (
           <>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_proposal.project_name_en')}</label>
-              <input type="text" value={name} onChange={e => setName(e.target.value)}
-                placeholder="AgentFlow" className={inputClass} />
+              <label htmlFor="prop-name" className={labelClass}>{t(lang, 'form.create_proposal.project_name_en')}</label>
+              <input id="prop-name" type="text" value={name} onChange={e => setName(e.target.value)}
+                placeholder="AgentFlow" aria-required="true" aria-invalid={!!submitError} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_proposal.project_name_zh')}</label>
-              <input type="text" value={nameZh} onChange={e => setNameZh(e.target.value)}
+              <label htmlFor="prop-name-zh" className={labelClass}>{t(lang, 'form.create_proposal.project_name_zh')}</label>
+              <input id="prop-name-zh" type="text" value={nameZh} onChange={e => setNameZh(e.target.value)}
                 placeholder="智能体工作流" className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_proposal.tagline_en')}</label>
-              <input type="text" value={tagline} onChange={e => setTagline(e.target.value)}
-                placeholder="Visual workflow builder for AI agents" className={inputClass} />
+              <label htmlFor="prop-tagline" className={labelClass}>{t(lang, 'form.create_proposal.tagline_en')}</label>
+              <input id="prop-tagline" type="text" value={tagline} onChange={e => setTagline(e.target.value)}
+                placeholder="Visual workflow builder for AI agents" aria-required="true" className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_proposal.tagline_zh')}</label>
-              <input type="text" value={taglineZh} onChange={e => setTaglineZh(e.target.value)}
+              <label htmlFor="prop-tagline-zh" className={labelClass}>{t(lang, 'form.create_proposal.tagline_zh')}</label>
+              <input id="prop-tagline-zh" type="text" value={taglineZh} onChange={e => setTaglineZh(e.target.value)}
                 placeholder="可视化 AI 智能体工作流构建器" className={inputClass} />
             </div>
             {currentHackathon && currentHackathon.tracks.length > 0 && (
               <div>
-                <label className={labelClass}>{t(lang, 'form.create_proposal.track')}</label>
-                <select value={track} onChange={e => setTrack(e.target.value)} className={selectClass}>
+                <label htmlFor="prop-track" className={labelClass}>{t(lang, 'form.create_proposal.track')}</label>
+                <select id="prop-track" value={track} onChange={e => setTrack(e.target.value)} aria-required="true" className={selectClass}>
                   <option value="">{t(lang, 'form.create_proposal.select_track')}</option>
                   {currentHackathon.tracks.map(tr => (
                     <option key={tr.slug} value={tr.slug}>
@@ -337,29 +337,29 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
         {step === 3 && (
           <>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_proposal.repo_url')}</label>
-              <input type="url" value={repo} onChange={e => setRepo(e.target.value)}
-                placeholder={t(lang, 'form.create_proposal.repo_placeholder')} className={inputClass} />
+              <label htmlFor="prop-repo" className={labelClass}>{t(lang, 'form.create_proposal.repo_url')}</label>
+              <input id="prop-repo" type="url" value={repo} onChange={e => setRepo(e.target.value)}
+                placeholder={t(lang, 'form.create_proposal.repo_placeholder')} aria-required="true" className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_proposal.video_url')}</label>
-              <input type="url" value={video} onChange={e => setVideo(e.target.value)}
+              <label htmlFor="prop-video" className={labelClass}>{t(lang, 'form.create_proposal.video_url')}</label>
+              <input id="prop-video" type="url" value={video} onChange={e => setVideo(e.target.value)}
                 placeholder="https://youtube.com/watch?v=..." className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_proposal.demo_url')}</label>
-              <input type="url" value={demo} onChange={e => setDemo(e.target.value)}
+              <label htmlFor="prop-demo" className={labelClass}>{t(lang, 'form.create_proposal.demo_url')}</label>
+              <input id="prop-demo" type="url" value={demo} onChange={e => setDemo(e.target.value)}
                 placeholder="https://your-demo.vercel.app" className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_proposal.description_en')}</label>
-              <textarea value={description} onChange={e => setDescription(e.target.value)}
+              <label htmlFor="prop-desc" className={labelClass}>{t(lang, 'form.create_proposal.description_en')}</label>
+              <textarea id="prop-desc" value={description} onChange={e => setDescription(e.target.value)}
                 placeholder={t(lang, 'form.create_proposal.description_placeholder')}
                 className={`${inputClass} resize-none h-24`} />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_proposal.description_zh')}</label>
-              <textarea value={descriptionZh} onChange={e => setDescriptionZh(e.target.value)}
+              <label htmlFor="prop-desc-zh" className={labelClass}>{t(lang, 'form.create_proposal.description_zh')}</label>
+              <textarea id="prop-desc-zh" value={descriptionZh} onChange={e => setDescriptionZh(e.target.value)}
                 placeholder={t(lang, 'form.create_proposal.description_placeholder')}
                 className={`${inputClass} resize-none h-24`} />
             </div>
@@ -410,11 +410,12 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
             <div className="flex flex-col items-end gap-3">
               <button type="button" onClick={handleSubmit}
                 disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(3) || submitting}
+                aria-describedby={submitError ? 'proposal-submit-error' : undefined}
                 className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {submitting ? t(lang, 'form.common.submitting') : t(lang, 'form.create_proposal.submit_pr')} {'\u2192'}
               </button>
               {submitError && (
-                <div className="w-full rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-error">
+                <div id="proposal-submit-error" role="alert" className="w-full rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-error">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="font-medium mb-1">{t(lang, 'form.common.submit_error')}</p>

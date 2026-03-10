@@ -135,7 +135,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
             >
               <div>{lang === 'zh' ? stage.labelZh : stage.label}</div>
               {stage.start && (
-                <div className="text-[10px] opacity-70 mt-0.5">
+                <div className="text-xs opacity-70 mt-0.5">
                   {new Date(stage.start).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                 </div>
               )}
@@ -143,7 +143,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); removeStage(idx); }}
-                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-error/80 text-white text-[10px] flex items-center justify-center hover:bg-error"
+                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-error/80 text-white text-xs flex items-center justify-center hover:bg-error"
                 >
                   ×
                 </button>
@@ -169,8 +169,9 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.start')}</label>
+              <label htmlFor={`timeline-start-${editingIdx}`} className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.start')}</label>
               <input
+                id={`timeline-start-${editingIdx}`}
                 type="datetime-local"
                 value={stages[editingIdx].start.replace('Z', '')}
                 onChange={e => updateStage(editingIdx, 'start', e.target.value)}
@@ -178,8 +179,9 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
               />
             </div>
             <div>
-              <label className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.end')}</label>
+              <label htmlFor={`timeline-end-${editingIdx}`} className="block text-xs text-muted mb-1">{t(lang, 'form.timeline.end')}</label>
               <input
+                id={`timeline-end-${editingIdx}`}
                 type="datetime-local"
                 value={stages[editingIdx].end.replace('Z', '')}
                 onChange={e => updateStage(editingIdx, 'end', e.target.value)}
@@ -217,6 +219,7 @@ export function TimelineEditor({ lang, value, onChange }: TimelineEditorProps) {
           value={customStageName}
           onChange={e => setCustomStageName(e.target.value)}
           placeholder={t(lang, 'form.timeline.custom_stage')}
+          aria-label={t(lang, 'form.timeline.custom_stage')}
           className="flex-1 bg-surface border border-secondary-bg rounded-md px-3 py-1.5 text-white text-sm focus:border-lime-primary focus:outline-none"
         />
         <button

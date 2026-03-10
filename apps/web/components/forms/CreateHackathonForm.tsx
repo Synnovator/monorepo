@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, memo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
 import { t } from '@synnovator/shared/i18n';
@@ -47,6 +47,173 @@ const TOTAL_STEPS = 8;
 function toSlug(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
+
+// Shared CSS classes — hoisted outside components to avoid re-creation
+const inputClass = 'w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none';
+const selectClass = 'w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none';
+const btnRemove = 'px-2 text-muted hover:text-error transition-colors';
+const btnAdd = 'text-sm text-lime-primary hover:text-lime-primary/80 transition-colors';
+
+/* ------------------------------------------------------------------ */
+/*  Memoized sub-components for expensive list sections               */
+/* ------------------------------------------------------------------ */
+
+interface OrganizerListProps {
+  organizers: Organizer[];
+  onAdd: () => void;
+  onRemove: (idx: number) => void;
+  onUpdate: (idx: number, field: keyof Organizer, value: string) => void;
+  lang: Lang;
+}
+
+const OrganizerList = memo(function OrganizerList({ organizers, onAdd, onRemove, onUpdate, lang }: OrganizerListProps) {
+  return (
+    <>
+      <p className="text-sm text-muted">{t(lang, 'form.create_hackathon.add_organizers')}</p>
+      <div className="space-y-4">
+        {organizers.map((org, idx) => (
+          <div key={idx} className="flex gap-2 items-start">
+            <div className="flex-1 space-y-2">
+              <input type="text" value={org.name} onChange={e => onUpdate(idx, 'name', e.target.value)}
+                placeholder={t(lang, 'form.create_hackathon.org_name_en')} className={inputClass} />
+              <input type="text" value={org.name_zh} onChange={e => onUpdate(idx, 'name_zh', e.target.value)}
+                placeholder={t(lang, 'form.create_hackathon.org_name_zh')} className={inputClass} />
+              <select value={org.role} onChange={e => onUpdate(idx, 'role', e.target.value)} className={selectClass}>
+                <option value="organizer">{t(lang, 'form.create_hackathon.organizer')}</option>
+                <option value="co-organizer">{t(lang, 'form.create_hackathon.co_organizer')}</option>
+                <option value="sponsor">{t(lang, 'form.create_hackathon.sponsor')}</option>
+              </select>
+            </div>
+            {organizers.length > 1 && (
+              <button type="button" onClick={() => onRemove(idx)} className={btnRemove}>{'\u2715'}</button>
+            )}
+          </div>
+        ))}
+      </div>
+      <button type="button" onClick={onAdd} className={btnAdd}>
+        + {t(lang, 'form.create_hackathon.add_organizer')}
+      </button>
+    </>
+  );
+});
+
+interface TrackEditorProps {
+  tracks: TrackData[];
+  onAddTrack: () => void;
+  onRemoveTrack: (idx: number) => void;
+  onUpdateTrack: (idx: number, field: keyof TrackData, value: unknown) => void;
+  onAddCriterion: (tIdx: number) => void;
+  onRemoveCriterion: (tIdx: number, cIdx: number) => void;
+  onUpdateCriterion: (tIdx: number, cIdx: number, field: keyof Criterion, value: string) => void;
+  lang: Lang;
+}
+
+const TrackEditor = memo(function TrackEditor({
+  tracks, onAddTrack, onRemoveTrack, onUpdateTrack,
+  onAddCriterion, onRemoveCriterion, onUpdateCriterion, lang,
+}: TrackEditorProps) {
+  return (
+    <>
+      <p className="text-sm text-muted">{t(lang, 'form.create_hackathon.add_tracks')}</p>
+      <div className="space-y-6">
+        {tracks.map((tr, tIdx) => {
+          const weightSum = tr.criteria.reduce((s, c) => s + (parseFloat(c.weight) || 0), 0);
+          const weightOk = Math.abs(weightSum - 1.0) < 0.01;
+          return (
+            <div key={tIdx} className="p-4 rounded-lg border border-secondary-bg space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-white font-medium">{t(lang, 'form.create_hackathon.track_n')} {tIdx + 1}</span>
+                {tracks.length > 1 && (
+                  <button type="button" onClick={() => onRemoveTrack(tIdx)} className={btnRemove}>{'\u2715'}</button>
+                )}
+              </div>
+              <input type="text" value={tr.name}
+                onChange={e => { onUpdateTrack(tIdx, 'name', e.target.value); if (!tr.slug) onUpdateTrack(tIdx, 'slug', toSlug(e.target.value)); }}
+                placeholder={t(lang, 'form.create_hackathon.track_name_en')} className={inputClass} />
+              <input type="text" value={tr.name_zh} onChange={e => onUpdateTrack(tIdx, 'name_zh', e.target.value)}
+                placeholder={t(lang, 'form.create_hackathon.track_name_zh')} className={inputClass} />
+              <input type="text" value={tr.slug} onChange={e => onUpdateTrack(tIdx, 'slug', e.target.value)}
+                placeholder={toSlug(tr.name) || 'track-slug'} className={inputClass} />
+
+              <div>
+                <label className="block text-xs text-muted mb-1">
+                  {t(lang, 'form.create_hackathon.rewards_hint')}
+                </label>
+                <textarea value={tr.rewards} onChange={e => onUpdateTrack(tIdx, 'rewards', e.target.value)}
+                  placeholder={'1st: $1,000\n2nd: $500\n3rd: $250'}
+                  className={`${inputClass} resize-none h-20`} />
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <label className="text-xs text-muted">{t(lang, 'form.create_hackathon.judging_criteria')}</label>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${weightOk ? 'bg-lime-primary/20 text-lime-primary' : 'bg-warning/20 text-warning'}`}>
+                    {t(lang, 'form.create_hackathon.weight_total')}: {weightSum.toFixed(2)} {weightOk ? '\u2713' : t(lang, 'form.create_hackathon.should_be_one')}
+                  </span>
+                </div>
+
+                {/* Criteria cards */}
+                <div className="space-y-3">
+                  {tr.criteria.map((c, cIdx) => (
+                    <div key={cIdx} className="p-3 rounded-lg border border-secondary-bg bg-surface/30 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-muted">
+                          {t(lang, 'form.create_hackathon.criterion_n')} {cIdx + 1}
+                        </span>
+                        {tr.criteria.length > 1 && (
+                          <button type="button" onClick={() => onRemoveCriterion(tIdx, cIdx)}
+                            className="text-xs text-muted hover:text-error transition-colors">
+                            {t(lang, 'form.create_hackathon.remove')}
+                          </button>
+                        )}
+                      </div>
+                      <input type="text" value={c.name}
+                        onChange={e => onUpdateCriterion(tIdx, cIdx, 'name', e.target.value)}
+                        placeholder={t(lang, 'form.create_hackathon.criterion_placeholder')}
+                        className={inputClass} />
+                      <div className="flex items-center gap-3">
+                        <label className="text-xs text-muted whitespace-nowrap">{t(lang, 'form.create_hackathon.weight')}:</label>
+                        <input type="range" min="0" max="1" step="0.05"
+                          value={c.weight}
+                          onChange={e => onUpdateCriterion(tIdx, cIdx, 'weight', e.target.value)}
+                          className="flex-1 accent-lime-primary" />
+                        <input type="number" step="0.05" min="0" max="1"
+                          value={c.weight}
+                          onChange={e => onUpdateCriterion(tIdx, cIdx, 'weight', e.target.value)}
+                          className={`${inputClass} w-20 text-center`} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Weight distribution bar */}
+                {tr.criteria.length > 0 && (
+                  <div className="mt-3 h-2 rounded-full bg-secondary-bg overflow-hidden flex">
+                    {tr.criteria.map((c, cIdx) => {
+                      const w = parseFloat(c.weight) || 0;
+                      const colors = ['bg-lime-primary', 'bg-cyan', 'bg-orange', 'bg-neon-blue', 'bg-pink', 'bg-mint'];
+                      return w > 0 ? (
+                        <div key={cIdx} className={`${colors[cIdx % colors.length]} transition-all`}
+                          style={{ width: `${w * 100}%` }} />
+                      ) : null;
+                    })}
+                  </div>
+                )}
+
+                <button type="button" onClick={() => onAddCriterion(tIdx)} className={`${btnAdd} mt-3`}>
+                  + {t(lang, 'form.create_hackathon.add_criterion')}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <button type="button" onClick={onAddTrack} className={btnAdd}>
+        + {t(lang, 'form.create_hackathon.add_track')}
+      </button>
+    </>
+  );
+});
 
 export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
   const { loading, isLoggedIn } = useAuth();
@@ -99,42 +266,42 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
     if (!slugManual) setSlug(toSlug(val));
   }
 
-  // Organizer helpers
-  function addOrganizer() {
+  // Organizer helpers — wrapped in useCallback for memoized sub-component
+  const addOrganizer = useCallback(() => {
     setOrganizers(prev => [...prev, { name: '', name_zh: '', role: 'organizer' }]);
-  }
-  function removeOrganizer(idx: number) {
+  }, []);
+  const removeOrganizer = useCallback((idx: number) => {
     setOrganizers(prev => prev.filter((_, i) => i !== idx));
-  }
-  function updateOrganizer(idx: number, field: keyof Organizer, value: string) {
+  }, []);
+  const updateOrganizer = useCallback((idx: number, field: keyof Organizer, value: string) => {
     setOrganizers(prev => { const n = [...prev]; n[idx] = { ...n[idx], [field]: value }; return n; });
-  }
+  }, []);
 
-  // Track helpers
-  function addTrack() {
+  // Track helpers — wrapped in useCallback for memoized sub-component
+  const addTrack = useCallback(() => {
     setTracks(prev => [...prev, { name: '', name_zh: '', slug: '', rewards: '', criteria: [{ name: '', weight: '0.3' }] }]);
-  }
-  function removeTrack(idx: number) {
+  }, []);
+  const removeTrack = useCallback((idx: number) => {
     setTracks(prev => prev.filter((_, i) => i !== idx));
-  }
-  function updateTrack(idx: number, field: keyof TrackData, value: unknown) {
+  }, []);
+  const updateTrack = useCallback((idx: number, field: keyof TrackData, value: unknown) => {
     setTracks(prev => { const n = [...prev]; n[idx] = { ...n[idx], [field]: value } as TrackData; return n; });
-  }
-  function addCriterion(tIdx: number) {
+  }, []);
+  const addCriterion = useCallback((tIdx: number) => {
     setTracks(prev => {
       const n = [...prev];
       n[tIdx] = { ...n[tIdx], criteria: [...n[tIdx].criteria, { name: '', weight: '0.1' }] };
       return n;
     });
-  }
-  function removeCriterion(tIdx: number, cIdx: number) {
+  }, []);
+  const removeCriterion = useCallback((tIdx: number, cIdx: number) => {
     setTracks(prev => {
       const n = [...prev];
       n[tIdx] = { ...n[tIdx], criteria: n[tIdx].criteria.filter((_, i) => i !== cIdx) };
       return n;
     });
-  }
-  function updateCriterion(tIdx: number, cIdx: number, field: keyof Criterion, value: string) {
+  }, []);
+  const updateCriterion = useCallback((tIdx: number, cIdx: number, field: keyof Criterion, value: string) => {
     setTracks(prev => {
       const n = [...prev];
       const criteria = [...n[tIdx].criteria];
@@ -142,7 +309,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
       n[tIdx] = { ...n[tIdx], criteria };
       return n;
     });
-  }
+  }, []);
 
   // Language toggle
   function toggleLang(l: string) {
@@ -280,19 +447,14 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
     }
   }
 
-  // Shared CSS classes
-  const inputClass = 'w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none';
   const labelClass = 'block text-sm text-muted mb-2';
-  const selectClass = 'w-full bg-surface border border-secondary-bg rounded-md px-3 py-2 text-white text-sm focus:border-lime-primary focus:outline-none';
-  const btnRemove = 'px-2 text-muted hover:text-error transition-colors';
-  const btnAdd = 'text-sm text-lime-primary hover:text-lime-primary/80 transition-colors';
 
   return (
     <div className="rounded-lg border border-secondary-bg bg-dark-bg p-6">
       {/* Step indicators */}
-      <div className="flex items-center justify-between mb-8 overflow-x-auto">
+      <div aria-label="Progress" className="flex items-center justify-between mb-8 overflow-x-auto">
         {stepLabels.map((label, idx) => (
-          <div key={idx} className="flex items-center">
+          <div key={idx} className="flex items-center" aria-current={idx === step ? 'step' : undefined}>
             <div className="flex flex-col items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
                 idx === step ? 'bg-lime-primary text-near-black'
@@ -300,7 +462,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               }`}>
                 {idx < step ? (isStepValid(idx) ? '\u2713' : '!') : idx + 1}
               </div>
-              <span className={`mt-1 text-xs whitespace-nowrap ${idx === step ? 'text-lime-primary' : 'text-muted'}`}>
+              <span className={`mt-1 text-xs whitespace-nowrap hidden sm:block ${idx === step ? 'text-lime-primary' : 'text-muted'}`}>
                 {label}
               </span>
             </div>
@@ -361,18 +523,18 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {step === 1 && (
           <>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.name_en')}</label>
-              <input type="text" value={name} onChange={e => handleNameChange(e.target.value)}
-                placeholder="Community Hackathon 2026" className={inputClass} />
+              <label htmlFor="hack-name" className={labelClass}>{t(lang, 'form.create_hackathon.name_en')}</label>
+              <input id="hack-name" type="text" value={name} onChange={e => handleNameChange(e.target.value)}
+                placeholder="Community Hackathon 2026" aria-required="true" aria-invalid={!!submitError} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.name_zh')}</label>
-              <input type="text" value={nameZh} onChange={e => setNameZh(e.target.value)}
+              <label htmlFor="hack-name-zh" className={labelClass}>{t(lang, 'form.create_hackathon.name_zh')}</label>
+              <input id="hack-name-zh" type="text" value={nameZh} onChange={e => setNameZh(e.target.value)}
                 placeholder="2026 社区 Hackathon" className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>Slug</label>
-              <input type="text" value={slug}
+              <label htmlFor="hack-slug" className={labelClass}>Slug</label>
+              <input id="hack-slug" type="text" value={slug}
                 onChange={e => { setSlug(e.target.value); setSlugManual(true); }}
                 placeholder={toSlug(name) || 'community-hackathon-2026'}
                 className={inputClass} />
@@ -381,13 +543,13 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               </p>
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.tagline_en')}</label>
-              <input type="text" value={tagline} onChange={e => setTagline(e.target.value)}
+              <label htmlFor="hack-tagline" className={labelClass}>{t(lang, 'form.create_hackathon.tagline_en')}</label>
+              <input id="hack-tagline" type="text" value={tagline} onChange={e => setTagline(e.target.value)}
                 placeholder="Build something amazing with AI" className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.tagline_zh')}</label>
-              <input type="text" value={taglineZh} onChange={e => setTaglineZh(e.target.value)}
+              <label htmlFor="hack-tagline-zh" className={labelClass}>{t(lang, 'form.create_hackathon.tagline_zh')}</label>
+              <input id="hack-tagline-zh" type="text" value={taglineZh} onChange={e => setTaglineZh(e.target.value)}
                 placeholder={t(lang, 'form.create_hackathon.tagline_placeholder_zh')} className={inputClass} />
             </div>
           </>
@@ -395,32 +557,13 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
 
         {/* Step 2: Organizers */}
         {step === 2 && (
-          <>
-            <p className="text-sm text-muted">{t(lang, 'form.create_hackathon.add_organizers')}</p>
-            <div className="space-y-4">
-              {organizers.map((org, idx) => (
-                <div key={idx} className="flex gap-2 items-start">
-                  <div className="flex-1 space-y-2">
-                    <input type="text" value={org.name} onChange={e => updateOrganizer(idx, 'name', e.target.value)}
-                      placeholder={t(lang, 'form.create_hackathon.org_name_en')} className={inputClass} />
-                    <input type="text" value={org.name_zh} onChange={e => updateOrganizer(idx, 'name_zh', e.target.value)}
-                      placeholder={t(lang, 'form.create_hackathon.org_name_zh')} className={inputClass} />
-                    <select value={org.role} onChange={e => updateOrganizer(idx, 'role', e.target.value)} className={selectClass}>
-                      <option value="organizer">{t(lang, 'form.create_hackathon.organizer')}</option>
-                      <option value="co-organizer">{t(lang, 'form.create_hackathon.co_organizer')}</option>
-                      <option value="sponsor">{t(lang, 'form.create_hackathon.sponsor')}</option>
-                    </select>
-                  </div>
-                  {organizers.length > 1 && (
-                    <button type="button" onClick={() => removeOrganizer(idx)} className={btnRemove}>{'\u2715'}</button>
-                  )}
-                </div>
-              ))}
-            </div>
-            <button type="button" onClick={addOrganizer} className={btnAdd}>
-              + {t(lang, 'form.create_hackathon.add_organizer')}
-            </button>
-          </>
+          <OrganizerList
+            organizers={organizers}
+            onAdd={addOrganizer}
+            onRemove={removeOrganizer}
+            onUpdate={updateOrganizer}
+            lang={lang}
+          />
         )}
 
         {/* Step 3: Timeline */}
@@ -439,113 +582,24 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
 
         {/* Step 4: Tracks */}
         {step === 4 && (
-          <>
-            <p className="text-sm text-muted">{t(lang, 'form.create_hackathon.add_tracks')}</p>
-            <div className="space-y-6">
-              {tracks.map((tr, tIdx) => {
-                const weightSum = tr.criteria.reduce((s, c) => s + (parseFloat(c.weight) || 0), 0);
-                const weightOk = Math.abs(weightSum - 1.0) < 0.01;
-                return (
-                  <div key={tIdx} className="p-4 rounded-lg border border-secondary-bg space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-white font-medium">{t(lang, 'form.create_hackathon.track_n')} {tIdx + 1}</span>
-                      {tracks.length > 1 && (
-                        <button type="button" onClick={() => removeTrack(tIdx)} className={btnRemove}>{'\u2715'}</button>
-                      )}
-                    </div>
-                    <input type="text" value={tr.name}
-                      onChange={e => { updateTrack(tIdx, 'name', e.target.value); if (!tr.slug) updateTrack(tIdx, 'slug', toSlug(e.target.value)); }}
-                      placeholder={t(lang, 'form.create_hackathon.track_name_en')} className={inputClass} />
-                    <input type="text" value={tr.name_zh} onChange={e => updateTrack(tIdx, 'name_zh', e.target.value)}
-                      placeholder={t(lang, 'form.create_hackathon.track_name_zh')} className={inputClass} />
-                    <input type="text" value={tr.slug} onChange={e => updateTrack(tIdx, 'slug', e.target.value)}
-                      placeholder={toSlug(tr.name) || 'track-slug'} className={inputClass} />
-
-                    <div>
-                      <label className="block text-xs text-muted mb-1">
-                        {t(lang, 'form.create_hackathon.rewards_hint')}
-                      </label>
-                      <textarea value={tr.rewards} onChange={e => updateTrack(tIdx, 'rewards', e.target.value)}
-                        placeholder={'1st: $1,000\n2nd: $500\n3rd: $250'}
-                        className={`${inputClass} resize-none h-20`} />
-                    </div>
-
-                    <div>
-                      <div className="flex justify-between items-center mb-3">
-                        <label className="text-xs text-muted">{t(lang, 'form.create_hackathon.judging_criteria')}</label>
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${weightOk ? 'bg-lime-primary/20 text-lime-primary' : 'bg-warning/20 text-warning'}`}>
-                          {t(lang, 'form.create_hackathon.weight_total')}: {weightSum.toFixed(2)} {weightOk ? '\u2713' : t(lang, 'form.create_hackathon.should_be_one')}
-                        </span>
-                      </div>
-
-                      {/* Criteria cards */}
-                      <div className="space-y-3">
-                        {tr.criteria.map((c, cIdx) => (
-                          <div key={cIdx} className="p-3 rounded-lg border border-secondary-bg bg-surface/30 space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span className="text-xs text-muted">
-                                {t(lang, 'form.create_hackathon.criterion_n')} {cIdx + 1}
-                              </span>
-                              {tr.criteria.length > 1 && (
-                                <button type="button" onClick={() => removeCriterion(tIdx, cIdx)}
-                                  className="text-xs text-muted hover:text-error transition-colors">
-                                  {t(lang, 'form.create_hackathon.remove')}
-                                </button>
-                              )}
-                            </div>
-                            <input type="text" value={c.name}
-                              onChange={e => updateCriterion(tIdx, cIdx, 'name', e.target.value)}
-                              placeholder={t(lang, 'form.create_hackathon.criterion_placeholder')}
-                              className={inputClass} />
-                            <div className="flex items-center gap-3">
-                              <label className="text-xs text-muted whitespace-nowrap">{t(lang, 'form.create_hackathon.weight')}:</label>
-                              <input type="range" min="0" max="1" step="0.05"
-                                value={c.weight}
-                                onChange={e => updateCriterion(tIdx, cIdx, 'weight', e.target.value)}
-                                className="flex-1 accent-lime-primary" />
-                              <input type="number" step="0.05" min="0" max="1"
-                                value={c.weight}
-                                onChange={e => updateCriterion(tIdx, cIdx, 'weight', e.target.value)}
-                                className={`${inputClass} w-20 text-center`} />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Weight distribution bar */}
-                      {tr.criteria.length > 0 && (
-                        <div className="mt-3 h-2 rounded-full bg-secondary-bg overflow-hidden flex">
-                          {tr.criteria.map((c, cIdx) => {
-                            const w = parseFloat(c.weight) || 0;
-                            const colors = ['bg-lime-primary', 'bg-cyan', 'bg-orange', 'bg-neon-blue', 'bg-pink', 'bg-mint'];
-                            return w > 0 ? (
-                              <div key={cIdx} className={`${colors[cIdx % colors.length]} transition-all`}
-                                style={{ width: `${w * 100}%` }} />
-                            ) : null;
-                          })}
-                        </div>
-                      )}
-
-                      <button type="button" onClick={() => addCriterion(tIdx)} className={`${btnAdd} mt-3`}>
-                        + {t(lang, 'form.create_hackathon.add_criterion')}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <button type="button" onClick={addTrack} className={btnAdd}>
-              + {t(lang, 'form.create_hackathon.add_track')}
-            </button>
-          </>
+          <TrackEditor
+            tracks={tracks}
+            onAddTrack={addTrack}
+            onRemoveTrack={removeTrack}
+            onUpdateTrack={updateTrack}
+            onAddCriterion={addCriterion}
+            onRemoveCriterion={removeCriterion}
+            onUpdateCriterion={updateCriterion}
+            lang={lang}
+          />
         )}
 
         {/* Step 5: Legal */}
         {step === 5 && (
           <>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.license')}</label>
-              <select value={license} onChange={e => setLicense(e.target.value)} className={selectClass}>
+              <label htmlFor="hack-license" className={labelClass}>{t(lang, 'form.create_hackathon.license')}</label>
+              <select id="hack-license" value={license} onChange={e => setLicense(e.target.value)} className={selectClass}>
                 <option value="Apache-2.0">Apache-2.0</option>
                 <option value="MIT">MIT</option>
                 <option value="GPL-3.0">GPL-3.0</option>
@@ -553,8 +607,8 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               </select>
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.ip_ownership')}</label>
-              <select value={ipOwnership} onChange={e => setIpOwnership(e.target.value)} className={selectClass}>
+              <label htmlFor="hack-ip" className={labelClass}>{t(lang, 'form.create_hackathon.ip_ownership')}</label>
+              <select id="hack-ip" value={ipOwnership} onChange={e => setIpOwnership(e.target.value)} className={selectClass}>
                 <option value="participant">{t(lang, 'form.create_hackathon.participant')}</option>
                 <option value="organizer">{t(lang, 'form.create_hackathon.organizer')}</option>
                 <option value="shared">{t(lang, 'form.create_hackathon.shared')}</option>
@@ -592,20 +646,20 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         {step === 6 && (
           <>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.eligibility')}</label>
-              <select value={eligibilityOpen} onChange={e => setEligibilityOpen(e.target.value)} className={selectClass}>
+              <label htmlFor="hack-eligibility" className={labelClass}>{t(lang, 'form.create_hackathon.eligibility')}</label>
+              <select id="hack-eligibility" value={eligibilityOpen} onChange={e => setEligibilityOpen(e.target.value)} className={selectClass}>
                 <option value="all">{t(lang, 'form.create_hackathon.all')}</option>
                 <option value="invite-only">{t(lang, 'form.create_hackathon.invite_only')}</option>
               </select>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={labelClass}>{t(lang, 'form.create_hackathon.min_team_size')}</label>
-                <input type="number" min="1" value={teamMin} onChange={e => setTeamMin(e.target.value)} className={inputClass} />
+                <label htmlFor="hack-min-team" className={labelClass}>{t(lang, 'form.create_hackathon.min_team_size')}</label>
+                <input id="hack-min-team" type="number" min="1" value={teamMin} onChange={e => setTeamMin(e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>{t(lang, 'form.create_hackathon.max_team_size')}</label>
-                <input type="number" min="1" value={teamMax} onChange={e => setTeamMax(e.target.value)} className={inputClass} />
+                <label htmlFor="hack-max-team" className={labelClass}>{t(lang, 'form.create_hackathon.max_team_size')}</label>
+                <input id="hack-max-team" type="number" min="1" value={teamMax} onChange={e => setTeamMax(e.target.value)} className={inputClass} />
               </div>
             </div>
             <label className="flex items-center gap-2 text-sm text-muted cursor-pointer">
@@ -626,8 +680,8 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               </div>
             </div>
             <div>
-              <label className={labelClass}>{t(lang, 'form.create_hackathon.public_voting')}</label>
-              <select value={publicVote} onChange={e => setPublicVote(e.target.value)} className={selectClass}>
+              <label htmlFor="hack-voting" className={labelClass}>{t(lang, 'form.create_hackathon.public_voting')}</label>
+              <select id="hack-voting" value={publicVote} onChange={e => setPublicVote(e.target.value)} className={selectClass}>
                 <option value="reactions">Reactions</option>
                 <option value="none">{t(lang, 'form.create_hackathon.none')}</option>
               </select>
@@ -677,11 +731,12 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
             <div className="flex flex-col items-end gap-3">
               <button type="button" onClick={handleSubmit}
                 disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(4) || submitting}
+                aria-describedby={submitError ? 'hackathon-submit-error' : undefined}
                 className="px-6 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {submitting ? t(lang, 'form.common.submitting') : t(lang, 'form.create_hackathon.submit_pr')} {'\u2192'}
               </button>
               {submitError && (
-                <div className="w-full rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-error">
+                <div id="hackathon-submit-error" role="alert" className="w-full rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-error">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="font-medium mb-1">{t(lang, 'form.common.submit_error')}</p>

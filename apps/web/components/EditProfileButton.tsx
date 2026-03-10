@@ -25,7 +25,7 @@ export function EditProfileButton({ profileUsername, lang }: EditProfileButtonPr
       className="inline-flex items-center gap-2 text-xs text-muted hover:text-lime-primary transition-colors"
     >
       {t(lang, 'profile.edit')}
-      <ExternalLinkIcon size={12} />
+      <ExternalLinkIcon size={12} aria-hidden="true" />
     </a>
   );
 }

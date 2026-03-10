@@ -41,7 +41,7 @@ Core accent colors and backgrounds for the Neon Forge theme.
 | Error / 错误 | `$error` | `#FA541C` |
 | Warning / 警告 | `$warning` | `#FAAD14` |
 | White / 白色 | `$white` | `#FFFFFF` |
-| Muted / 柔灰 | `$muted` | `#8E8E8E` |
+| Muted / 柔灰 | `$muted` | `#A0A0A0` |
 | Light Gray / 浅灰 | `$light-gray` | `#DCDCDC` |
 
 ---
@@ -188,7 +188,7 @@ Page layout grid for the Synnovator platform at W>1440 breakpoint.
 --secondary-bg:   #333333;
 --near-black:     #00000E;
 --white:          #FFFFFF;
---muted:          #8E8E8E;
+--muted:          #A0A0A0;
 --light-gray:     #DCDCDC;
 --success:        #00B42A;
 --error:          #FA541C;

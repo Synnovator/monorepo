@@ -62,12 +62,13 @@ export function HackathonFilter({ hackathons, lang }: HackathonFilterProps) {
       {/* Search + Filters */}
       <div className="mb-8 space-y-4">
         <div className="relative max-w-md">
-          <SearchIcon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+          <SearchIcon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" aria-hidden="true" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t(lang, 'home.search_placeholder')}
+            aria-label={t(lang, 'home.search_placeholder')}
             className="w-full bg-dark-bg border border-secondary-bg rounded-lg pl-10 pr-4 py-2.5 text-white text-sm placeholder-muted focus:border-lime-primary focus:outline-none transition-colors"
           />
         </div>
@@ -77,7 +78,8 @@ export function HackathonFilter({ hackathons, lang }: HackathonFilterProps) {
             <button
               key={filter}
               onClick={() => setCurrentFilter(filter)}
-              className={`text-sm px-4 py-1.5 rounded-full border transition-colors cursor-pointer ${
+              aria-pressed={currentFilter === filter}
+              className={`text-sm px-4 py-1.5 min-h-11 rounded-full border transition-colors cursor-pointer ${
                 currentFilter === filter
                   ? 'border-lime-primary bg-lime-primary/20 text-lime-primary'
                   : 'border-secondary-bg text-muted hover:border-lime-primary hover:text-white'

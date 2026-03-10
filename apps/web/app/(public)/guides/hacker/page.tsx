@@ -52,7 +52,7 @@ export default async function HackerGuidePage({
       <GuideTabBar activeRole="hacker" lang={lang} />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-10">
-          <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-3">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white mb-3">
             {t(lang, 'guide.hacker_title')}
           </h1>
           <p className="text-lg text-muted">{t(lang, 'guide.hacker_subtitle')}</p>
