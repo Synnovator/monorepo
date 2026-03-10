@@ -20,7 +20,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="border-t border-secondary-bg bg-near-black py-12 mt-24">
+    <footer className="border-t border-border bg-background py-12 mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-start gap-8">
           {/* Brand */}
@@ -28,7 +28,7 @@ export function Footer() {
             <Link href={langHref('/')}>
               <Image src="/logo-light.svg" alt="Synnovator" width={72} height={36} />
             </Link>
-            <p className="text-muted text-sm mt-2 max-w-xs">
+            <p className="text-muted-foreground text-sm mt-2 max-w-xs">
               {t(lang, 'site.tagline')}
             </p>
           </div>
@@ -36,29 +36,29 @@ export function Footer() {
           {/* Links */}
           <div className="flex gap-12">
             <div>
-              <h4 className="text-white text-sm font-medium mb-3">{t(lang, 'footer.platform')}</h4>
+              <h4 className="text-foreground text-sm font-medium mb-3">{t(lang, 'footer.platform')}</h4>
               <ul className="space-y-2">
-                <li><Link href={langHref('/')} className="text-muted hover:text-white text-sm transition-colors">{t(lang, 'footer.events_list')}</Link></li>
-                <li><Link href="#" className="text-muted hover:text-white text-sm transition-colors">{t(lang, 'footer.hackers')}</Link></li>
+                <li><Link href={langHref('/')} className="text-muted-foreground hover:text-foreground text-sm transition-colors">{t(lang, 'footer.events_list')}</Link></li>
+                <li><Link href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">{t(lang, 'footer.hackers')}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white text-sm font-medium mb-3">{t(lang, 'footer.guides')}</h4>
+              <h4 className="text-foreground text-sm font-medium mb-3">{t(lang, 'footer.guides')}</h4>
               <ul className="space-y-2">
-                <li><Link href={langHref('/guides/hacker')} className="text-muted hover:text-white text-sm transition-colors">{t(lang, 'footer.hacker_guide')}</Link></li>
-                <li><Link href={langHref('/guides/organizer')} className="text-muted hover:text-white text-sm transition-colors">{t(lang, 'footer.organizer_guide')}</Link></li>
-                <li><Link href={langHref('/guides/judge')} className="text-muted hover:text-white text-sm transition-colors">{t(lang, 'footer.judge_guide')}</Link></li>
+                <li><Link href={langHref('/guides/hacker')} className="text-muted-foreground hover:text-foreground text-sm transition-colors">{t(lang, 'footer.hacker_guide')}</Link></li>
+                <li><Link href={langHref('/guides/organizer')} className="text-muted-foreground hover:text-foreground text-sm transition-colors">{t(lang, 'footer.organizer_guide')}</Link></li>
+                <li><Link href={langHref('/guides/judge')} className="text-muted-foreground hover:text-foreground text-sm transition-colors">{t(lang, 'footer.judge_guide')}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white text-sm font-medium mb-3">{t(lang, 'footer.resources')}</h4>
+              <h4 className="text-foreground text-sm font-medium mb-3">{t(lang, 'footer.resources')}</h4>
               <ul className="space-y-2">
                 <li>
                   <a
                     href="https://github.com/Synnovator/monorepo"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-muted hover:text-white text-sm transition-colors"
+                    className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm transition-colors"
                   >
                     <GitHubIcon size={20} className="shrink-0" aria-hidden="true" />
                     {t(lang, 'footer.platform_code')}
@@ -70,8 +70,8 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 pt-6 border-t border-secondary-bg">
-          <p className="text-muted text-xs">
+        <div className="mt-10 pt-6 border-t border-border">
+          <p className="text-muted-foreground text-xs">
             {currentYear} Synnovator. Built by OneSyn.ai
           </p>
         </div>

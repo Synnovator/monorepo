@@ -38,23 +38,23 @@ export function NavBar() {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-near-black/80 backdrop-blur-md border-b border-secondary-bg">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link href={langHref('/')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <Image src="/logo-light.svg" alt="Synnovator" width={72} height={36} priority />
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          <Link href={langHref('/')} className={`text-sm transition-colors ${pathname === '/' ? 'text-light-gray hover:text-white' : 'text-muted hover:text-white'}`}>
+          <Link href={langHref('/')} className={`text-sm transition-colors ${pathname === '/' ? 'text-foreground hover:text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
             {t(lang, 'nav.hackathons')}
           </Link>
-          <Link href={langHref('/proposals')} className="text-muted hover:text-white transition-colors text-sm">
+          <Link href={langHref('/proposals')} className="text-muted-foreground hover:text-foreground transition-colors text-sm">
             {t(lang, 'nav.proposals')}
           </Link>
-          <Link href={langHref('/guides')} className="text-muted hover:text-white transition-colors text-sm">
+          <Link href={langHref('/guides')} className="text-muted-foreground hover:text-foreground transition-colors text-sm">
             {t(lang, 'nav.guides')}
           </Link>
-          <Link href="/admin" className="text-muted hover:text-white transition-colors text-sm">
+          <Link href="/admin" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
             {t(lang, 'nav.admin')}
           </Link>
         </div>
@@ -64,28 +64,28 @@ export function NavBar() {
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-lime-primary text-near-black text-sm font-medium hover:bg-lime-primary/90 transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
                 aria-label={t(lang, 'nav.create_btn')}
               >
                 <span>{t(lang, 'nav.create_btn')}</span>
                 <ChevronDownIcon size={16} aria-hidden="true" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[10rem] bg-dark-bg border border-secondary-bg rounded-lg shadow-lg">
+            <DropdownMenuContent align="end" className="min-w-[10rem] bg-card border border-border rounded-lg shadow-lg">
               <DropdownMenuItem asChild>
-                <Link href={langHref('/create-hackathon')} className="block px-4 py-2.5 text-sm text-white hover:bg-secondary-bg hover:text-lime-primary transition-colors">
+                <Link href={langHref('/create-hackathon')} className="block px-4 py-2.5 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors">
                   {t(lang, 'nav.create_hackathon')}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href={langHref('/create-proposal')} className="block px-4 py-2.5 text-sm text-white hover:bg-secondary-bg hover:text-lime-primary transition-colors">
+                <Link href={langHref('/create-proposal')} className="block px-4 py-2.5 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors">
                   {t(lang, 'nav.create_proposal')}
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <button type="button" onClick={handleLangSwitch} className="cursor-pointer py-2 px-2 min-h-11 min-w-11 text-muted hover:text-white text-sm transition-colors relative z-10 inline-flex items-center justify-center" aria-label="Switch language">
+          <button type="button" onClick={handleLangSwitch} className="cursor-pointer py-2 px-2 min-h-11 min-w-11 text-muted-foreground hover:text-foreground text-sm transition-colors relative z-10 inline-flex items-center justify-center" aria-label="Switch language">
             {t(lang, 'nav.lang_switch')}
           </button>
 
@@ -96,7 +96,7 @@ export function NavBar() {
           {/* Hamburger button — mobile only */}
           <button
             type="button"
-            className="md:hidden inline-flex items-center justify-center min-h-11 min-w-11 text-muted hover:text-white transition-colors"
+            className="md:hidden inline-flex items-center justify-center min-h-11 min-w-11 text-muted-foreground hover:text-foreground transition-colors"
             onClick={() => setMobileMenuOpen(prev => !prev)}
             aria-expanded={mobileMenuOpen}
             aria-label="Toggle navigation menu"
@@ -121,18 +121,18 @@ export function NavBar() {
 
       {/* Mobile menu panel */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-secondary-bg bg-near-black/95 backdrop-blur-md">
+        <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-md">
           <div className="px-4 py-4 space-y-1">
-            <Link href={langHref('/')} onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-3 rounded-lg text-sm transition-colors ${pathname === '/' ? 'text-light-gray bg-secondary-bg' : 'text-muted hover:text-white hover:bg-secondary-bg'}`}>
+            <Link href={langHref('/')} onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-3 rounded-lg text-sm transition-colors ${pathname === '/' ? 'text-foreground bg-muted' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}>
               {t(lang, 'nav.hackathons')}
             </Link>
-            <Link href={langHref('/proposals')} onClick={() => setMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-sm text-muted hover:text-white hover:bg-secondary-bg transition-colors">
+            <Link href={langHref('/proposals')} onClick={() => setMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
               {t(lang, 'nav.proposals')}
             </Link>
-            <Link href={langHref('/guides')} onClick={() => setMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-sm text-muted hover:text-white hover:bg-secondary-bg transition-colors">
+            <Link href={langHref('/guides')} onClick={() => setMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
               {t(lang, 'nav.guides')}
             </Link>
-            <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-sm text-muted hover:text-white hover:bg-secondary-bg transition-colors">
+            <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
               {t(lang, 'nav.admin')}
             </Link>
           </div>
