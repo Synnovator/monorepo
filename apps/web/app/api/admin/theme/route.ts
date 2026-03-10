@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import yaml from 'js-yaml';
 
-const REPO_ROOT = process.cwd();
+const REPO_ROOT = path.resolve(process.cwd(), '..', '..');
 const OWNER = process.env.GITHUB_OWNER || 'Synnovator';
 const REPO = process.env.GITHUB_REPO || 'monorepo';
 
