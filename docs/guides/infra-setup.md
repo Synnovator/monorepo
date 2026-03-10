@@ -13,29 +13,36 @@
 
 ---
 
-## 1. Cloudflare Pages
+## 1. Cloudflare Workers 部署
 
-### 1.1 创建项目
+> **架构变更（2026-03-10）**：已从 Cloudflare Pages 原生 GitHub 集成迁移到 **GitHub Actions + wrangler deploy**。
+> 原因：原生集成会在所有分支（包括 `data/*`）触发构建，而我们只需在 `main` 上部署。
 
-- Dashboard → Workers & Pages → Create → Pages → Connect to Git
-- 选择 GitHub 账号 → 授权 → 选择 `synnovator/monorepo`
-- 项目名称: `synnovator`（默认域名 `synnovator.pages.dev`）
+### 1.1 部署方式
 
-### 1.2 构建与部署设置
+通过 GitHub Actions 工作流 `.github/workflows/deploy.yml` 自动部署：
 
-- Framework preset: `Astro`
-- Build command: `cd site && pnpm install && pnpm build`
-- Build output directory: `site/dist`
-- Root directory: `/`（留空，不要设为 `site/`）
-- **生产部署**: `cd site && pnpm run deploy`（执行 `wrangler deploy`）
-- **预览部署**: `cd site && pnpm run deploy:preview`（执行 `wrangler versions upload`，用于非 main 分支）
-- Node.js version: 环境变量 `NODE_VERSION` = `20`
+- **触发条件**：仅 `push` 到 `main` 分支
+- **构建命令**：`pnpm run deploy`（= `opennextjs-cloudflare build && wrangler deploy`）
+- **Worker 名称**：`synnovator`（配置在 `apps/web/wrangler.jsonc`）
 
-> **注意**: Production 使用 `pnpm run deploy`，Non-production（PR Preview）使用 `pnpm run deploy:preview`。
+> **重要**：Cloudflare dashboard 中 Pages 项目的 GitHub 集成应保持**断开**状态，
+> 否则会与 Actions workflow 重复触发部署。
+
+### 1.2 GitHub Repo Secrets（部署所需）
+
+Repo → Settings → Secrets and variables → Actions → New repository secret
+
+| Secret 名 | 值来源 | 说明 |
+|-----------|--------|------|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens | 权限：Account.Workers Scripts (Edit)、Account.Account Settings (Read) |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → Workers & Pages → 右侧边栏 Account ID | 账号标识 |
+
+> **API Token 权限**：可复用已有的 `synnovator-wrangler-cli` token，或新建 token 使用 "Edit Cloudflare Workers" 模板。
 
 ### 1.3 自定义域名
 
-- Pages 项目 → Custom domains → Add → `home.synnovator.space`
+- Workers & Pages → `synnovator` → Settings → Domains & Routes → Add → `home.synnovator.space`
 - 前提：`synnovator.space` 的 DNS 已托管在 Cloudflare
 - CF 自动创建 CNAME 记录并签发 SSL
 
@@ -47,8 +54,7 @@
 
 ### 1.5 PR Preview
 
-- 默认启用，无需额外配置
-- 每个 PR 自动构建预览站点，格式: `https://{hash}.synnovator.pages.dev/`
+当前未启用自动 PR Preview 部署。如需启用，可在 deploy.yml 中添加 `pull_request` 触发器并使用 `wrangler versions upload`。
 
 ---
 
@@ -100,13 +106,13 @@
 
 ## 4. 环境变量与 Secrets
 
-> **架构说明**: 站点通过 `wrangler deploy` 部署为 Cloudflare Worker（非 Pages 直接部署）。
-> CF Pages 仅作为 CI/CD 触发构建，实际运行时变量来自 **Worker** 的配置。
-> 非敏感值写入 `wrangler.toml [vars]`，敏感值通过 Worker Secrets 配置。
+> **架构说明**: 站点通过 GitHub Actions + `wrangler deploy` 部署为 Cloudflare Worker。
+> 非敏感运行时变量写入 `wrangler.jsonc [vars]`，敏感值通过 Worker Secrets 配置。
+> 部署所需的 `CLOUDFLARE_API_TOKEN` 和 `CLOUDFLARE_ACCOUNT_ID` 配置在 GitHub Repo Secrets（见 §1.2）。
 
-### 4.1 wrangler.toml 变量（非敏感，提交到仓库）
+### 4.1 wrangler.jsonc 变量（非敏感，提交到仓库）
 
-`site/wrangler.toml` 的 `[vars]` 区段已包含：
+`apps/web/wrangler.jsonc` 的 `vars` 区段已包含：
 
 | 变量名 | 值 | 说明 |
 |--------|------|------|
@@ -130,36 +136,29 @@ Workers & Pages → `synnovator` → Settings → Variables and Secrets → Add
 
 CLI 方式配置 Secrets（需 `CLOUDFLARE_API_TOKEN`）：
 ```bash
-cd site
+cd apps/web
 pnpm exec wrangler secret put GITHUB_CLIENT_SECRET
 pnpm exec wrangler secret put AUTH_SECRET
 # 按提示粘贴值
 ```
 
-> **注意**: CF Pages build settings 的环境变量仅在构建阶段可用，Worker 运行时读不到。
-> 所有运行时变量必须通过 `wrangler.toml [vars]` 或 Worker Secrets 配置。
+> **注意**: 所有运行时变量必须通过 `wrangler.jsonc [vars]` 或 Worker Secrets 配置。
 
-### 4.3 CF Pages Build Settings（仅构建阶段）
-
-Pages 项目 → Settings → Environment variables → Add
-
-| 变量名 | 值 | 说明 |
-|--------|------|------|
-| `NODE_VERSION` | `20` | 构建时 Node.js 版本 |
-
-### 4.2 GitHub Repo Secrets
+### 4.3 GitHub Repo Secrets
 
 Repo → Settings → Secrets and variables → Actions → New repository secret
 
 | Secret 名 | 值来源 | 用途 |
 |-----------|--------|------|
+| `CLOUDFLARE_API_TOKEN` | §1.2 API Token | GitHub Actions 部署到 Cloudflare Workers |
+| `CLOUDFLARE_ACCOUNT_ID` | §1.2 Account ID | 同上 |
 | `R2_ACCESS_KEY_ID` | §2.2 API Token | Actions 上传文件到 R2 |
 | `R2_SECRET_ACCESS_KEY` | §2.2 API Token | 同上 |
 | `R2_BUCKET_NAME` | `synnovator-assets` | 同上 |
 | `R2_ENDPOINT` | §2.2 S3 Endpoint | 同上 |
-| `CLAUDE_CODE_OAUTH_TOKEN` | §4.3 本地生成 | Claude Code Action（PR Review Bot） |
+| `CLAUDE_CODE_OAUTH_TOKEN` | §4.4 本地生成 | Claude Code Action（PR Review Bot） |
 
-### 4.3 Claude Code OAuth Token
+### 4.4 Claude Code OAuth Token
 
 MVP 阶段使用 `CLAUDE_CODE_OAUTH_TOKEN`（个人 Claude Pro/Max 订阅额度）驱动 Claude Code GitHub Action。无需单独充值 API credits。
 
@@ -191,31 +190,14 @@ gh secret set CLAUDE_CODE_OAUTH_TOKEN
 1. 打开 https://github.com/apps/claude → Install
 2. 选择 `synnovator/monorepo` 仓库 → 授权
 
-### 5.2 创建 workflow
+### 5.2 Workflow 文件
 
-创建 `.github/workflows/claude-review.yml`：
+仓库中已有两个 Claude Code 相关 workflow：
 
-```yaml
-name: Claude Code Review
-on:
-  issue_comment:
-    types: [created]
-  pull_request_review_comment:
-    types: [created]
-  pull_request:
-    types: [opened, synchronize]
+- **`.github/workflows/claude-code-review.yml`** — PR 自动 Code Review（使用 code-review plugin）
+- **`.github/workflows/claude.yml`** — PR/Issue 中 `@claude` 对话触发
 
-jobs:
-  review:
-    if: |
-      (github.event_name == 'pull_request') ||
-      (contains(github.event.comment.body, '@claude'))
-    runs-on: ubuntu-latest
-    steps:
-      - uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-```
+**bot 权限**：`claude-code-review.yml` 中配置了 `allowed_bots: 'synnovator'`，允许 synnovator GitHub App 创建的 PR 触发 Code Review。
 
 **功能说明**：
 - PR 创建/更新时自动审查
@@ -224,78 +206,68 @@ jobs:
 
 ---
 
-## 6. 代码变更
+## 6. 代码配置
 
-### 6.1 安装 Cloudflare adapter
+> **架构变更**：站点已从 Astro 迁移到 Next.js 15 + OpenNext Cloudflare 适配器。
 
-```bash
-cd site && pnpm add @astrojs/cloudflare
+### 6.1 OpenNext 配置
+
+`apps/web/open-next.config.ts`:
+```ts
+import { defineCloudflareConfig } from '@opennextjs/cloudflare';
+export default defineCloudflareConfig({});
 ```
 
-### 6.2 修改 site/astro.config.mjs
+### 6.2 wrangler.jsonc
 
-```javascript
-import { defineConfig } from 'astro/config';
-import cloudflare from '@astrojs/cloudflare';
-import tailwindcss from '@tailwindcss/vite';
+Worker 部署配置（`apps/web/wrangler.jsonc`）:
 
-export default defineConfig({
-  site: 'https://home.synnovator.space',
-  output: 'hybrid',
-  adapter: cloudflare(),
-  vite: {
-    plugins: [tailwindcss()],
+```jsonc
+{
+  "name": "synnovator",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2024-12-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
   },
-});
+  "vars": {
+    "SITE_URL": "https://home.synnovator.space",
+    "GITHUB_CLIENT_ID": "Iv23li...",
+    "GITHUB_OWNER": "Synnovator",
+    "GITHUB_REPO": "monorepo",
+    "GITHUB_APP_ID": "...",
+    "GITHUB_APP_INSTALLATION_ID": "..."
+  }
+}
 ```
 
-变更点:
-- `output`: `'static'` → `'hybrid'`
-- 新增 `adapter: cloudflare()`
-- `site` URL 更新为 `https://home.synnovator.space`
+> `vars` 存放非敏感运行时变量，敏感值通过 Worker Secrets 配置（见 §4.2）。
 
-### 6.3 wrangler.toml
+### 6.3 部署脚本
 
-Worker 部署配置（`site/wrangler.toml`）:
+`apps/web/package.json` 中的部署相关脚本：
 
-```toml
-name = "synnovator"
-main = "./dist/_worker.js/index.js"
-compatibility_date = "2024-09-23"
-compatibility_flags = ["nodejs_compat"]
-
-[assets]
-binding = "ASSETS"
-directory = "./dist"
-
-[vars]
-SITE_URL = "https://home.synnovator.space"
-GITHUB_CLIENT_ID = "Iv23li..."
-GITHUB_OWNER = "Synnovator"        # GitHub 组织名
-GITHUB_REPO = "monorepo"           # 仓库名
-```
-
-> `[vars]` 存放非敏感运行时变量，敏感值通过 Worker Secrets 配置（见 §4.2）。
-
-### 6.4 .assetsignore
-
-在 `site/public/.assetsignore` 中排除 Worker 代码目录，防止作为静态资源上传：
-
-```
-_worker.js
+```json
+{
+  "build:worker": "opennextjs-cloudflare build",
+  "deploy": "opennextjs-cloudflare build && wrangler deploy",
+  "deploy:preview": "opennextjs-cloudflare build && wrangler versions upload"
+}
 ```
 
 ---
 
 ## 7. 验证清单
 
-### 7.1 Cloudflare Pages
+### 7.1 Cloudflare Workers 部署
 
-- [ ] 首次构建成功（Dashboard → Deployments 无报错）
-- [ ] `https://synnovator.pages.dev/` 可访问
+- [ ] GitHub Actions `deploy.yml` 在 push to main 时触发成功
+- [ ] `data/*` 分支不触发部署
+- [ ] Cloudflare dashboard Pages 项目已断开 GitHub 集成
 - [ ] `https://home.synnovator.space` 可访问
 - [ ] `synnovator.space` 301 重定向到 `home.synnovator.space`
-- [ ] PR 提交后自动生成 Preview 部署
 
 ### 7.2 R2
 
@@ -321,10 +293,9 @@ _worker.js
 
 ### 7.5 环境变量
 
-- [ ] `wrangler.toml [vars]`: `SITE_URL`, `GITHUB_CLIENT_ID`, `GITHUB_OWNER`, `GITHUB_REPO` 已配置
-- [ ] Worker Secrets: `GITHUB_CLIENT_SECRET`, `AUTH_SECRET`, R2 相关 4 项已配置
-- [ ] CF Pages Build Settings: `NODE_VERSION=20` 已配置
-- [ ] GitHub Actions Secrets: 5 项已配置（`gh secret list` 验证）
+- [ ] `wrangler.jsonc [vars]`: `SITE_URL`, `GITHUB_CLIENT_ID`, `GITHUB_OWNER`, `GITHUB_REPO`, `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID` 已配置
+- [ ] Worker Secrets: `GITHUB_CLIENT_SECRET`, `AUTH_SECRET`, `GITHUB_APP_PRIVATE_KEY`, R2 相关 4 项已配置
+- [ ] GitHub Actions Secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, R2 4 项, `CLAUDE_CODE_OAUTH_TOKEN` 已配置（`gh secret list` 验证）
 
 ---
 

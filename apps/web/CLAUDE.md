@@ -2,7 +2,7 @@
 
 ## 概述
 
-Synnovator 官网，基于 Next.js 15 App Router，通过 OpenNext 适配部署到 Cloudflare Pages。
+Synnovator 官网，基于 Next.js 15 App Router，通过 OpenNext 适配部署到 Cloudflare Workers。
 
 ## 目录结构
 
@@ -40,4 +40,9 @@ pnpm build            # 构建生产版本（OpenNext + Cloudflare）
 
 ## 部署
 
-推送到 `main` 分支后，通过 OpenNext 适配器构建并自动部署到 Cloudflare Pages。
+推送到 `main` 分支后，GitHub Actions（`.github/workflows/deploy.yml`）自动构建并通过 `wrangler deploy` 部署到 Cloudflare Workers。
+
+- **触发条件**：仅 `push` 到 `main`（`data/*` 等分支不会触发部署）
+- **构建命令**：`pnpm run deploy`（= `opennextjs-cloudflare build && wrangler deploy`）
+- **所需 Secrets**：`CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID`（GitHub repo Secrets）
+- **Worker 配置**：`wrangler.jsonc`（Worker 名 `synnovator`，运行时变量和 Secrets 在 Cloudflare dashboard 配置）
