@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
 } from '@synnovator/ui';
 import { OAuthButton } from './OAuthButton';
+import { ModeToggle } from './ModeToggle';
 import { ChevronDownIcon } from './icons';
 
 export function NavBar() {
@@ -87,6 +88,8 @@ export function NavBar() {
           <button type="button" onClick={handleLangSwitch} className="cursor-pointer py-2 px-2 min-h-11 min-w-11 text-muted hover:text-white text-sm transition-colors relative z-10 inline-flex items-center justify-center" aria-label="Switch language">
             {t(lang, 'nav.lang_switch')}
           </button>
+
+          <ModeToggle />
 
           <OAuthButton />
 
