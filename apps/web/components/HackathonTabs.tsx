@@ -89,8 +89,25 @@ export function HackathonTabs({ detailsLabel, submissionsLabel, leaderboardLabel
     window.history.replaceState(null, '', `#${tab}`);
   }
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    const idx = TAB_IDS.indexOf(activeTab);
+    let nextIdx: number | null = null;
+
+    if (e.key === 'ArrowRight') nextIdx = (idx + 1) % TAB_IDS.length;
+    else if (e.key === 'ArrowLeft') nextIdx = (idx - 1 + TAB_IDS.length) % TAB_IDS.length;
+    else if (e.key === 'Home') nextIdx = 0;
+    else if (e.key === 'End') nextIdx = TAB_IDS.length - 1;
+
+    if (nextIdx !== null) {
+      e.preventDefault();
+      const nextTab = TAB_IDS[nextIdx];
+      handleTabClick(nextTab);
+      document.getElementById(`tab-${nextTab}`)?.focus();
+    }
+  }
+
   return (
-    <div role="tablist" className="inline-flex h-10 items-center gap-1 rounded-lg bg-muted p-1">
+    <div role="tablist" className="inline-flex h-10 items-center gap-1 rounded-lg bg-muted p-1" onKeyDown={handleKeyDown}>
       {TAB_IDS.map(tab => (
         <button
           key={tab}
@@ -98,6 +115,7 @@ export function HackathonTabs({ detailsLabel, submissionsLabel, leaderboardLabel
           id={`tab-${tab}`}
           aria-selected={activeTab === tab}
           aria-controls={`panel-${tab}`}
+          tabIndex={activeTab === tab ? 0 : -1}
           onClick={() => handleTabClick(tab)}
           className={cn(
             "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all",

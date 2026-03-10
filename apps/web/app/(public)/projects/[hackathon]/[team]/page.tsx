@@ -71,7 +71,7 @@ export default async function ProjectDetailPage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           {project.description ? (
-            <div className="prose prose-invert prose-sm max-w-none text-foreground">
+            <div className="prose prose-sm max-w-none text-foreground">
               <p>{localize(lang, project.description, project.description_zh)}</p>
             </div>
           ) : (

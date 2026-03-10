@@ -17,7 +17,7 @@ export function ModeToggle() {
     <button
       type="button"
       onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}
-      className="cursor-pointer py-2 px-2 min-h-11 min-w-11 text-muted-foreground hover:text-foreground text-sm transition-colors inline-flex items-center justify-center"
+      className="cursor-pointer py-2 px-2 min-h-11 min-w-11 rounded-md text-muted-foreground hover:text-foreground text-sm transition-colors inline-flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
       aria-label={resolvedTheme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
     >
       {resolvedTheme === 'light' ? (

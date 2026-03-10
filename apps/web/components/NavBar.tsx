@@ -99,6 +99,7 @@ export function NavBar() {
             className="md:hidden inline-flex items-center justify-center min-h-11 min-w-11 text-muted-foreground hover:text-foreground transition-colors"
             onClick={() => setMobileMenuOpen(prev => !prev)}
             aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-nav-menu"
             aria-label="Toggle navigation menu"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
@@ -121,7 +122,7 @@ export function NavBar() {
 
       {/* Mobile menu panel */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-md">
+        <div id="mobile-nav-menu" className="md:hidden border-t border-border bg-background/95 backdrop-blur-md">
           <div className="px-4 py-4 space-y-1">
             <Link href={langHref('/')} onClick={() => setMobileMenuOpen(false)} className={`block px-3 py-3 rounded-lg text-sm transition-colors ${pathname === '/' ? 'text-foreground bg-muted' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}>
               {t(lang, 'nav.hackathons')}
