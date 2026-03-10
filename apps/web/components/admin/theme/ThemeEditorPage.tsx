@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import { TOKEN_NAMES, type TokenName } from '@synnovator/shared/schemas/theme';
 import type { ThemeConfig, HackathonTheme } from '@synnovator/shared/schemas/theme';
 import { ThemeSelector } from './ThemeSelector';
+import { TokenGroup, TOKEN_GROUPS } from './TokenGroup';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -53,14 +54,14 @@ export function ThemeEditorPage() {
 
   // Apply CSS variable preview
   const applyPreview = useCallback(
-    (tokens: TokenEntry[]) => {
+    (tokenList: TokenEntry[]) => {
       const style = document.documentElement.style;
       // Clear previously injected properties
       for (const prop of injectedPropsRef.current) {
         style.removeProperty(prop);
       }
       const injected: string[] = [];
-      for (const token of tokens) {
+      for (const token of tokenList) {
         const prop = `--${token.name}`;
         style.setProperty(prop, token.value);
         injected.push(prop);
@@ -81,7 +82,7 @@ export function ThemeEditorPage() {
   }, []);
 
   // Build token list from current state
-  const tokens: TokenEntry[] = (() => {
+  const tokens: TokenEntry[] = useMemo(() => {
     if (!themeData) return [];
     const modeData = themeData[mode];
     if (!modeData) return [];
@@ -104,7 +105,97 @@ export function ThemeEditorPage() {
         inherited: !overrideVal,
       };
     });
-  })();
+  }, [themeData, overrides, target, mode]);
+
+  // Derive lookup maps for TokenGroup
+  const valuesMap = useMemo(() => {
+    const m: Record<string, string> = {};
+    for (const tok of tokens) m[tok.name] = tok.value;
+    return m;
+  }, [tokens]);
+
+  const inheritedMap = useMemo(() => {
+    const m: Record<string, boolean> = {};
+    for (const tok of tokens) m[tok.name] = tok.inherited;
+    return m;
+  }, [tokens]);
+
+  // Apply preview whenever tokens change
+  useEffect(() => {
+    if (tokens.length > 0) {
+      applyPreview(tokens);
+    }
+  }, [tokens, applyPreview]);
+
+  // Handle token value change
+  const handleTokenChange = useCallback(
+    (name: string, value: string) => {
+      if (target === 'global') {
+        setThemeData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            [mode]: {
+              ...prev[mode],
+              [name]: value,
+            },
+          };
+        });
+      } else {
+        setOverrides((prev) => {
+          const current = prev ?? {};
+          const currentMode = (current[mode] ?? {}) as Record<string, string | undefined>;
+          return {
+            ...current,
+            [mode]: {
+              ...currentMode,
+              [name]: value,
+            },
+          } as HackathonTheme;
+        });
+      }
+    },
+    [target, mode],
+  );
+
+  // Handle promoting an inherited token to an override
+  const handleOverride = useCallback(
+    (name: string) => {
+      if (target === 'global') return; // global tokens are never inherited
+      // Copy the current (global) value into overrides
+      const currentValue = valuesMap[name];
+      if (!currentValue) return;
+      setOverrides((prev) => {
+        const current = prev ?? {};
+        const currentMode = (current[mode] ?? {}) as Record<string, string | undefined>;
+        return {
+          ...current,
+          [mode]: {
+            ...currentMode,
+            [name]: currentValue,
+          },
+        } as HackathonTheme;
+      });
+    },
+    [target, mode, valuesMap],
+  );
+
+  // Handle resetting a hackathon override back to inherited
+  const handleReset = useCallback(
+    (name: string) => {
+      if (target === 'global') return;
+      setOverrides((prev) => {
+        if (!prev) return prev;
+        const currentMode = { ...((prev[mode] ?? {}) as Record<string, string | undefined>) };
+        delete currentMode[name];
+        return {
+          ...prev,
+          [mode]: currentMode,
+        } as HackathonTheme;
+      });
+    },
+    [target, mode],
+  );
 
   // Toggle light/dark mode
   const toggleMode = () => {
@@ -140,9 +231,17 @@ export function ThemeEditorPage() {
         <div className="flex gap-6 flex-1 min-h-0">
           {/* Left: editor panel */}
           <div className="w-80 shrink-0 overflow-y-auto pr-2">
-            <p className="text-muted-foreground text-sm">
-              {t(lang, 'admin.theme_colors')} — {tokens.length} tokens
-            </p>
+            {TOKEN_GROUPS.map((group) => (
+              <TokenGroup
+                key={group.label}
+                group={group}
+                values={valuesMap}
+                inherited={inheritedMap}
+                onChange={handleTokenChange}
+                onOverride={handleOverride}
+                onReset={handleReset}
+              />
+            ))}
           </div>
           {/* Right: preview panel */}
           <div className="flex-1 overflow-y-auto border border-border rounded-lg p-4 bg-background">
