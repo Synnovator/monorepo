@@ -128,7 +128,22 @@
     "reject_reason": "Reason for rejection",
     "review_comment": "Review comment",
     "confirm_approve": "Approve this PR?",
-    "confirm_reject": "Reject this PR?"
+    "confirm_reject": "Reject this PR?",
+    "theme": "Theme Editor",
+    "theme_global": "Global Theme",
+    "theme_publish": "Publish PR",
+    "theme_publish_success": "PR Created",
+    "theme_inherited": "Inherited from global",
+    "theme_override": "Override",
+    "theme_reset": "Reset to inherited",
+    "theme_colors": "Colors",
+    "theme_typography": "Typography",
+    "theme_radius": "Radius",
+    "theme_preview_components": "Component Preview",
+    "theme_preview_page": "Page Preview",
+    "theme_contrast": "Contrast",
+    "theme_contrast_pass": "Passes AA",
+    "theme_contrast_fail": "Fails AA"
   },
   "common": {
     "back_home": "Back to Home",

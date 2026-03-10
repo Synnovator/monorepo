@@ -126,7 +126,22 @@
     "reject_reason": "拒绝原因",
     "review_comment": "审核意见",
     "confirm_approve": "确认批准此 PR？",
-    "confirm_reject": "确认拒绝此 PR？"
+    "confirm_reject": "确认拒绝此 PR？",
+    "theme": "主题编辑",
+    "theme_global": "全局主题",
+    "theme_publish": "发布 PR",
+    "theme_publish_success": "PR 已创建",
+    "theme_inherited": "继承自全局",
+    "theme_override": "覆盖",
+    "theme_reset": "重置为继承",
+    "theme_colors": "颜色",
+    "theme_typography": "字体",
+    "theme_radius": "圆角",
+    "theme_preview_components": "组件预览",
+    "theme_preview_page": "页面预览",
+    "theme_contrast": "对比度",
+    "theme_contrast_pass": "通过 AA",
+    "theme_contrast_fail": "未达 AA"
   },
   "common": {
     "back_home": "返回首页",
