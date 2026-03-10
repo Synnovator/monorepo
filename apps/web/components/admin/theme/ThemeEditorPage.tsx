@@ -7,6 +7,9 @@ import { TOKEN_NAMES, type TokenName } from '@synnovator/shared/schemas/theme';
 import type { ThemeConfig, HackathonTheme } from '@synnovator/shared/schemas/theme';
 import { ThemeSelector } from './ThemeSelector';
 import { TokenGroup, TOKEN_GROUPS } from './TokenGroup';
+import { PreviewPanel } from './PreviewPanel';
+import { ContrastChecker } from './ContrastChecker';
+import { PublishButton } from './PublishButton';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -197,6 +200,45 @@ export function ThemeEditorPage() {
     [target, mode],
   );
 
+  // Build publish data maps (both light and dark modes)
+  const publishLight = useMemo(() => {
+    if (!themeData) return {};
+    if (target === 'global') {
+      const m: Record<string, string> = {};
+      for (const name of TOKEN_NAMES) {
+        const v = themeData.light?.[name];
+        if (v) m[name] = v;
+      }
+      return m;
+    }
+    // Hackathon: only send overrides
+    const ov = overrides?.light ?? {};
+    const m: Record<string, string> = {};
+    for (const [k, v] of Object.entries(ov)) {
+      if (v) m[k] = v;
+    }
+    return m;
+  }, [themeData, overrides, target]);
+
+  const publishDark = useMemo(() => {
+    if (!themeData) return {};
+    if (target === 'global') {
+      const m: Record<string, string> = {};
+      for (const name of TOKEN_NAMES) {
+        const v = themeData.dark?.[name];
+        if (v) m[name] = v;
+      }
+      return m;
+    }
+    // Hackathon: only send overrides
+    const ov = overrides?.dark ?? {};
+    const m: Record<string, string> = {};
+    for (const [k, v] of Object.entries(ov)) {
+      if (v) m[k] = v;
+    }
+    return m;
+  }, [themeData, overrides, target]);
+
   // Toggle light/dark mode
   const toggleMode = () => {
     const next: ThemeMode = mode === 'light' ? 'dark' : 'light';
@@ -220,6 +262,13 @@ export function ThemeEditorPage() {
         >
           {mode === 'light' ? 'Light' : 'Dark'}
         </button>
+        <PublishButton
+          target={target}
+          light={publishLight}
+          dark={publishDark}
+          fonts={themeData?.fonts as Record<string, string> | undefined}
+          radius={themeData?.radius}
+        />
       </div>
 
       {/* Main content */}
@@ -242,12 +291,11 @@ export function ThemeEditorPage() {
                 onReset={handleReset}
               />
             ))}
+            <ContrastChecker tokens={valuesMap} />
           </div>
           {/* Right: preview panel */}
           <div className="flex-1 overflow-y-auto border border-border rounded-lg p-4 bg-background">
-            <p className="text-muted-foreground text-sm">
-              {t(lang, 'admin.theme_preview_components')}
-            </p>
+            <PreviewPanel />
           </div>
         </div>
       )}
