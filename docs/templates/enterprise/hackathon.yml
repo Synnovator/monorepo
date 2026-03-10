@@ -27,7 +27,7 @@ hackathon:
     ip_ownership: "organizer"
     nda:
       required: true
-      url: ""
+      url: "https://example.com/nda.pdf"  # Replace with your NDA document URL
     compliance_notes:
       - "All submissions become property of the organizing company"
       - "Participants must sign NDA before accessing datasets"
