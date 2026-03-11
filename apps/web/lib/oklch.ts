@@ -62,14 +62,21 @@ export function formatOklch(color: OklchColor): string {
  *
  * Client-side only — requires canvas API.
  */
-export function oklchToHex(cssColor: string): string {
-  if (typeof document === 'undefined') return '#000000';
+// Shared canvas for color conversion (avoids creating one per call)
+let _sharedCanvas: HTMLCanvasElement | null = null;
+function getCanvasCtx(): CanvasRenderingContext2D | null {
+  if (typeof document === 'undefined') return null;
+  if (!_sharedCanvas) {
+    _sharedCanvas = document.createElement('canvas');
+    _sharedCanvas.width = 1;
+    _sharedCanvas.height = 1;
+  }
+  return _sharedCanvas.getContext('2d');
+}
 
+export function oklchToHex(cssColor: string): string {
   try {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1;
-    canvas.height = 1;
-    const ctx = canvas.getContext('2d');
+    const ctx = getCanvasCtx();
     if (!ctx) return '#000000';
 
     ctx.fillStyle = cssColor;
@@ -112,13 +119,8 @@ function hex(n: number): string {
 }
 
 function cssToRgb(cssColor: string): [number, number, number] | null {
-  if (typeof document === 'undefined') return null;
-
   try {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1;
-    canvas.height = 1;
-    const ctx = canvas.getContext('2d');
+    const ctx = getCanvasCtx();
     if (!ctx) return null;
 
     ctx.fillStyle = cssColor;

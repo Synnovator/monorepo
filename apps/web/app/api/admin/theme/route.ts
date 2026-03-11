@@ -9,6 +9,7 @@ import yaml from 'js-yaml';
 const REPO_ROOT = path.resolve(process.cwd(), '..', '..');
 const OWNER = process.env.GITHUB_OWNER || 'Synnovator';
 const REPO = process.env.GITHUB_REPO || 'monorepo';
+const SLUG_RE = /^[a-z0-9][a-z0-9-]*[a-z0-9]$/;
 
 function readYamlFile(filePath: string): Record<string, unknown> | null {
   try {
@@ -41,6 +42,14 @@ export async function GET(request: NextRequest) {
     const action = searchParams.get('action');
     const themeName = searchParams.get('theme');
     const hackathonSlug = searchParams.get('hackathon');
+
+    // Validate slugs to prevent path traversal
+    if (themeName && !SLUG_RE.test(themeName)) {
+      return NextResponse.json({ error: 'Invalid theme name' }, { status: 400 });
+    }
+    if (hackathonSlug && !SLUG_RE.test(hackathonSlug)) {
+      return NextResponse.json({ error: 'Invalid hackathon slug' }, { status: 400 });
+    }
 
     const themesDir = path.join(REPO_ROOT, 'config', 'themes');
     const activeFile = path.join(themesDir, '.active');
@@ -88,6 +97,9 @@ export async function GET(request: NextRequest) {
 
     // Fallback: legacy ?target= support
     const target = searchParams.get('target');
+    if (target && target !== 'global' && !SLUG_RE.test(target)) {
+      return NextResponse.json({ error: 'Invalid target slug' }, { status: 400 });
+    }
     if (target === 'global') {
       const activeTheme = fs.existsSync(activeFile)
         ? fs.readFileSync(activeFile, 'utf-8').trim()
@@ -181,11 +193,26 @@ export async function POST(request: NextRequest) {
       });
 
       const commitMsg = `theme: activate ${themeName} as default platform theme`;
+
+      // Fetch existing file SHA (required by GitHub API for updates)
+      let activeSha: string | undefined;
+      try {
+        const { data: existing } = await octokit.repos.getContent({
+          owner: OWNER, repo: REPO,
+          path: 'config/themes/.active',
+          ref: branchName,
+        });
+        if (!Array.isArray(existing)) {
+          activeSha = existing.sha;
+        }
+      } catch { /* file doesn't exist yet */ }
+
       await octokit.repos.createOrUpdateFileContents({
         owner: OWNER, repo: REPO,
         path: 'config/themes/.active',
         message: commitMsg,
-        content: toBase64(themeName),
+        content: toBase64(themeName + '\n'),
+        sha: activeSha,
         branch: branchName,
       });
 
@@ -250,11 +277,25 @@ export async function POST(request: NextRequest) {
 
     const commitMsg = message || `theme(${themeName}): update ${type === 'platform' ? 'platform theme' : `variant for ${hackathonSlug}`}`;
 
+    // Fetch existing file SHA if updating an existing theme
+    let fileSha: string | undefined;
+    try {
+      const { data: existing } = await octokit.repos.getContent({
+        owner: OWNER, repo: REPO,
+        path: filePath,
+        ref: branchName,
+      });
+      if (!Array.isArray(existing)) {
+        fileSha = existing.sha;
+      }
+    } catch { /* file doesn't exist yet — creating new */ }
+
     await octokit.repos.createOrUpdateFileContents({
       owner: OWNER, repo: REPO,
       path: filePath,
       message: commitMsg,
       content: toBase64(yamlContent),
+      sha: fileSha,
       branch: branchName,
     });
 

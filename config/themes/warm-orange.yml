@@ -2,7 +2,7 @@ name: "Warm Orange"
 name_zh: "暖橙"
 description: "Synnovator default theme with warm orange brand"
 
-# config/theme.yml — Single source of truth for platform theme
+# Synnovator default platform theme
 # Compiled to CSS by scripts/generate-theme-css.mjs during prebuild.
 
 light:

@@ -41,6 +41,7 @@ export function ThemeEditorPage() {
   const injectedPropsRef = useRef<string[]>([]);
 
   // Create theme flow
+  const skipNextFetchRef = useRef(false);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
   const [newNameZh, setNewNameZh] = useState('');
@@ -81,6 +82,10 @@ export function ThemeEditorPage() {
   // --- Fetch theme data when selection changes ---
   useEffect(() => {
     if (!selectedTheme) return;
+    if (skipNextFetchRef.current) {
+      skipNextFetchRef.current = false;
+      return;
+    }
     setLoading(true);
     setError(null);
     setActivatePrUrl(null);
@@ -371,15 +376,23 @@ export function ThemeEditorPage() {
       active: false,
     };
     setThemes((prev) => [...prev, newMeta]);
+
+    // Seed the new theme with a copy of the current theme data
+    // so the user starts from a known-good base instead of fetching a 404
+    // The useEffect on selectedTheme will skip the fetch since themeData is already set
+    setThemeDescription(newDescription.trim());
+    setThemeName(newName.trim());
+    setThemeNameZh(newNameZh.trim());
+    setOverrides(null);
+    // themeData stays as-is (cloned from whatever theme was being viewed)
+    skipNextFetchRef.current = true;
+
     setSelectedTheme(slug);
     setSelectedVariant(null);
     setShowCreate(false);
     setNewName('');
     setNewNameZh('');
     setNewDescription('');
-    setThemeDescription(newDescription.trim());
-    setThemeName(newName.trim());
-    setThemeNameZh(newNameZh.trim());
   };
 
   return (

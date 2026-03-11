@@ -91,6 +91,7 @@ export function ColorTokenEditor({
           {/* Lightness */}
           <SliderRow
             label="L"
+            tokenName={name}
             value={parsed.l}
             min={0}
             max={1}
@@ -101,6 +102,7 @@ export function ColorTokenEditor({
           {/* Chroma */}
           <SliderRow
             label="C"
+            tokenName={name}
             value={parsed.c}
             min={0}
             max={0.4}
@@ -111,6 +113,7 @@ export function ColorTokenEditor({
           {/* Hue */}
           <SliderRow
             label="H"
+            tokenName={name}
             value={parsed.h}
             min={0}
             max={360}
@@ -136,6 +139,7 @@ export function ColorTokenEditor({
 
 interface SliderRowProps {
   label: string;
+  tokenName: string;
   value: number;
   min: number;
   max: number;
@@ -143,8 +147,8 @@ interface SliderRowProps {
   onChange: (value: number) => void;
 }
 
-function SliderRow({ label, value, min, max, step, onChange }: SliderRowProps) {
-  const id = `slider-${label}`;
+function SliderRow({ label, value, min, max, step, onChange, tokenName }: SliderRowProps) {
+  const id = `slider-${tokenName}-${label}`;
   return (
     <div className="flex items-center gap-2">
       <label htmlFor={id} className="w-4 text-xs text-muted-foreground font-mono shrink-0">
