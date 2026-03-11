@@ -27,6 +27,14 @@ export function generateStaticParams() {
   return listHackathons().map(h => ({ slug: h.hackathon.slug }));
 }
 
+function typeVariant(type: string): 'brand' | 'info' | 'highlight' {
+  switch (type) {
+    case 'enterprise': return 'info';
+    case 'youth-league': return 'highlight';
+    default: return 'brand';
+  }
+}
+
 type StageVariant = 'secondary' | 'brand' | 'highlight' | 'info' | 'warning';
 
 function stageVariant(stage: string): StageVariant {
@@ -95,7 +103,7 @@ export default async function HackathonDetailPage({
       {/* Hero */}
       <div className="mb-12">
         <div className="flex items-center gap-3 mb-4">
-          <Badge variant="secondary">
+          <Badge variant={typeVariant(h.type)}>
             {t(lang, `hackathon.type_${h.type.replace('-', '_')}`)}
           </Badge>
           <Badge variant={stageVariant(stage)}>

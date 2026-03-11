@@ -1,17 +1,79 @@
 'use client';
 
+// 重要：一定要复用 HackathonCard / ProjectCard 等真实组件渲染预览！！！
+// 不要手写 mock HTML，否则预览和实际页面的样式会不一致。
+
 import { useMemo } from 'react';
-import { Button } from '@synnovator/ui';
-import { Badge } from '@synnovator/ui';
-import { Card } from '@synnovator/ui';
-import { Separator } from '@synnovator/ui';
-import { listHackathons } from '@/app/_generated/data';
+import { useSearchParams } from 'next/navigation';
+import { getLangFromSearchParams } from '@synnovator/shared/i18n';
+import { Button, Badge, Separator } from '@synnovator/ui';
+import { HackathonCard } from '@/components/HackathonCard';
+import { ProjectCard } from '@/components/ProjectCard';
+import { listHackathons, listSubmissions } from '@/app/_generated/data';
 
 interface PagePreviewProps {
   hackathonSlug?: string;
 }
 
+type MockHackathon = {
+  name: string;
+  name_zh: string;
+  slug: string;
+  tagline: string;
+  tagline_zh: string;
+  type: string;
+  timeline: Record<string, { start: string; end: string }>;
+};
+
+const MOCK_HACKATHONS: MockHackathon[] = [
+  {
+    name: 'AI Innovation Challenge',
+    name_zh: 'AI 创新挑战赛',
+    slug: 'mock-community',
+    tagline: 'Open to all developers. Build creative AI applications.',
+    tagline_zh: '面向所有开发者，构建创新的 AI 应用',
+    type: 'community',
+    timeline: {
+      registration: {
+        start: new Date(Date.now() - 7 * 86400000).toISOString(),
+        end: new Date(Date.now() + 30 * 86400000).toISOString(),
+      },
+    },
+  },
+  {
+    name: 'Enterprise AI Solutions',
+    name_zh: '企业级 AI 解决方案',
+    slug: 'mock-enterprise',
+    tagline: 'Corporate-sponsored hackathon for B2B AI solutions.',
+    tagline_zh: '企业赞助的 B2B AI 解决方案挑战赛',
+    type: 'enterprise',
+    timeline: {
+      development: {
+        start: new Date(Date.now() - 3 * 86400000).toISOString(),
+        end: new Date(Date.now() + 14 * 86400000).toISOString(),
+      },
+    },
+  },
+];
+
+const MOCK_PROJECT = {
+  name: 'Neural Canvas',
+  name_zh: '神经画布',
+  tagline: 'AI-powered collaborative drawing tool',
+  tagline_zh: 'AI 驱动的协作绘图工具',
+  track: 'AI Applications',
+  team: [
+    { github: 'alice', role: 'lead' },
+    { github: 'bob', role: 'developer' },
+  ],
+  tech_stack: ['Python', 'TensorFlow', 'React', 'WebSocket'],
+  likes: 42,
+};
+
 export function PagePreview({ hackathonSlug }: PagePreviewProps) {
+  const searchParams = useSearchParams();
+  const lang = getLangFromSearchParams(searchParams);
+
   const hackathon = useMemo(() => {
     if (!hackathonSlug) return null;
     try {
@@ -22,52 +84,21 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
     }
   }, [hackathonSlug]);
 
-  // If a hackathon is selected and found, render a real data preview
+  const submission = useMemo(() => {
+    if (!hackathonSlug) return null;
+    try {
+      const all = listSubmissions();
+      return all.find((s) => s._hackathonSlug === hackathonSlug) ?? null;
+    } catch {
+      return null;
+    }
+  }, [hackathonSlug]);
+
   if (hackathon) {
     const h = hackathon.hackathon;
-    const typeLabel =
-      h.type === 'community'
-        ? 'Community'
-        : h.type === 'enterprise'
-          ? 'Enterprise'
-          : h.type === 'youth-league'
-            ? 'Youth League'
-            : 'Open Source';
-
-    const typeColor =
-      h.type === 'enterprise' ? 'var(--info)' : 'var(--brand)';
-
-    const cardRounding =
-      h.type === 'community'
-        ? 'rounded-xl'
-        : h.type === 'enterprise'
-          ? 'rounded-sm'
-          : h.type === 'youth-league'
-            ? 'rounded-lg'
-            : 'rounded-lg';
-
-    const borderStyle =
-      h.type === 'community'
-        ? { borderTopWidth: '3px', borderTopColor: 'var(--brand)' }
-        : h.type === 'enterprise'
-          ? { borderLeftWidth: '3px', borderLeftColor: 'var(--info)' }
-          : h.type === 'youth-league'
-            ? { borderWidth: '2px', borderStyle: 'dashed', borderColor: 'var(--highlight)' }
-            : {};
-
     return (
-      <div data-hackathon={hackathonSlug} className="space-y-8">
-        {/* Hero section with real hackathon data */}
+      <div className="space-y-8 [&_a]:pointer-events-none" data-hackathon={hackathonSlug}>
         <section className="text-center py-8">
-          <Badge
-            className="mb-4 text-xs"
-            style={{
-              backgroundColor: `oklch(from ${typeColor} l c h / 0.2)`,
-              color: typeColor,
-            }}
-          >
-            {typeLabel}
-          </Badge>
           <h1 className="text-2xl font-heading font-bold text-foreground mb-3">
             {h.name}
           </h1>
@@ -84,70 +115,39 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
 
         <Separator />
 
-        {/* Tracks section */}
-        {h.tracks && h.tracks.length > 0 && (
-          <section>
-            <h2 className="text-lg font-heading font-semibold text-foreground mb-4">
-              Tracks
-            </h2>
-            <div className="grid grid-cols-2 gap-4">
-              {h.tracks.map((track) => (
-                <Card
-                  key={track.slug}
-                  className={`${cardRounding} p-4`}
-                  style={borderStyle}
-                >
-                  <h3 className="text-sm font-semibold text-card-foreground mb-1">
-                    {track.name}
-                  </h3>
-                  {track.description && (
-                    <p className="text-xs text-muted-foreground">
-                      {track.description}
-                    </p>
-                  )}
-                </Card>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {h.tracks && h.tracks.length > 0 && <Separator />}
-
-        {/* Detail section */}
         <section>
-          <div className="flex gap-2 mb-3">
-            <Badge variant="outline">{typeLabel}</Badge>
-            {h.description && (
-              <Badge
-                className="text-xs"
-                style={{
-                  backgroundColor: `oklch(from var(--highlight) l c h / 0.2)`,
-                  color: 'var(--highlight)',
-                }}
-              >
-                {h.type}
-              </Badge>
-            )}
+          <h2 className="text-lg font-heading font-semibold text-foreground mb-4">
+            Hackathon Card
+          </h2>
+          <div className="max-w-sm">
+            <HackathonCard hackathon={h} lang={lang} />
           </div>
-          <Card className={`${cardRounding} p-4`}>
-            <h3 className="text-base font-heading font-semibold text-card-foreground mb-2">
-              {h.name}
-            </h3>
-            {h.description && (
-              <p className="text-xs text-muted-foreground">
-                {h.description}
-              </p>
-            )}
-          </Card>
         </section>
+
+        {submission && (
+          <>
+            <Separator />
+            <section>
+              <h2 className="text-lg font-heading font-semibold text-foreground mb-4">
+                Project Card
+              </h2>
+              <div className="max-w-sm">
+                <ProjectCard
+                  project={submission.project}
+                  hackathonSlug={submission._hackathonSlug}
+                  teamSlug={submission._teamSlug}
+                  lang={lang}
+                />
+              </div>
+            </section>
+          </>
+        )}
       </div>
     );
   }
 
-  // Default mock preview (no hackathon selected or not found)
   return (
-    <div className="space-y-8">
-      {/* Section 1: Hero mock */}
+    <div className="space-y-8 [&_a]:pointer-events-none">
       <section className="text-center py-8">
         <Badge variant="secondary" className="mb-4">
           AI Hackathon Platform
@@ -157,7 +157,7 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
         </h1>
         <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6">
           Join thousands of developers in creating innovative AI-powered
-          solutions. Register your team, submit projects, and compete for prizes.
+          solutions.
         </p>
         <div className="flex justify-center gap-3">
           <Button>Get Started</Button>
@@ -167,110 +167,31 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
 
       <Separator />
 
-      {/* Section 2: Hackathon cards */}
       <section>
         <h2 className="text-lg font-heading font-semibold text-foreground mb-4">
           Hackathon Events
         </h2>
         <div className="grid grid-cols-2 gap-4">
-          {/* Community card: rounded-xl, top border brand */}
-          <Card
-            className="rounded-xl p-4"
-            style={{ borderTopWidth: '3px', borderTopColor: 'var(--brand)' }}
-          >
-            <Badge
-              className="mb-2 text-xs"
-              style={{ backgroundColor: 'oklch(from var(--brand) l c h / 0.2)', color: 'var(--brand)' }}
-            >
-              Community
-            </Badge>
-            <h3 className="text-sm font-semibold text-card-foreground mb-1">
-              AI Innovation Challenge
-            </h3>
-            <p className="text-xs text-muted-foreground mb-3">
-              Open to all developers. Build creative AI applications.
-            </p>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>128 teams</span>
-              <span>&middot;</span>
-              <span>Mar 15–20</span>
-            </div>
-          </Card>
-
-          {/* Enterprise card: rounded-sm, left border info */}
-          <Card
-            className="rounded-sm p-4"
-            style={{ borderLeftWidth: '3px', borderLeftColor: 'var(--info)' }}
-          >
-            <Badge
-              className="mb-2 text-xs"
-              style={{ backgroundColor: 'oklch(from var(--info) l c h / 0.2)', color: 'var(--info)' }}
-            >
-              Enterprise
-            </Badge>
-            <h3 className="text-sm font-semibold text-card-foreground mb-1">
-              Enterprise AI Solutions
-            </h3>
-            <p className="text-xs text-muted-foreground mb-3">
-              Corporate-sponsored hackathon for B2B AI solutions.
-            </p>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>64 teams</span>
-              <span>&middot;</span>
-              <span>Apr 1–7</span>
-            </div>
-          </Card>
+          {MOCK_HACKATHONS.map((h) => (
+            <HackathonCard key={h.slug} hackathon={h} lang={lang} />
+          ))}
         </div>
       </section>
 
       <Separator />
 
-      {/* Section 3: Detail page mock */}
       <section>
-        <div className="flex gap-2 mb-3">
-          <Badge variant="outline">Open</Badge>
-          <Badge
-            className="text-xs"
-            style={{ backgroundColor: 'oklch(from var(--highlight) l c h / 0.2)', color: 'var(--highlight)' }}
-          >
-            Submissions Open
-          </Badge>
+        <h2 className="text-lg font-heading font-semibold text-foreground mb-4">
+          Project Card
+        </h2>
+        <div className="max-w-sm">
+          <ProjectCard
+            project={MOCK_PROJECT}
+            hackathonSlug="mock-community"
+            teamSlug="mock-team"
+            lang={lang}
+          />
         </div>
-        <Card className="p-4">
-          <h3 className="text-base font-heading font-semibold text-card-foreground mb-2">
-            Project: Neural Canvas
-          </h3>
-          <p className="text-xs text-muted-foreground mb-4">
-            An AI-powered collaborative drawing tool that transforms rough
-            sketches into polished illustrations using diffusion models.
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            <span
-              className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium"
-              style={{ backgroundColor: 'oklch(from var(--highlight) l c h / 0.15)', color: 'var(--highlight)' }}
-            >
-              Python
-            </span>
-            <span
-              className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium"
-              style={{ backgroundColor: 'oklch(from var(--info) l c h / 0.15)', color: 'var(--info)' }}
-            >
-              TensorFlow
-            </span>
-            <span
-              className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium"
-              style={{ backgroundColor: 'oklch(from var(--highlight) l c h / 0.15)', color: 'var(--highlight)' }}
-            >
-              React
-            </span>
-            <span
-              className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium"
-              style={{ backgroundColor: 'oklch(from var(--info) l c h / 0.15)', color: 'var(--info)' }}
-            >
-              WebSocket
-            </span>
-          </div>
-        </Card>
       </section>
     </div>
   );

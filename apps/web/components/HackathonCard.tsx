@@ -19,6 +19,14 @@ interface HackathonCardProps {
   lang: Lang;
 }
 
+function typeVariant(type: string): 'brand' | 'info' | 'highlight' {
+  switch (type) {
+    case 'enterprise': return 'info';
+    case 'youth-league': return 'highlight';
+    default: return 'brand';
+  }
+}
+
 type StageVariant = 'secondary' | 'brand' | 'highlight' | 'info' | 'warning';
 
 function stageVariant(stage: string): StageVariant {
@@ -49,7 +57,7 @@ export function HackathonCard({ hackathon, lang }: HackathonCardProps) {
       >
       {/* Type + Stage badges */}
       <div className="flex items-center gap-2 mb-3">
-        <Badge variant="secondary" className="gap-1">
+        <Badge variant={typeVariant(hackathon.type)} className="gap-1">
           <TypeIcon size={14} className="shrink-0" />
           {t(lang, typeKey)}
         </Badge>
