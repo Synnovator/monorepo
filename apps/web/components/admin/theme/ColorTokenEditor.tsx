@@ -8,6 +8,7 @@ interface ColorTokenEditorProps {
   name: string;
   value: string;
   inherited: boolean;
+  isVariant?: boolean;
   onChange: (name: string, value: string) => void;
   onOverride: (name: string) => void;
   onReset: (name: string) => void;
@@ -17,6 +18,7 @@ export function ColorTokenEditor({
   name,
   value,
   inherited,
+  isVariant,
   onChange,
   onOverride,
   onReset,
@@ -51,10 +53,13 @@ export function ColorTokenEditor({
       <button
         type="button"
         onClick={handleClick}
+        aria-expanded={!inherited ? expanded : undefined}
         className="flex items-center gap-3 w-full px-3 py-2 text-left hover:bg-muted/50 transition-colors rounded-md"
       >
         {/* Color swatch */}
         <div
+          role="img"
+          aria-label={`${name}: ${hexValue}`}
           className="w-6 h-6 rounded border border-border shrink-0"
           style={{ backgroundColor: value }}
         />
@@ -121,14 +126,16 @@ export function ColorTokenEditor({
             onChange={(v) => handleSliderChange('h', v)}
           />
 
-          {/* Reset button for hackathon overrides */}
-          <button
-            type="button"
-            onClick={() => onReset(name)}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Reset to inherited
-          </button>
+          {/* Reset button for hackathon overrides — only visible in variant mode */}
+          {isVariant && (
+            <button
+              type="button"
+              onClick={() => onReset(name)}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Reset to inherited
+            </button>
+          )}
         </div>
       )}
     </div>

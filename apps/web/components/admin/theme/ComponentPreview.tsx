@@ -122,10 +122,10 @@ export function ComponentPreview() {
           <div className="space-y-1.5">
             <Label>Select</Label>
             <Select>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full" aria-label="Preview select">
                 <SelectValue placeholder="Choose an option" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent position="popper" sideOffset={4}>
                 <SelectItem value="option-1">Option 1</SelectItem>
                 <SelectItem value="option-2">Option 2</SelectItem>
                 <SelectItem value="option-3">Option 3</SelectItem>

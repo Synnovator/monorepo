@@ -1,6 +1,8 @@
 'use client';
 
 import { useMemo } from 'react';
+import { t } from '@synnovator/shared/i18n';
+import type { Lang } from '@synnovator/shared/i18n';
 import { contrastRatio } from '@/lib/oklch';
 
 interface ContrastPair {
@@ -20,9 +22,10 @@ const CONTRAST_PAIRS: ContrastPair[] = [
 
 interface ContrastCheckerProps {
   tokens: Record<string, string>;
+  lang: Lang;
 }
 
-export function ContrastChecker({ tokens }: ContrastCheckerProps) {
+export function ContrastChecker({ tokens, lang }: ContrastCheckerProps) {
   const results = useMemo(() => {
     return CONTRAST_PAIRS.map((pair) => {
       const fgValue = tokens[pair.fg];
@@ -38,7 +41,7 @@ export function ContrastChecker({ tokens }: ContrastCheckerProps) {
   return (
     <div className="mb-6">
       <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-        Contrast
+        {t(lang, 'admin.theme_contrast')}
       </h3>
       <div className="space-y-1.5">
         {results.map((result) => (
@@ -54,7 +57,7 @@ export function ContrastChecker({ tokens }: ContrastCheckerProps) {
               <span
                 className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${
                   result.pass
-                    ? 'bg-highlight/15 text-highlight-foreground'
+                    ? 'bg-highlight/15 text-highlight'
                     : 'bg-destructive/15 text-destructive'
                 }`}
               >

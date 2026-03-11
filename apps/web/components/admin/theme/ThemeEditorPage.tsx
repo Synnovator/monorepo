@@ -398,7 +398,7 @@ export function ThemeEditorPage() {
   return (
     <div className="flex flex-col h-full">
       {/* Toolbar */}
-      <div className="flex items-center gap-4 pb-4 border-b border-border mb-4">
+      <div className="flex flex-wrap items-center gap-4 pb-4 border-b border-border mb-4">
         <h1 className="text-xl font-heading text-foreground">
           {t(lang, 'admin.theme')}
         </h1>
@@ -449,7 +449,7 @@ export function ThemeEditorPage() {
           onClick={toggleMode}
           className="px-3 py-1.5 text-sm rounded-md border border-border bg-card text-foreground hover:bg-muted transition-colors"
         >
-          {mode === 'light' ? 'Light' : 'Dark'}
+          {mode === 'light' ? t(lang, 'admin.theme_mode_light') : t(lang, 'admin.theme_mode_dark')}
         </button>
         <PublishButton
           type={selectedVariant ? 'hackathon-variant' : 'platform'}
@@ -510,7 +510,7 @@ export function ThemeEditorPage() {
               setNewDescription('');
             }}
           >
-            Cancel
+            {t(lang, 'admin.theme_cancel')}
           </Button>
         </div>
       )}
@@ -518,7 +518,7 @@ export function ThemeEditorPage() {
       {/* Main content */}
       {loading ? (
         <div className="flex items-center justify-center flex-1">
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">{t(lang, 'admin.theme_loading')}</p>
         </div>
       ) : error ? (
         <div className="flex items-center justify-center flex-1">
@@ -528,22 +528,27 @@ export function ThemeEditorPage() {
         <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
           {/* Left: editor panel */}
           <div className="w-full lg:w-80 shrink-0 overflow-y-auto pr-2">
-            {TOKEN_GROUPS.map((group) => (
-              <TokenGroup
-                key={group.label}
-                group={group}
-                values={valuesMap}
-                inherited={inheritedMap}
-                onChange={handleTokenChange}
-                onOverride={handleOverride}
-                onReset={handleReset}
-              />
-            ))}
-            <ContrastChecker tokens={valuesMap} />
+            {TOKEN_GROUPS.map((group) => {
+              const labelKey = `admin.theme_group_${group.label.toLowerCase()}`;
+              return (
+                <TokenGroup
+                  key={group.label}
+                  group={group}
+                  label={t(lang, labelKey)}
+                  values={valuesMap}
+                  inherited={inheritedMap}
+                  isVariant={!!selectedVariant}
+                  onChange={handleTokenChange}
+                  onOverride={handleOverride}
+                  onReset={handleReset}
+                />
+              );
+            })}
+            <ContrastChecker tokens={valuesMap} lang={lang} />
           </div>
           {/* Right: preview panel */}
           <div className="flex-1 overflow-y-auto border border-border rounded-lg p-4 bg-background">
-            <PreviewPanel hackathonSlug={selectedVariant} />
+            <PreviewPanel hackathonSlug={selectedVariant} lang={lang} />
           </div>
         </div>
       )}

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { t } from '@synnovator/shared/i18n';
+import type { Lang } from '@synnovator/shared/i18n';
 import { ComponentPreview } from './ComponentPreview';
 import { PagePreview } from './PagePreview';
 
@@ -8,9 +10,10 @@ type PreviewTab = 'components' | 'page';
 
 interface PreviewPanelProps {
   hackathonSlug?: string | null;
+  lang: Lang;
 }
 
-export function PreviewPanel({ hackathonSlug }: PreviewPanelProps) {
+export function PreviewPanel({ hackathonSlug, lang }: PreviewPanelProps) {
   const [activeTab, setActiveTab] = useState<PreviewTab>('components');
 
   return (
@@ -30,7 +33,7 @@ export function PreviewPanel({ hackathonSlug }: PreviewPanelProps) {
               : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
-          Components
+          {t(lang, 'admin.theme_preview_components')}
         </button>
         <button
           type="button"
@@ -45,7 +48,7 @@ export function PreviewPanel({ hackathonSlug }: PreviewPanelProps) {
               : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
-          Page
+          {t(lang, 'admin.theme_preview_page')}
         </button>
       </div>
 

@@ -160,7 +160,17 @@
     "theme_no_variant": "No variant",
     "theme_create_variant": "Create Variant",
     "theme_select_theme": "Select theme",
-    "theme_select_variant": "Select variant"
+    "theme_select_variant": "Select variant",
+    "theme_mode_light": "Light",
+    "theme_mode_dark": "Dark",
+    "theme_cancel": "Cancel",
+    "theme_loading": "Loading...",
+    "theme_group_surfaces": "Surfaces",
+    "theme_group_primary": "Primary",
+    "theme_group_muted": "Muted",
+    "theme_group_status": "Status",
+    "theme_group_borders": "Borders",
+    "theme_group_brand": "Brand"
   },
   "common": {
     "back_home": "Back to Home",

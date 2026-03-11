@@ -51,8 +51,10 @@ export const TOKEN_GROUPS: TokenGroupDef[] = [
 
 interface TokenGroupProps {
   group: TokenGroupDef;
+  label: string;
   values: Record<string, string>;
   inherited: Record<string, boolean>;
+  isVariant?: boolean;
   onChange: (name: string, value: string) => void;
   onOverride: (name: string) => void;
   onReset: (name: string) => void;
@@ -60,8 +62,10 @@ interface TokenGroupProps {
 
 export function TokenGroup({
   group,
+  label,
   values,
   inherited,
+  isVariant,
   onChange,
   onOverride,
   onReset,
@@ -69,7 +73,7 @@ export function TokenGroup({
   return (
     <div className="mb-6">
       <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-        {group.label}
+        {label}
       </h3>
       <div className="space-y-1">
         {group.tokens.map((tokenName) => (
@@ -78,6 +82,7 @@ export function TokenGroup({
             name={tokenName}
             value={values[tokenName] ?? ''}
             inherited={inherited[tokenName] ?? false}
+            isVariant={isVariant}
             onChange={onChange}
             onOverride={onOverride}
             onReset={onReset}

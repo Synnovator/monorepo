@@ -158,7 +158,17 @@
     "theme_no_variant": "无变体",
     "theme_create_variant": "创建变体",
     "theme_select_theme": "选择主题",
-    "theme_select_variant": "选择变体"
+    "theme_select_variant": "选择变体",
+    "theme_mode_light": "浅色",
+    "theme_mode_dark": "深色",
+    "theme_cancel": "取消",
+    "theme_loading": "加载中...",
+    "theme_group_surfaces": "表面",
+    "theme_group_primary": "主色",
+    "theme_group_muted": "弱化",
+    "theme_group_status": "状态",
+    "theme_group_borders": "边框",
+    "theme_group_brand": "品牌"
   },
   "common": {
     "back_home": "返回首页",
