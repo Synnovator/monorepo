@@ -6,7 +6,11 @@ import { PagePreview } from './PagePreview';
 
 type PreviewTab = 'components' | 'page';
 
-export function PreviewPanel() {
+interface PreviewPanelProps {
+  hackathonSlug?: string | null;
+}
+
+export function PreviewPanel({ hackathonSlug }: PreviewPanelProps) {
   const [activeTab, setActiveTab] = useState<PreviewTab>('components');
 
   return (
@@ -52,7 +56,11 @@ export function PreviewPanel() {
         aria-labelledby={`tab-${activeTab}`}
         className="flex-1 overflow-y-auto"
       >
-        {activeTab === 'components' ? <ComponentPreview /> : <PagePreview />}
+        {activeTab === 'components' ? (
+          <ComponentPreview />
+        ) : (
+          <PagePreview hackathonSlug={hackathonSlug ?? undefined} />
+        )}
       </div>
     </div>
   );

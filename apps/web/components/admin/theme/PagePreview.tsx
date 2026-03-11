@@ -1,9 +1,148 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Button } from '@synnovator/ui';
 import { Badge } from '@synnovator/ui';
+import { listHackathons } from '@/app/_generated/data';
 
-export function PagePreview() {
+interface PagePreviewProps {
+  hackathonSlug?: string;
+}
+
+export function PagePreview({ hackathonSlug }: PagePreviewProps) {
+  const hackathon = useMemo(() => {
+    if (!hackathonSlug) return null;
+    try {
+      const all = listHackathons();
+      return all.find((h) => h.hackathon.slug === hackathonSlug) ?? null;
+    } catch {
+      return null;
+    }
+  }, [hackathonSlug]);
+
+  // If a hackathon is selected and found, render a real data preview
+  if (hackathon) {
+    const h = hackathon.hackathon;
+    const typeLabel =
+      h.type === 'community'
+        ? 'Community'
+        : h.type === 'enterprise'
+          ? 'Enterprise'
+          : h.type === 'youth-league'
+            ? 'Youth League'
+            : 'Open Source';
+
+    const typeColor =
+      h.type === 'enterprise' ? 'var(--info)' : 'var(--brand)';
+
+    const cardRounding =
+      h.type === 'community'
+        ? 'rounded-xl'
+        : h.type === 'enterprise'
+          ? 'rounded-sm'
+          : h.type === 'youth-league'
+            ? 'rounded-lg'
+            : 'rounded-lg';
+
+    const borderStyle =
+      h.type === 'community'
+        ? { borderTopWidth: '3px', borderTopColor: 'var(--brand)' }
+        : h.type === 'enterprise'
+          ? { borderLeftWidth: '3px', borderLeftColor: 'var(--info)' }
+          : h.type === 'youth-league'
+            ? { borderWidth: '2px', borderStyle: 'dashed', borderColor: 'var(--highlight)' }
+            : {};
+
+    return (
+      <div data-hackathon={hackathonSlug} className="space-y-8">
+        {/* Hero section with real hackathon data */}
+        <section className="text-center py-8">
+          <Badge
+            className="mb-4 text-xs"
+            style={{
+              backgroundColor: `oklch(from ${typeColor} l c h / 0.2)`,
+              color: typeColor,
+            }}
+          >
+            {typeLabel}
+          </Badge>
+          <h1 className="text-2xl font-heading font-bold text-foreground mb-3">
+            {h.name}
+          </h1>
+          {h.tagline && (
+            <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6">
+              {h.tagline}
+            </p>
+          )}
+          <div className="flex justify-center gap-3">
+            <Button>Register</Button>
+            <Button variant="outline">Details</Button>
+          </div>
+        </section>
+
+        <hr className="border-border" />
+
+        {/* Tracks section */}
+        {h.tracks && h.tracks.length > 0 && (
+          <section>
+            <h2 className="text-lg font-heading font-semibold text-foreground mb-4">
+              Tracks
+            </h2>
+            <div className="grid grid-cols-2 gap-4">
+              {h.tracks.map((track) => (
+                <div
+                  key={track.slug}
+                  className={`${cardRounding} border border-border bg-card p-4`}
+                  style={borderStyle}
+                >
+                  <h3 className="text-sm font-semibold text-card-foreground mb-1">
+                    {track.name}
+                  </h3>
+                  {track.description && (
+                    <p className="text-xs text-muted-foreground">
+                      {track.description}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {h.tracks && h.tracks.length > 0 && <hr className="border-border" />}
+
+        {/* Detail section */}
+        <section>
+          <div className="flex gap-2 mb-3">
+            <Badge variant="outline">{typeLabel}</Badge>
+            {h.description && (
+              <Badge
+                className="text-xs"
+                style={{
+                  backgroundColor: `oklch(from var(--highlight) l c h / 0.2)`,
+                  color: 'var(--highlight)',
+                }}
+              >
+                {h.type}
+              </Badge>
+            )}
+          </div>
+          <div className={`${cardRounding} border border-border bg-card p-4`}>
+            <h3 className="text-base font-heading font-semibold text-card-foreground mb-2">
+              {h.name}
+            </h3>
+            {h.description && (
+              <p className="text-xs text-muted-foreground">
+                {h.description}
+              </p>
+            )}
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  // Default mock preview (no hackathon selected or not found)
   return (
     <div className="space-y-8">
       {/* Section 1: Hero mock */}
