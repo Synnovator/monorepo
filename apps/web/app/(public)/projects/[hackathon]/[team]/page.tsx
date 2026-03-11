@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { listSubmissions, listProfiles, getHackathon } from '@/app/_generated/data';
 import { t, localize, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import { Card } from '@synnovator/ui';
+import { Card, Avatar, AvatarImage, AvatarFallback } from '@synnovator/ui';
 import { EditProjectButton } from '@/components/EditProjectButton';
 
 export const dynamic = 'force-static';
@@ -90,12 +90,10 @@ export default async function ProjectDetailPage({
                 const profileId = githubToProfile.get(member.github);
                 const inner = (
                   <>
-                    <img
-                      src={`https://github.com/${member.github}.png?size=40`}
-                      alt={member.github}
-                      className="w-8 h-8 rounded-full"
-                      loading="lazy"
-                    />
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={`https://github.com/${member.github}.png?size=40`} alt={member.github} />
+                      <AvatarFallback>{member.github[0].toUpperCase()}</AvatarFallback>
+                    </Avatar>
                     <div>
                       <p className="text-foreground text-sm">{member.github}</p>
                       {member.role && <p className="text-muted-foreground text-xs">{member.role}</p>}

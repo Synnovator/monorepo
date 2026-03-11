@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { localize, t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import { Card } from '@synnovator/ui';
+import { Card, Avatar, AvatarImage, AvatarFallback } from '@synnovator/ui';
 import { ShieldCheckIcon } from './icons';
 
 interface JudgeCardProps {
@@ -26,20 +26,16 @@ export function JudgeCard({ judge, lang, profileSlug }: JudgeCardProps) {
     <Card className="flex items-start gap-4 p-4">
       {profileUrl ? (
         <Link href={profileUrl} className="shrink-0 group">
-          <img
-            src={`https://github.com/${judge.github}.png`}
-            alt={displayName}
-            className="w-12 h-12 rounded-full bg-muted ring-2 ring-transparent group-hover:ring-primary transition-all"
-            loading="lazy"
-          />
+          <Avatar className="h-12 w-12 ring-2 ring-transparent group-hover:ring-primary transition-all">
+            <AvatarImage src={`https://github.com/${judge.github}.png`} alt={displayName} />
+            <AvatarFallback>{judge.github[0].toUpperCase()}</AvatarFallback>
+          </Avatar>
         </Link>
       ) : (
-        <img
-          src={`https://github.com/${judge.github}.png`}
-          alt={displayName}
-          className="w-12 h-12 rounded-full bg-muted shrink-0"
-          loading="lazy"
-        />
+        <Avatar className="h-12 w-12 shrink-0">
+          <AvatarImage src={`https://github.com/${judge.github}.png`} alt={displayName} />
+          <AvatarFallback>{judge.github[0].toUpperCase()}</AvatarFallback>
+        </Avatar>
       )}
       <div>
         {profileUrl ? (

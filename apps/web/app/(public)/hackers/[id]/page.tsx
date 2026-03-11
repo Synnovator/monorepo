@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { getProfile, listProfiles } from '@/app/_generated/data';
 import { t, localize, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import { Card } from '@synnovator/ui';
+import { Card, Avatar, AvatarImage, AvatarFallback } from '@synnovator/ui';
 import { SkillBadge } from '@/components/SkillBadge';
 import { SparklesIcon } from '@/components/icons';
 import { EditProfileButton } from '@/components/EditProfileButton';
@@ -33,12 +33,10 @@ export default async function HackerProfilePage({
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="flex items-start gap-6 mb-10">
-        <img
-          src={h.avatar || `https://github.com/${h.github}.png`}
-          alt={localize(lang, h.name, h.name_zh)}
-          className="w-24 h-24 rounded-full bg-muted"
-          loading="lazy"
-        />
+        <Avatar className="h-24 w-24">
+          <AvatarImage src={h.avatar || `https://github.com/${h.github}.png`} alt={localize(lang, h.name, h.name_zh)} />
+          <AvatarFallback>{h.github[0].toUpperCase()}</AvatarFallback>
+        </Avatar>
         <div>
           <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground">
             {localize(lang, h.name, h.name_zh)}

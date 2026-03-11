@@ -9,6 +9,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+  Skeleton,
 } from '@synnovator/ui';
 import { GitHubIcon } from './icons';
 
@@ -42,7 +46,7 @@ export function OAuthButton() {
   }, [user, navigating]);
 
   if (loading) {
-    return <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />;
+    return <Skeleton className="h-8 w-8 rounded-full" />;
   }
 
   if (!isLoggedIn) {
@@ -58,7 +62,10 @@ export function OAuthButton() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 cursor-pointer" aria-label="User menu">
-          <img src={user!.avatar_url} alt={user!.login} className="w-8 h-8 rounded-full border border-border" />
+          <Avatar className="h-8 w-8 border border-border">
+            <AvatarImage src={user!.avatar_url} alt={user!.login} />
+            <AvatarFallback>{user!.login[0].toUpperCase()}</AvatarFallback>
+          </Avatar>
           <span className="hidden sm:inline text-sm text-foreground">{user!.login}</span>
         </button>
       </DropdownMenuTrigger>

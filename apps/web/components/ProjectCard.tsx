@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { localize } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import { Card } from '@synnovator/ui';
+import { Card, Avatar, AvatarImage, AvatarFallback } from '@synnovator/ui';
 import { HeartIcon } from './icons';
 
 interface ProjectCardProps {
@@ -51,12 +51,10 @@ export function ProjectCard({ project, hackathonSlug, teamSlug, lang }: ProjectC
       <div className="flex flex-wrap gap-2 mb-3">
         {project.team.map(member => (
           <span key={member.github} className="flex items-center gap-1 text-xs text-muted-foreground">
-            <img
-              src={`https://github.com/${member.github}.png?size=20`}
-              alt={member.github}
-              className="w-4 h-4 rounded-full"
-              loading="lazy"
-            />
+            <Avatar className="h-4 w-4">
+              <AvatarImage src={`https://github.com/${member.github}.png?size=20`} alt={member.github} />
+              <AvatarFallback className="text-[8px]">{member.github[0].toUpperCase()}</AvatarFallback>
+            </Avatar>
             {member.github}
           </span>
         ))}
