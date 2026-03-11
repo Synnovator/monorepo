@@ -205,7 +205,12 @@
     "network_error": "Network error, please try again",
     "loading": "Loading...",
     "link_github": "Link GitHub",
-    "link_github_hint": "Please sign in with GitHub to create a profile"
+    "link_github_hint": "Please sign in with GitHub to create a profile",
+    "brand_tagline": "Git-Native AI Hackathon Platform",
+    "brand_highlight_1": "Browse and join AI Hackathons",
+    "brand_highlight_2": "Build teams, submit projects",
+    "brand_highlight_3": "Showcase results, earn recognition",
+    "no_account_hint": "No account? Sign in with GitHub to create one automatically"
   },
   "score": {
     "title": "Score Card",
@@ -533,5 +538,16 @@
     "sort_activity": "Group by Activity",
     "empty": "No proposals yet",
     "likes": "likes"
+  },
+  "welcome": {
+    "title": "Welcome to Synnovator!",
+    "subtitle": "Your all-in-one AI Hackathon platform",
+    "browse_title": "Browse Events",
+    "browse_desc": "Discover ongoing AI Hackathons",
+    "profile_title": "Create Profile",
+    "profile_desc": "Showcase your skills, find teammates",
+    "submit_title": "Submit Project",
+    "submit_desc": "Join a team, submit your work, earn recognition",
+    "cta": "Start Exploring"
   }
 }

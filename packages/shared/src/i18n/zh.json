@@ -203,7 +203,12 @@
     "network_error": "网络错误，请重试",
     "loading": "加载中...",
     "link_github": "关联 GitHub",
-    "link_github_hint": "请先登录 GitHub 以创建 档案"
+    "link_github_hint": "请先登录 GitHub 以创建 档案",
+    "brand_tagline": "Git 原生的 AI Hackathon 平台",
+    "brand_highlight_1": "浏览并参与 AI Hackathon",
+    "brand_highlight_2": "组建团队，提交项目",
+    "brand_highlight_3": "展示成果，赢得认可",
+    "no_account_hint": "还没有账号？通过 GitHub 登录即可自动创建"
   },
   "score": {
     "title": "评分卡",
@@ -532,5 +537,16 @@
     "sort_activity": "按活动分组",
     "empty": "暂无提案",
     "likes": "赞"
+  },
+  "welcome": {
+    "title": "欢迎来到 Synnovator！",
+    "subtitle": "一站式 AI Hackathon 平台",
+    "browse_title": "浏览活动",
+    "browse_desc": "发现正在进行的 AI Hackathon",
+    "profile_title": "创建档案",
+    "profile_desc": "展示你的技能，匹配理想队友",
+    "submit_title": "提交项目",
+    "submit_desc": "组队参赛，提交作品，赢得认可",
+    "cta": "开始探索"
   }
 }
