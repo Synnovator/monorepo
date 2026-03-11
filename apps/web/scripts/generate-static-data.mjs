@@ -87,6 +87,61 @@ async function collectSubmissions() {
   return results;
 }
 
+async function collectThemes() {
+  const themesDir = path.join(DATA_ROOT, 'config', 'themes');
+
+  // Read .active file
+  let activeTheme = '';
+  try {
+    activeTheme = (await fs.readFile(path.join(themesDir, '.active'), 'utf-8')).trim();
+  } catch {
+    // No .active file
+  }
+
+  // Read all theme YAML files
+  const entries = await fs.readdir(themesDir);
+  const ymlFiles = entries.filter(f => f.endsWith('.yml'));
+  const themes = [];
+  for (const file of ymlFiles) {
+    try {
+      const data = await readYaml(path.join(themesDir, file));
+      const id = file.replace(/\.yml$/, '');
+      themes.push({ ...data, _id: id });
+    } catch {
+      // Skip invalid theme files
+    }
+  }
+
+  // Read hackathon theme variants
+  const hackathonsDir = path.join(DATA_ROOT, 'hackathons');
+  const variants = {};
+  try {
+    const hackathonEntries = await fs.readdir(hackathonsDir, { withFileTypes: true });
+    for (const entry of hackathonEntries.filter(e => e.isDirectory())) {
+      const variantsDir = path.join(hackathonsDir, entry.name, 'themes');
+      try {
+        const variantFiles = await fs.readdir(variantsDir);
+        for (const vf of variantFiles.filter(f => f.endsWith('.yml'))) {
+          try {
+            const data = await readYaml(path.join(variantsDir, vf));
+            const themeName = vf.replace(/\.yml$/, '');
+            const key = `${entry.name}/${themeName}`;
+            variants[key] = data;
+          } catch {
+            // Skip invalid variant files
+          }
+        }
+      } catch {
+        // No themes directory for this hackathon
+      }
+    }
+  } catch {
+    // No hackathons directory
+  }
+
+  return { activeTheme, themes, variants };
+}
+
 async function collectResults() {
   const hackathonsDir = path.join(DATA_ROOT, 'hackathons');
   const hackathonEntries = await fs.readdir(hackathonsDir, { withFileTypes: true });
@@ -145,14 +200,15 @@ function normaliseWeights(data) {
 async function main() {
   console.log('[generate-static-data] Reading YAML data...');
 
-  const [hackathons, profiles, submissions, results] = await Promise.all([
+  const [hackathons, profiles, submissions, results, themeData] = await Promise.all([
     collectHackathons(),
     collectProfiles(),
     collectSubmissions(),
     collectResults(),
+    collectThemes(),
   ]);
 
-  const data = { hackathons, profiles, submissions, results };
+  const data = { hackathons, profiles, submissions, results, themes: themeData };
 
   await fs.mkdir(path.dirname(OUT_FILE), { recursive: true });
   await fs.writeFile(OUT_FILE, JSON.stringify(data, null, 2));
@@ -162,6 +218,7 @@ async function main() {
   console.log(`  profiles: ${profiles.length}`);
   console.log(`  submissions: ${submissions.length}`);
   console.log(`  results: ${Object.keys(results).length} hackathons with results`);
+  console.log(`  themes: ${themeData.themes.length} (active: ${themeData.activeTheme || 'none'}, variants: ${Object.keys(themeData.variants).length})`);
 }
 
 main().catch(err => {

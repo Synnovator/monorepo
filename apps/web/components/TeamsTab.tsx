@@ -2,6 +2,7 @@
 
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 import { ExternalLinkIcon } from '@/components/icons';
 
 interface TeamsTabProps {
@@ -15,9 +16,9 @@ export function TeamsTab({ hackathonSlug, stage, lang }: TeamsTabProps) {
 
   if (!isActive) {
     return (
-      <div className="rounded-lg border border-border bg-card p-12 text-center">
+      <Card className="p-12 text-center">
         <p className="text-muted-foreground text-lg">{t(lang, 'hackathon.teams_not_available')}</p>
-      </div>
+      </Card>
     );
   }
 

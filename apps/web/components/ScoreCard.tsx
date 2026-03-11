@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { buildIssueUrl, openGitHubUrl } from '@/lib/github-url';
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 
 interface Criterion { name: string; name_zh?: string; weight: number; description?: string; score_range?: number[]; }
 interface ScoreCardProps { hackathonSlug: string; trackSlug: string; criteria: Criterion[]; lang: Lang; }
@@ -34,7 +35,7 @@ export function ScoreCard({ hackathonSlug, trackSlug, criteria, lang }: ScoreCar
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-6">
+    <Card className="p-6">
       <h3 className="text-lg font-heading font-bold text-foreground mb-6">{t(lang, 'score.title')}</h3>
       <div className="mb-6">
         <label htmlFor="score-team" className="block text-sm text-muted-foreground mb-2">{t(lang, 'score.team_name')}</label>
@@ -79,6 +80,6 @@ export function ScoreCard({ hackathonSlug, trackSlug, criteria, lang }: ScoreCar
           {t(lang, 'score.submit')}
         </button>
       </div>
-    </div>
+    </Card>
   );
 }

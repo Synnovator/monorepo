@@ -19,11 +19,34 @@ import { AppealForm } from '@/components/forms/AppealForm';
 import { TeamFormationForm } from '@/components/forms/TeamFormationForm';
 import { TeamsTab } from '@/components/TeamsTab';
 import { SketchUnderline, SketchDoodle } from '@/components/sketch';
+import { Separator, Badge } from '@synnovator/ui';
 
 export const dynamic = 'force-static';
 
 export function generateStaticParams() {
   return listHackathons().map(h => ({ slug: h.hackathon.slug }));
+}
+
+function typeVariant(type: string): 'brand' | 'info' | 'highlight' {
+  switch (type) {
+    case 'enterprise': return 'info';
+    case 'youth-league': return 'highlight';
+    default: return 'brand';
+  }
+}
+
+type StageVariant = 'secondary' | 'brand' | 'highlight' | 'info' | 'warning';
+
+function stageVariant(stage: string): StageVariant {
+  switch (stage) {
+    case 'registration': return 'brand';
+    case 'development':
+    case 'submission': return 'highlight';
+    case 'judging': return 'info';
+    case 'announcement':
+    case 'award': return 'warning';
+    default: return 'secondary';
+  }
 }
 
 export default async function HackathonDetailPage({
@@ -75,17 +98,17 @@ export default async function HackathonDetailPage({
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" data-hackathon-type={h.type}>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" data-hackathon={h.slug}>
 
       {/* Hero */}
       <div className="mb-12">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground">
+          <Badge variant={typeVariant(h.type)}>
             {t(lang, `hackathon.type_${h.type.replace('-', '_')}`)}
-          </span>
-          <span className="text-xs px-3 py-1 rounded-full bg-primary/20 text-primary">
+          </Badge>
+          <Badge variant={stageVariant(stage)}>
             {t(lang, `stage.${stage}`)}
-          </span>
+          </Badge>
         </div>
 
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
@@ -119,9 +142,9 @@ export default async function HackathonDetailPage({
             </a>
           )}
           {h.legal?.nda?.required && (
-            <span className="inline-flex items-center text-xs text-warning px-3 py-2 rounded-lg bg-warning/10">
+            <Badge variant="warning">
               {t(lang, 'hackathon.nda_warning')}
-            </span>
+            </Badge>
           )}
         </div>
       </div>
@@ -147,7 +170,7 @@ export default async function HackathonDetailPage({
 
               {h.organizers && h.organizers.length > 0 && (
                 <>
-                  <hr className="border-border" />
+                  <Separator />
                   <section className="mt-12 mb-12">
                     <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.organizers')}</h2>
                     <div className="flex flex-wrap gap-4">
@@ -166,7 +189,7 @@ export default async function HackathonDetailPage({
 
               {h.tracks && h.tracks.length > 0 && (
                 <>
-                  <hr className="border-border" />
+                  <Separator />
                   <section className="mt-12 mb-12">
                     <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.tracks')}</h2>
                     <div className="space-y-6">
@@ -180,7 +203,7 @@ export default async function HackathonDetailPage({
 
               {h.eligibility && (
                 <>
-                  <hr className="border-border" />
+                  <Separator />
                   <section className="mt-12 mb-8">
                     <h2 className="text-xl font-heading font-bold text-foreground mb-4 flex items-center gap-2">
                       <ClipboardListIcon size={22} className="shrink-0" aria-hidden="true" />
@@ -203,7 +226,7 @@ export default async function HackathonDetailPage({
 
               {h.datasets && h.datasets.length > 0 && (
                 <>
-                <hr className="border-border" />
+                <Separator />
                 <section className="mt-12 mb-8">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.datasets')}</h2>
                   <DatasetSection datasets={h.datasets as any} hackathonSlug={h.slug} lang={lang} />
@@ -213,7 +236,7 @@ export default async function HackathonDetailPage({
 
               {h.legal && (
                 <>
-                <hr className="border-border" />
+                <Separator />
                 <section className="mt-12 mb-8">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4 flex items-center gap-2">
                     <ShieldCheckIcon size={22} className="shrink-0" aria-hidden="true" />
@@ -232,7 +255,7 @@ export default async function HackathonDetailPage({
 
               {h.faq && h.faq.length > 0 && (
                 <>
-                  <hr className="border-border" />
+                  <Separator />
                   <section className="mt-12 mb-12">
                     <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.faq')}</h2>
                     <FAQAccordion items={h.faq} lang={lang} />

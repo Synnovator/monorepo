@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { buildIssueUrl } from '@/lib/github-url';
 import { t, localize } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 
 interface Dataset {
   name: string;
@@ -77,7 +78,7 @@ function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; h
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-6">
+    <Card className="p-6">
       <div className="flex items-center justify-between mb-2">
         <p className="text-foreground font-medium text-sm">{localize(lang, ds.name, ds.name_zh)}</p>
         {ds.version && <span className="text-xs text-muted-foreground">v{ds.version}</span>}
@@ -119,6 +120,6 @@ function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; h
           {ndaUrl && <a href={ndaUrl} target="_blank" rel="noopener" className="underline ml-2 font-medium hover:text-foreground">{t(lang, 'dataset.sign_nda_link')}</a>}
         </div>
       )}
-    </div>
+    </Card>
   );
 }

@@ -57,6 +57,21 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+      - name: Inject Preview Secrets
+        if: github.event_name == 'pull_request'
+        working-directory: apps/web
+        run: |
+          PREVIEW_NAME="synnovator-pr-${{ github.event.pull_request.number }}"
+          echo "$AUTH_SECRET" | pnpm exec wrangler secret put AUTH_SECRET --name "$PREVIEW_NAME"
+          echo "$GITHUB_APP_PRIVATE_KEY" | pnpm exec wrangler secret put GITHUB_APP_PRIVATE_KEY --name "$PREVIEW_NAME"
+          echo "$GITHUB_CLIENT_SECRET" | pnpm exec wrangler secret put GITHUB_CLIENT_SECRET --name "$PREVIEW_NAME"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          GITHUB_APP_PRIVATE_KEY: ${{ secrets.GITHUB_APP_PRIVATE_KEY }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
+
       - name: Comment Preview URL
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7

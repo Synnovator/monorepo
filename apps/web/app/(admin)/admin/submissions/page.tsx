@@ -16,7 +16,7 @@ export default async function AdminSubmissionsPage({
   const cookieStore = await cookies();
   const session = await decrypt(
     cookieStore.get('session')!.value,
-    process.env.AUTH_SECRET || 'dev-secret-key-min-32-chars-long!!',
+    process.env.AUTH_SECRET!,
   ) as Session;
 
   let items: Awaited<ReturnType<typeof listPendingReviews>> = [];

@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { buildIssueUrl, openGitHubUrl } from '@/lib/github-url';
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 import type { Track } from './form-utils';
 
 interface RegisterFormProps {
@@ -74,7 +75,7 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-6">
+    <Card className="p-6">
       <h3 className="text-lg font-heading font-bold text-foreground mb-6">
         {t(lang, 'form.register.title')}
       </h3>
@@ -178,7 +179,7 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
             : t(lang, 'form.register.submit_pr')} →
         </button>
       </fieldset>
-    </div>
+    </Card>
   );
 }
 

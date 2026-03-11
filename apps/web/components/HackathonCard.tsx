@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getCurrentStage, t, localize } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card, Badge } from '@synnovator/ui';
 import { TrophyIcon } from './icons';
 import { hackathonCardClass, hackathonHoverClass, hackathonTypeIcon } from '@/lib/hackathon-theme';
 import { SketchCircle } from '@/components/sketch';
@@ -18,16 +19,27 @@ interface HackathonCardProps {
   lang: Lang;
 }
 
-const stageColors: Record<string, string> = {
-  draft: 'bg-muted/20 text-muted-foreground',
-  registration: 'bg-brand/20 text-brand',
-  development: 'bg-info/20 text-info',
-  submission: 'bg-brand/20 text-brand',
-  judging: 'bg-info/20 text-info',
-  announcement: 'bg-highlight/20 text-highlight-foreground',
-  award: 'bg-highlight/20 text-highlight-foreground',
-  ended: 'bg-muted/20 text-muted-foreground',
-};
+function typeVariant(type: string): 'brand' | 'info' | 'highlight' {
+  switch (type) {
+    case 'enterprise': return 'info';
+    case 'youth-league': return 'highlight';
+    default: return 'brand';
+  }
+}
+
+type StageVariant = 'secondary' | 'brand' | 'highlight' | 'info' | 'warning';
+
+function stageVariant(stage: string): StageVariant {
+  switch (stage) {
+    case 'registration': return 'brand';
+    case 'development':
+    case 'submission': return 'highlight';
+    case 'judging': return 'info';
+    case 'announcement':
+    case 'award': return 'warning';
+    default: return 'secondary';
+  }
+}
 
 export function HackathonCard({ hackathon, lang }: HackathonCardProps) {
   const stage = hackathon.timeline ? getCurrentStage(hackathon.timeline) : 'draft';
@@ -35,21 +47,24 @@ export function HackathonCard({ hackathon, lang }: HackathonCardProps) {
   const TypeIcon = hackathonTypeIcon(hackathon.type);
 
   return (
-    <Link
-      href={`/hackathons/${hackathon.slug}`}
-      data-hackathon-type={hackathon.type}
-      className={`block group border border-border bg-card hover:border-primary/40 transition-all duration-200 p-6 h-full flex flex-col ${hackathonCardClass(hackathon.type)} ${hackathonHoverClass(hackathon.type)}`}
+    <Card
+      data-hackathon={hackathon.slug}
+      className={`hover:border-primary/40 transition-all duration-200 h-full flex flex-col ${hackathonCardClass(hackathon.type)} ${hackathonHoverClass(hackathon.type)}`}
     >
+      <Link
+        href={`/hackathons/${hackathon.slug}`}
+        className="block p-6 h-full flex flex-col group"
+      >
       {/* Type + Stage badges */}
       <div className="flex items-center gap-2 mb-3">
-        <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+        <Badge variant={typeVariant(hackathon.type)} className="gap-1">
           <TypeIcon size={14} className="shrink-0" />
           {t(lang, typeKey)}
-        </span>
+        </Badge>
         <span className="relative">
-          <span className={`text-xs px-2 py-0.5 rounded-full ${stageColors[stage] || stageColors.draft}`}>
+          <Badge variant={stageVariant(stage)}>
             {t(lang, `stage.${stage}`)}
-          </span>
+          </Badge>
           {['registration', 'development', 'submission'].includes(stage) && (
             <SketchCircle className="absolute -inset-1" delay={200} />
           )}
@@ -79,6 +94,7 @@ export function HackathonCard({ hackathon, lang }: HackathonCardProps) {
           {t(lang, 'stage.registration')}: {new Date(hackathon.timeline.registration.start).toLocaleDateString()} — {new Date(hackathon.timeline.registration.end).toLocaleDateString()}
         </div>
       )}
-    </Link>
+      </Link>
+    </Card>
   );
 }

@@ -3,7 +3,7 @@ import { getSession } from '@synnovator/shared/auth';
 import { createGitHubClient } from '@synnovator/shared/data';
 
 export async function POST(request: NextRequest) {
-  const authSecret = process.env.AUTH_SECRET || 'dev-secret-key-min-32-chars-long!!';
+  const authSecret = process.env.AUTH_SECRET!;
   const session = await getSession(request, authSecret);
 
   if (!session) {

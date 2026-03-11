@@ -11,6 +11,7 @@ const DEPRECATED_TOKENS = [
   'text-pink', 'text-mint',
   'text-error', 'bg-error', 'border-error',
   'hover:text-white', 'hover:bg-lime-primary',
+  'data-hackathon-type',
 ];
 
 describe('token audit', () => {

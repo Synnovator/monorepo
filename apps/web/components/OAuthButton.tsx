@@ -9,6 +9,14 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from '@synnovator/ui';
 import { GitHubIcon } from './icons';
 
@@ -42,7 +50,7 @@ export function OAuthButton() {
   }, [user, navigating]);
 
   if (loading) {
-    return <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />;
+    return <Skeleton className="h-8 w-8 rounded-full" />;
   }
 
   if (!isLoggedIn) {
@@ -58,7 +66,10 @@ export function OAuthButton() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 cursor-pointer" aria-label="User menu">
-          <img src={user!.avatar_url} alt={user!.login} className="w-8 h-8 rounded-full border border-border" />
+          <Avatar className="h-8 w-8 border border-border">
+            <AvatarImage src={user!.avatar_url} alt={user!.login} />
+            <AvatarFallback>{user!.login[0].toUpperCase()}</AvatarFallback>
+          </Avatar>
           <span className="hidden sm:inline text-sm text-foreground">{user!.login}</span>
         </button>
       </DropdownMenuTrigger>
@@ -74,18 +85,24 @@ export function OAuthButton() {
             </button>
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem asChild>
-            <a
-              href={`/api/auth/login?returnTo=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/')}`}
-              className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground transition-colors"
-            >
-              <span className="flex items-center gap-2">
-                <GitHubIcon size={16} aria-hidden="true" />
-                {t(lang, 'auth.link_github')}
-              </span>
-              <span className="text-xs text-muted-foreground block mt-0.5">{t(lang, 'auth.link_github_hint')}</span>
-            </a>
-          </DropdownMenuItem>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuItem asChild>
+                  <a
+                    href={`/api/auth/login?returnTo=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/')}`}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  >
+                    <GitHubIcon size={16} aria-hidden="true" />
+                    {t(lang, 'auth.link_github')}
+                  </a>
+                </DropdownMenuItem>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                {t(lang, 'auth.link_github_hint')}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
         <DropdownMenuItem asChild>
           <a href="/api/auth/logout" className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground transition-colors">

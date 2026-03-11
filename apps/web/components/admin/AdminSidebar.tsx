@@ -4,12 +4,24 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import type { Session } from '@synnovator/shared/auth';
 import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+} from '@synnovator/ui';
 
 const navItems = [
   { href: '/admin', key: 'admin.dashboard' },
   { href: '/admin/hackathons', key: 'admin.hackathons' },
   { href: '/admin/profiles', key: 'admin.profiles' },
   { href: '/admin/submissions', key: 'admin.submissions' },
+  { href: '/admin/theme', key: 'admin.theme' },
 ] as const;
 
 export function AdminSidebar({ user }: { user: Session }) {
@@ -18,26 +30,34 @@ export function AdminSidebar({ user }: { user: Session }) {
   const lang = getLangFromSearchParams(searchParams);
 
   return (
-    <aside className="w-64 bg-card border-r border-border p-4">
-      <div className="mb-8">
-        <h2 className="text-primary font-heading text-lg">{t(lang, 'admin.title')}</h2>
-        <p className="text-muted-foreground text-sm">@{user.login}</p>
-      </div>
-      <nav className="space-y-1">
-        {navItems.map(item => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`block px-3 py-2 rounded-md text-sm transition-colors ${
-              pathname === item.href
-                ? 'bg-muted text-primary'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            }`}
-          >
-            {t(lang, item.key)}
-          </Link>
-        ))}
-      </nav>
-    </aside>
+    <Sidebar
+      collapsible="icon"
+      style={{ top: '4rem', height: 'calc(100svh - 4rem)' }}
+    >
+      <SidebarHeader className="p-4">
+        <h2 className="text-primary font-heading text-lg group-data-[collapsible=icon]:hidden">
+          {t(lang, 'admin.title')}
+        </h2>
+        <p className="text-muted-foreground text-sm group-data-[collapsible=icon]:hidden">
+          @{user.login}
+        </p>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItems.map(item => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild isActive={pathname === item.href}>
+                    <Link href={item.href}>{t(lang, item.key)}</Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarRail />
+    </Sidebar>
   );
 }

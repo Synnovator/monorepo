@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getHackathon, getResults, listHackathons } from '@/app/_generated/data';
 import { t, localize, getCurrentStage, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card, ScrollArea } from '@synnovator/ui';
 
 export const dynamic = 'force-static';
 
@@ -46,13 +47,13 @@ export default async function ResultsPage({
       </h1>
 
       {!showResults ? (
-        <div className="rounded-lg border border-border bg-card p-12 text-center">
+        <Card className="p-12 text-center">
           <p className="text-muted-foreground text-lg">{t(lang, 'result.pending')}</p>
-        </div>
+        </Card>
       ) : !trackResults || trackResults.length === 0 ? (
-        <div className="rounded-lg border border-border bg-card p-12 text-center">
+        <Card className="p-12 text-center">
           <p className="text-muted-foreground text-lg">{t(lang, 'result.no_results')}</p>
-        </div>
+        </Card>
       ) : (
         <div className="space-y-12">
           {trackResults.map((tr: any) => {
@@ -69,7 +70,7 @@ export default async function ResultsPage({
                     {tr.data.total_teams} {t(lang, 'result.teams_count')}
                   </div>
                 )}
-                <div className="overflow-x-auto">
+                <ScrollArea className="w-full">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border text-muted-foreground">
@@ -94,7 +95,7 @@ export default async function ResultsPage({
                       ))}
                     </tbody>
                   </table>
-                </div>
+                </ScrollArea>
               </section>
             );
           })}
