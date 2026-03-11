@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
-  const authSecret = process.env.AUTH_SECRET || 'dev-secret-key-min-32-chars-long!!';
+  const authSecret = process.env.AUTH_SECRET!;
 
   const token = await encrypt(
     {

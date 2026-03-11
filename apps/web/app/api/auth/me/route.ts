@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@synnovator/shared/auth';
 
 export async function GET(request: NextRequest) {
-  const authSecret = process.env.AUTH_SECRET || 'dev-secret-key-min-32-chars-long!!';
+  const authSecret = process.env.AUTH_SECRET!;
   const session = await getSession(request, authSecret);
 
   if (!session) {

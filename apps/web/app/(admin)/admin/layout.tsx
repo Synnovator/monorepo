@@ -15,7 +15,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!sessionCookie) redirect('/login?returnTo=/admin');
 
-  const session = await decrypt(sessionCookie, process.env.AUTH_SECRET || 'dev-secret-key-min-32-chars-long!!') as Session | null;
+  const session = await decrypt(sessionCookie, process.env.AUTH_SECRET!) as Session | null;
   if (!session) redirect('/login?returnTo=/admin');
 
   // Skip GitHub permission check for dev login

@@ -21,7 +21,7 @@ function toBase64(str: string): string {
 
 export async function GET(request: NextRequest) {
   try {
-    const authSecret = process.env.AUTH_SECRET || 'dev-secret-key-min-32-chars-long!!';
+    const authSecret = process.env.AUTH_SECRET!;
     const session = await getSession(request, authSecret);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authSecret = process.env.AUTH_SECRET || 'dev-secret-key-min-32-chars-long!!';
+    const authSecret = process.env.AUTH_SECRET!;
     const session = await getSession(request, authSecret);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
