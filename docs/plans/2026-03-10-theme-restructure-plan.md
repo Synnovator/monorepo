@@ -61,14 +61,14 @@ Replace `themeSubmissionSchema` (lines 106-120) with:
 // === Theme Submission Schema (POST body) ===
 
 export const themeSubmissionSchema = z.object({
-  type: z.enum(['platform', 'hackathon-variant']),
+  type: z.enum(['platform', 'hackathon-variant', 'activate']),
   themeName: z.string().min(1),
   hackathonSlug: z.string().optional(),
   name: z.string().optional(),
   name_zh: z.string().optional(),
   description: z.string().optional(),
-  light: tokenMapSchema,
-  dark: tokenMapSchema,
+  light: tokenMapSchema.optional(),
+  dark: tokenMapSchema.optional(),
   fonts: z
     .object({
       heading: z.string().optional(),
@@ -529,16 +529,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ themes, activeTheme });
     }
 
-    // Action: activate a theme
-    if (action === 'activate' && themeName) {
-      const themeFile = path.join(themesDir, `${themeName}.yml`);
-      if (!fs.existsSync(themeFile)) {
-        return NextResponse.json({ error: `Theme "${themeName}" not found` }, { status: 404 });
-      }
-      fs.writeFileSync(activeFile, themeName);
-      return NextResponse.json({ success: true, activeTheme: themeName });
-    }
-
     // Get specific platform theme
     if (themeName) {
       const themeFile = path.join(themesDir, `${themeName}.yml`);
@@ -641,6 +631,76 @@ export async function POST(request: NextRequest) {
 
     const { type, themeName, hackathonSlug, name, name_zh, description, light, dark, fonts, radius, message } = parsed.data;
 
+    // Check required env vars (common to all types)
+    const appId = process.env.GITHUB_APP_ID;
+    const privateKey = process.env.GITHUB_APP_PRIVATE_KEY;
+    const installationId = process.env.GITHUB_APP_INSTALLATION_ID;
+    const missing = [
+      !appId && 'GITHUB_APP_ID',
+      !privateKey && 'GITHUB_APP_PRIVATE_KEY',
+      !installationId && 'GITHUB_APP_INSTALLATION_ID',
+    ].filter(Boolean);
+    if (missing.length) {
+      return NextResponse.json(
+        { error: `Server configuration error: missing ${missing.join(', ')}` },
+        { status: 500 },
+      );
+    }
+
+    const octokit = getInstallationOctokit({
+      GITHUB_APP_ID: appId!,
+      GITHUB_APP_PRIVATE_KEY: privateKey!,
+      GITHUB_APP_INSTALLATION_ID: installationId!,
+    });
+
+    // Get main branch SHA (common to all types)
+    const { data: ref } = await octokit.git.getRef({
+      owner: OWNER, repo: REPO, ref: 'heads/main',
+    });
+    const mainSha = ref.object.sha;
+
+    const timestamp = Math.floor(Date.now() / 1000);
+
+    // --- Activate theme: create PR that updates config/themes/.active ---
+    if (type === 'activate') {
+      const branchName = `theme/activate-${themeName}-${timestamp}`;
+      await octokit.git.createRef({
+        owner: OWNER, repo: REPO,
+        ref: `refs/heads/${branchName}`, sha: mainSha,
+      });
+
+      const commitMsg = `theme: activate ${themeName} as default platform theme`;
+      await octokit.repos.createOrUpdateFileContents({
+        owner: OWNER, repo: REPO,
+        path: 'config/themes/.active',
+        message: commitMsg,
+        content: toBase64(themeName),
+        branch: branchName,
+      });
+
+      const { data: pr } = await octokit.pulls.create({
+        owner: OWNER, repo: REPO,
+        title: commitMsg,
+        body: [
+          `Submitted by @${session.login}`,
+          '',
+          `**Action:** Activate platform theme \`${themeName}\``,
+          `**File:** \`config/themes/.active\``,
+          '',
+          'After merging, the platform will rebuild with this theme as the default.',
+          '',
+          '---',
+          '> Auto-created via [Synnovator Theme Editor](https://home.synnovator.space/admin/theme)',
+        ].join('\n'),
+        head: branchName,
+        base: 'main',
+      });
+
+      return NextResponse.json({ url: pr.html_url, number: pr.number });
+    }
+
+    // --- Platform or hackathon-variant: create PR with theme YAML ---
+
     // Build YAML content
     const themeData: Record<string, unknown> = {};
     if (type === 'platform') {
@@ -664,34 +724,6 @@ export async function POST(request: NextRequest) {
       ? `config/themes/${themeName}.yml`
       : `hackathons/${hackathonSlug}/themes/${themeName}.yml`;
 
-    // Check required env vars
-    const appId = process.env.GITHUB_APP_ID;
-    const privateKey = process.env.GITHUB_APP_PRIVATE_KEY;
-    const installationId = process.env.GITHUB_APP_INSTALLATION_ID;
-    const missing = [
-      !appId && 'GITHUB_APP_ID',
-      !privateKey && 'GITHUB_APP_PRIVATE_KEY',
-      !installationId && 'GITHUB_APP_INSTALLATION_ID',
-    ].filter(Boolean);
-    if (missing.length) {
-      return NextResponse.json(
-        { error: `Server configuration error: missing ${missing.join(', ')}` },
-        { status: 500 },
-      );
-    }
-
-    const octokit = getInstallationOctokit({
-      GITHUB_APP_ID: appId!,
-      GITHUB_APP_PRIVATE_KEY: privateKey!,
-      GITHUB_APP_INSTALLATION_ID: installationId!,
-    });
-
-    const { data: ref } = await octokit.git.getRef({
-      owner: OWNER, repo: REPO, ref: 'heads/main',
-    });
-    const mainSha = ref.object.sha;
-
-    const timestamp = Math.floor(Date.now() / 1000);
     let branchName = `theme/${themeName}-${timestamp}`;
     try {
       await octokit.git.createRef({
@@ -781,7 +813,7 @@ Add to `admin` section in `en.json`:
 "theme_active": "Active",
 "theme_activate": "Activate",
 "theme_activating": "Activating...",
-"theme_activate_success": "Theme activated",
+"theme_activate_success": "Activate PR Created",
 "theme_no_variant": "No variant",
 "theme_create_variant": "Create Variant",
 "theme_select_theme": "Select theme",
@@ -800,7 +832,7 @@ Add to `admin` section in `zh.json`:
 "theme_active": "当前激活",
 "theme_activate": "激活",
 "theme_activating": "激活中...",
-"theme_activate_success": "主题已激活",
+"theme_activate_success": "激活 PR 已创建",
 "theme_no_variant": "无变体",
 "theme_create_variant": "创建变体",
 "theme_select_theme": "选择主题",
@@ -1230,22 +1262,29 @@ export function ThemeEditorPage() {
     ]);
   };
 
-  // Activate theme handler
+  // Activate theme handler — creates a PR to change config/themes/.active
+  const [activatePrUrl, setActivatePrUrl] = useState<string | null>(null);
   const handleActivate = async () => {
     if (!selectedTheme) return;
     const current = themes.find((t) => t.active);
     if (current?.id === selectedTheme) return; // Already active
 
     setActivating(true);
+    setActivatePrUrl(null);
     try {
-      const res = await fetch(`/api/admin/theme?action=activate&theme=${encodeURIComponent(selectedTheme)}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      // Update local state
-      setThemes((prev) =>
-        prev.map((t) => ({ ...t, active: t.id === selectedTheme }))
-      );
+      const res = await fetch('/api/admin/theme', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'activate', themeName: selectedTheme }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error || `HTTP ${res.status}`);
+      }
+      const data = (await res.json()) as { url: string; number: number };
+      setActivatePrUrl(data.url);
     } catch (err) {
-      console.error('Failed to activate theme:', err);
+      console.error('Failed to create activate PR:', err);
     } finally {
       setActivating(false);
     }
@@ -1270,18 +1309,30 @@ export function ThemeEditorPage() {
           lang={lang}
         />
         <div className="flex-1" />
-        {/* Activate button — only show when not the active theme */}
+        {/* Activate button — only show when not the active theme, creates a PR */}
         {!isActiveTheme && selectedTheme && !selectedVariant && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleActivate}
-            disabled={activating}
-          >
-            {activating
-              ? t(lang, 'admin.theme_activating')
-              : t(lang, 'admin.theme_activate')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleActivate}
+              disabled={activating}
+            >
+              {activating
+                ? t(lang, 'admin.theme_activating')
+                : t(lang, 'admin.theme_activate')}
+            </Button>
+            {activatePrUrl && (
+              <a
+                href={activatePrUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-primary underline hover:text-primary/80"
+              >
+                {t(lang, 'admin.theme_activate_success')}
+              </a>
+            )}
+          </div>
         )}
         {isActiveTheme && !selectedVariant && (
           <span className="text-xs text-muted-foreground px-2 py-1 rounded-md bg-muted">
