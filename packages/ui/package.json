@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./styles": "./src/styles/global.css",
+    "./theme-meta": "./src/styles/generated-theme-meta.json",
     "./lib/utils": "./src/lib/utils.ts",
     "./components/*": "./src/components/*.tsx",
     "./icons": "./src/icons/index.tsx"

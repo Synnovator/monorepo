@@ -1,6 +1,7 @@
 name: "Neon Forge"
 name_zh: "霓虹锻造"
 description: "Dark cyber/neon aesthetic with lime green primary"
+default_mode: dark
 
 light:
   background: "oklch(0.96 0.01 145)"

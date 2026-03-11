@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { type, themeName, hackathonSlug, name, name_zh, description, light, dark, fonts, radius, message } = parsed.data;
+    const { type, themeName, hackathonSlug, name, name_zh, description, default_mode, light, dark, fonts, radius, message } = parsed.data;
 
     // Check required env vars
     const appId = process.env.GITHUB_APP_ID;
@@ -243,6 +243,7 @@ export async function POST(request: NextRequest) {
       if (name) themeData.name = name;
       if (name_zh) themeData.name_zh = name_zh;
       if (description) themeData.description = description;
+      if (default_mode) themeData.default_mode = default_mode;
     }
     if (light) themeData.light = light;
     if (dark) themeData.dark = dark;

@@ -94,10 +94,13 @@ export type ThemeConfig = z.infer<typeof themeConfigSchema>;
 
 // === Platform Theme Schema (full theme + metadata) ===
 
+export const defaultModeSchema = z.enum(['light', 'dark', 'system']).default('system');
+
 export const platformThemeSchema = z.object({
   name: z.string().min(1),
   name_zh: z.string().optional(),
   description: z.string().optional(),
+  default_mode: defaultModeSchema.optional(),
   light: fullTokenMapSchema,
   dark: fullTokenMapSchema,
   fonts: z
@@ -142,6 +145,7 @@ export const themeSubmissionSchema = z.object({
   name: z.string().optional(),
   name_zh: z.string().optional(),
   description: z.string().optional(),
+  default_mode: defaultModeSchema.optional(),
   light: tokenMapSchema.optional(),
   dark: tokenMapSchema.optional(),
   fonts: z

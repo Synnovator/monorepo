@@ -21,7 +21,8 @@ const ACTIVE_FILE = path.join(THEMES_DIR, '.active');
 const HACKATHONS_DIR = path.join(ROOT, 'hackathons');
 const OUT_FILE = path.join(ROOT, 'packages/ui/src/styles/generated-themes.css');
 
-const META_FIELDS = ['name', 'name_zh', 'description'];
+const META_FIELDS = ['name', 'name_zh', 'description', 'default_mode'];
+const META_FILE = path.join(path.dirname(OUT_FILE), 'generated-theme-meta.json');
 
 function renderTokens(tokens, indent = '  ') {
   return Object.entries(tokens)
@@ -57,10 +58,12 @@ function main() {
   }
 
   const themes = new Map();
+  const themeMeta = new Map(); // slug → { default_mode }
   for (const file of themeFiles) {
     const slug = file.replace(/\.yml$/, '');
     const data = readYamlFile(path.join(THEMES_DIR, file));
     if (data) {
+      themeMeta.set(slug, { default_mode: data.default_mode || 'system' });
       for (const field of META_FIELDS) delete data[field];
       themes.set(slug, data);
     }
@@ -189,7 +192,16 @@ function main() {
   const output = lines.join('\n');
   writeFileSync(OUT_FILE, output);
 
+  // 7. Write theme meta JSON (for next-themes defaultTheme)
+  const activeMeta = themeMeta.get(activeTheme) || { default_mode: 'system' };
+  const metaJson = JSON.stringify({
+    activeTheme,
+    defaultMode: activeMeta.default_mode,
+  }, null, 2);
+  writeFileSync(META_FILE, metaJson + '\n');
+
   console.log(`[generate-theme-css] Written to ${path.relative(process.cwd(), OUT_FILE)}`);
+  console.log(`[generate-theme-css] Meta written to ${path.relative(process.cwd(), META_FILE)}`);
   console.log(`  platform themes: ${themes.size}`);
   console.log(`  hackathon variants: ${variantCount}`);
 }
