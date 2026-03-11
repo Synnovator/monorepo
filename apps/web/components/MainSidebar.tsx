@@ -21,7 +21,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
-  useSidebar,
 } from '@synnovator/ui';
 import {
   TrophyIcon,
@@ -79,8 +78,6 @@ export function MainSidebar({ showAdmin = false }: MainSidebarProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const lang = getLangFromSearchParams(searchParams);
-  const { state } = useSidebar();
-
   function langHref(path: string) {
     if (lang === 'en') {
       const sep = path.includes('?') ? '&' : '?';
@@ -134,7 +131,6 @@ export function MainSidebar({ showAdmin = false }: MainSidebarProps) {
                 pathname={pathname}
                 langHref={langHref}
                 defaultOpen={isGroupActive(guidesGroup.items)}
-                sidebarState={state}
               />
 
               {/* Admin collapsible group (conditional) */}
@@ -145,7 +141,6 @@ export function MainSidebar({ showAdmin = false }: MainSidebarProps) {
                   pathname={pathname}
                   langHref={langHref}
                   defaultOpen={isGroupActive(adminGroup.items)}
-                  sidebarState={state}
                 />
               )}
             </SidebarMenu>
@@ -164,14 +159,12 @@ function CollapsibleGroup({
   pathname,
   langHref,
   defaultOpen,
-  sidebarState,
 }: {
   group: CollapsibleNavGroup;
   lang: 'zh' | 'en';
   pathname: string;
   langHref: (path: string) => string;
   defaultOpen: boolean;
-  sidebarState: string;
 }) {
   const Icon = group.icon;
 
