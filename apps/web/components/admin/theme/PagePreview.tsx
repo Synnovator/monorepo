@@ -148,6 +148,32 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
 
   return (
     <div className="space-y-8 [&_a]:pointer-events-none">
+      {/* Mini layout preview — SlimHeader + Sidebar skeleton */}
+      <div className="flex border border-border rounded-lg overflow-hidden mb-6">
+        {/* Mini sidebar */}
+        <div className="w-10 shrink-0 bg-sidebar border-r border-border flex flex-col items-center py-2 gap-2">
+          <div className="w-5 h-5 rounded bg-primary/20" />
+          <div className="w-5 h-5 rounded bg-muted" />
+          <div className="w-5 h-5 rounded bg-muted" />
+          <div className="w-5 h-5 rounded bg-muted" />
+        </div>
+        {/* Mini header + content area */}
+        <div className="flex-1">
+          {/* Mini SlimHeader */}
+          <div className="flex items-center gap-2 h-8 px-2 border-b border-border bg-background/80">
+            <div className="w-4 h-4 rounded bg-muted" />
+            <div className="flex-1 h-5 rounded bg-muted/50 max-w-[120px]" />
+            <div className="h-5 px-2 rounded bg-primary/20 text-[8px] text-primary-foreground flex items-center">+ 创建</div>
+            <div className="w-4 h-4 rounded-full bg-muted" />
+          </div>
+          {/* Content placeholder */}
+          <div className="p-3">
+            <div className="h-3 w-24 rounded bg-muted mb-2" />
+            <div className="h-2 w-32 rounded bg-muted/50" />
+          </div>
+        </div>
+      </div>
+
       <section className="text-center py-8">
         <Badge variant="secondary" className="mb-4">
           AI Hackathon Platform
