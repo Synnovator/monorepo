@@ -19,6 +19,7 @@ import { AppealForm } from '@/components/forms/AppealForm';
 import { TeamFormationForm } from '@/components/forms/TeamFormationForm';
 import { TeamsTab } from '@/components/TeamsTab';
 import { SketchUnderline, SketchDoodle } from '@/components/sketch';
+import { Separator } from '@synnovator/ui';
 
 export const dynamic = 'force-static';
 
@@ -147,7 +148,7 @@ export default async function HackathonDetailPage({
 
               {h.organizers && h.organizers.length > 0 && (
                 <>
-                  <hr className="border-border" />
+                  <Separator />
                   <section className="mt-12 mb-12">
                     <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.organizers')}</h2>
                     <div className="flex flex-wrap gap-4">
@@ -166,7 +167,7 @@ export default async function HackathonDetailPage({
 
               {h.tracks && h.tracks.length > 0 && (
                 <>
-                  <hr className="border-border" />
+                  <Separator />
                   <section className="mt-12 mb-12">
                     <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.tracks')}</h2>
                     <div className="space-y-6">
@@ -180,7 +181,7 @@ export default async function HackathonDetailPage({
 
               {h.eligibility && (
                 <>
-                  <hr className="border-border" />
+                  <Separator />
                   <section className="mt-12 mb-8">
                     <h2 className="text-xl font-heading font-bold text-foreground mb-4 flex items-center gap-2">
                       <ClipboardListIcon size={22} className="shrink-0" aria-hidden="true" />
@@ -203,7 +204,7 @@ export default async function HackathonDetailPage({
 
               {h.datasets && h.datasets.length > 0 && (
                 <>
-                <hr className="border-border" />
+                <Separator />
                 <section className="mt-12 mb-8">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.datasets')}</h2>
                   <DatasetSection datasets={h.datasets as any} hackathonSlug={h.slug} lang={lang} />
@@ -213,7 +214,7 @@ export default async function HackathonDetailPage({
 
               {h.legal && (
                 <>
-                <hr className="border-border" />
+                <Separator />
                 <section className="mt-12 mb-8">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4 flex items-center gap-2">
                     <ShieldCheckIcon size={22} className="shrink-0" aria-hidden="true" />
@@ -232,7 +233,7 @@ export default async function HackathonDetailPage({
 
               {h.faq && h.faq.length > 0 && (
                 <>
-                  <hr className="border-border" />
+                  <Separator />
                   <section className="mt-12 mb-12">
                     <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.faq')}</h2>
                     <FAQAccordion items={h.faq} lang={lang} />

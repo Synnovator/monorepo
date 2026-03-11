@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { Button } from '@synnovator/ui';
 import { Badge } from '@synnovator/ui';
 import { Card } from '@synnovator/ui';
+import { Separator } from '@synnovator/ui';
 import { listHackathons } from '@/app/_generated/data';
 
 interface PagePreviewProps {
@@ -81,7 +82,7 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
           </div>
         </section>
 
-        <hr className="border-border" />
+        <Separator />
 
         {/* Tracks section */}
         {h.tracks && h.tracks.length > 0 && (
@@ -110,7 +111,7 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
           </section>
         )}
 
-        {h.tracks && h.tracks.length > 0 && <hr className="border-border" />}
+        {h.tracks && h.tracks.length > 0 && <Separator />}
 
         {/* Detail section */}
         <section>
@@ -164,7 +165,7 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
         </div>
       </section>
 
-      <hr className="border-border" />
+      <Separator />
 
       {/* Section 2: Hackathon cards */}
       <section>
@@ -222,7 +223,7 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
         </div>
       </section>
 
-      <hr className="border-border" />
+      <Separator />
 
       {/* Section 3: Detail page mock */}
       <section>
