@@ -145,7 +145,22 @@
     "theme_preview_page": "Page Preview",
     "theme_contrast": "Contrast",
     "theme_contrast_pass": "Passes AA",
-    "theme_contrast_fail": "Fails AA"
+    "theme_contrast_fail": "Fails AA",
+    "theme_platform_themes": "Platform Themes",
+    "theme_hackathon_variants": "Hackathon Variants",
+    "theme_create": "Create Theme",
+    "theme_create_title": "New Theme",
+    "theme_name": "Theme Name",
+    "theme_name_zh": "Theme Name (Chinese)",
+    "theme_description": "Description",
+    "theme_active": "Active",
+    "theme_activate": "Activate",
+    "theme_activating": "Activating...",
+    "theme_activate_success": "Activate PR Created",
+    "theme_no_variant": "No variant",
+    "theme_create_variant": "Create Variant",
+    "theme_select_theme": "Select theme",
+    "theme_select_variant": "Select variant"
   },
   "common": {
     "back_home": "Back to Home",

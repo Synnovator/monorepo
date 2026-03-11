@@ -143,7 +143,22 @@
     "theme_preview_page": "页面预览",
     "theme_contrast": "对比度",
     "theme_contrast_pass": "通过 AA",
-    "theme_contrast_fail": "未达 AA"
+    "theme_contrast_fail": "未达 AA",
+    "theme_platform_themes": "平台主题",
+    "theme_hackathon_variants": "活动主题变体",
+    "theme_create": "创建主题",
+    "theme_create_title": "新主题",
+    "theme_name": "主题名称",
+    "theme_name_zh": "主题名称（中文）",
+    "theme_description": "描述",
+    "theme_active": "当前激活",
+    "theme_activate": "激活",
+    "theme_activating": "激活中...",
+    "theme_activate_success": "激活 PR 已创建",
+    "theme_no_variant": "无变体",
+    "theme_create_variant": "创建变体",
+    "theme_select_theme": "选择主题",
+    "theme_select_variant": "选择变体"
   },
   "common": {
     "back_home": "返回首页",
