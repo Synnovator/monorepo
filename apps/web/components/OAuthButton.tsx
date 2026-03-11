@@ -13,6 +13,10 @@ import {
   AvatarImage,
   AvatarFallback,
   Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from '@synnovator/ui';
 import { GitHubIcon } from './icons';
 
@@ -81,18 +85,24 @@ export function OAuthButton() {
             </button>
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem asChild>
-            <a
-              href={`/api/auth/login?returnTo=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/')}`}
-              className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground transition-colors"
-            >
-              <span className="flex items-center gap-2">
-                <GitHubIcon size={16} aria-hidden="true" />
-                {t(lang, 'auth.link_github')}
-              </span>
-              <span className="text-xs text-muted-foreground block mt-0.5">{t(lang, 'auth.link_github_hint')}</span>
-            </a>
-          </DropdownMenuItem>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuItem asChild>
+                  <a
+                    href={`/api/auth/login?returnTo=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/')}`}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  >
+                    <GitHubIcon size={16} aria-hidden="true" />
+                    {t(lang, 'auth.link_github')}
+                  </a>
+                </DropdownMenuItem>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                {t(lang, 'auth.link_github_hint')}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
         <DropdownMenuItem asChild>
           <a href="/api/auth/logout" className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground transition-colors">

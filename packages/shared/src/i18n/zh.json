@@ -27,7 +27,7 @@
   },
   "home": {
     "title": "发现 AI Hackathon",
-    "subtitle": "浏览活动，注册 Profile，组队参赛",
+    "subtitle": "浏览活动，注册 档案，组队参赛",
     "empty": "暂无活动，敬请期待",
     "empty_cta": "想举办活动？查看组织者指南",
     "filter_all": "全部",
@@ -100,7 +100,7 @@
     "looking_for": "组队偏好",
     "projects": "项目",
     "links": "链接",
-    "edit": "编辑 Profile",
+    "edit": "编辑 档案",
     "hackathons": "参赛记录",
     "seeking": "正在寻找",
     "team_size": "团队规模",
@@ -112,7 +112,7 @@
     "title": "管理",
     "dashboard": "仪表盘",
     "hackathons": "活动管理",
-    "profiles": "Profile 管理",
+    "profiles": "档案 管理",
     "submissions": "提交管理",
     "pending": "待审核",
     "access_denied": "访问被拒绝",
@@ -189,7 +189,7 @@
     "login_github": "GitHub 登录",
     "login_password": "密码登录",
     "logout": "退出",
-    "my_profile": "我的 Profile",
+    "my_profile": "我的 档案",
     "username": "用户名",
     "password": "密码",
     "signing_in": "登录中...",
@@ -201,7 +201,7 @@
     "network_error": "网络错误，请重试",
     "loading": "加载中...",
     "link_github": "关联 GitHub",
-    "link_github_hint": "请先登录 GitHub 以创建 Profile"
+    "link_github_hint": "请先登录 GitHub 以创建 档案"
   },
   "score": {
     "title": "评分卡",
@@ -266,7 +266,7 @@
       "title": "活动报名",
       "sign_in_first": "请先登录 GitHub",
       "sign_in_github": "登录 GitHub",
-      "create_profile": "创建 Profile",
+      "create_profile": "创建 档案",
       "hackathon": "活动",
       "track": "赛道",
       "select_track": "请选择赛道",
@@ -274,14 +274,14 @@
       "select_role": "请选择角色",
       "team_name": "队伍名称",
       "terms_agree": "已阅读比赛规则并同意条款",
-      "profile_up_to_date": "Profile 已创建且信息最新",
+      "profile_up_to_date": "档案 已创建且信息最新",
       "nda_required_hint": "此活动需要签署 NDA，请在报名前完成签署",
       "processing": "处理中...",
       "submit_pr": "报名并创建 PR",
-      "create_profile_first": "请先创建 Profile",
+      "create_profile_first": "请先创建 档案",
       "operation_failed": "操作失败，请重试",
       "already_registered": "您已报名该活动",
-      "profile_not_found": "GitHub 上未找到 Profile 文件，请确认 PR 已合并",
+      "profile_not_found": "GitHub 上未找到 档案 文件，请确认 PR 已合并",
       "github_api_failed": "GitHub API 请求失败"
     },
     "common": {
@@ -345,8 +345,8 @@
       "signer": "签署人",
       "processing": "处理中...",
       "sign_and_pr": "签署 NDA 并创建 PR",
-      "create_profile": "创建 Profile",
-      "create_profile_first": "请先创建 Profile，然后再签署 NDA",
+      "create_profile": "创建 档案",
+      "create_profile_first": "请先创建 档案，然后再签署 NDA",
       "already_signed": "您已签署过该活动的 NDA"
     },
     "create_hackathon": {
@@ -519,9 +519,9 @@
     "back_to_guides": "返回指南",
     "index_title": "指南",
     "index_subtitle": "选择你的角色，了解完整流程",
-    "hacker_bullets": "注册 Profile|浏览并报名活动|组建团队|提交项目",
+    "hacker_bullets": "注册 档案|浏览并报名活动|组建团队|提交项目",
     "organizer_bullets": "创建活动仓库|配置赛道与时间线|管理报名与提交|配置评委与评审",
-    "judge_bullets": "设置评委 Profile|查看提交作品|使用评分卡评分|声明利益冲突"
+    "judge_bullets": "设置评委 档案|查看提交作品|使用评分卡评分|声明利益冲突"
   },
   "proposals": {
     "title": "提案",
