@@ -64,24 +64,10 @@ export function ComponentPreview({ lang }: ComponentPreviewProps) {
           <Badge variant="secondary">Secondary</Badge>
           <Badge variant="outline">Outline</Badge>
           <Badge variant="destructive">Destructive</Badge>
-          <span
-            className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-            style={{ backgroundColor: 'oklch(from var(--brand) l c h / 0.2)', color: 'var(--brand)' }}
-          >
-            Brand
-          </span>
-          <span
-            className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-            style={{ backgroundColor: 'oklch(from var(--highlight) l c h / 0.2)', color: 'var(--highlight)' }}
-          >
-            Highlight
-          </span>
-          <span
-            className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-            style={{ backgroundColor: 'oklch(from var(--info) l c h / 0.2)', color: 'var(--info)' }}
-          >
-            Info
-          </span>
+          <Badge variant="brand">Brand</Badge>
+          <Badge variant="highlight">Highlight</Badge>
+          <Badge variant="info">Info</Badge>
+          <Badge variant="warning">Warning</Badge>
         </div>
       </section>
 

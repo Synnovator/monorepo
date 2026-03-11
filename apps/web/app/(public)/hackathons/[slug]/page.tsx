@@ -19,12 +19,26 @@ import { AppealForm } from '@/components/forms/AppealForm';
 import { TeamFormationForm } from '@/components/forms/TeamFormationForm';
 import { TeamsTab } from '@/components/TeamsTab';
 import { SketchUnderline, SketchDoodle } from '@/components/sketch';
-import { Separator } from '@synnovator/ui';
+import { Separator, Badge } from '@synnovator/ui';
 
 export const dynamic = 'force-static';
 
 export function generateStaticParams() {
   return listHackathons().map(h => ({ slug: h.hackathon.slug }));
+}
+
+type StageVariant = 'secondary' | 'brand' | 'highlight' | 'info' | 'warning';
+
+function stageVariant(stage: string): StageVariant {
+  switch (stage) {
+    case 'registration': return 'brand';
+    case 'development':
+    case 'submission': return 'highlight';
+    case 'judging': return 'info';
+    case 'announcement':
+    case 'award': return 'warning';
+    default: return 'secondary';
+  }
 }
 
 export default async function HackathonDetailPage({
@@ -81,12 +95,12 @@ export default async function HackathonDetailPage({
       {/* Hero */}
       <div className="mb-12">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground">
+          <Badge variant="secondary">
             {t(lang, `hackathon.type_${h.type.replace('-', '_')}`)}
-          </span>
-          <span className="text-xs px-3 py-1 rounded-full bg-primary/20 text-primary">
+          </Badge>
+          <Badge variant={stageVariant(stage)}>
             {t(lang, `stage.${stage}`)}
-          </span>
+          </Badge>
         </div>
 
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
