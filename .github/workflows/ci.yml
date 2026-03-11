@@ -25,15 +25,15 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Generate static data
+        working-directory: apps/web
+        run: node scripts/generate-static-data.mjs && node ../../scripts/generate-theme-css.mjs
+
       - name: Typecheck
         run: pnpm exec tsc --noEmit --project apps/web/tsconfig.json
 
       - name: Test (shared)
         run: pnpm --filter @synnovator/shared test
-
-      - name: Generate static data
-        working-directory: apps/web
-        run: node scripts/generate-static-data.mjs && node ../../scripts/generate-theme-css.mjs
 
       - name: Test (web)
         run: pnpm --filter @synnovator/web test
