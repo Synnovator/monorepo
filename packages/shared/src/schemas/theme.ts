@@ -92,6 +92,38 @@ export const themeConfigSchema = z.object({
 
 export type ThemeConfig = z.infer<typeof themeConfigSchema>;
 
+// === Platform Theme Schema (full theme + metadata) ===
+
+export const platformThemeSchema = z.object({
+  name: z.string().min(1),
+  name_zh: z.string().optional(),
+  description: z.string().optional(),
+  light: fullTokenMapSchema,
+  dark: fullTokenMapSchema,
+  fonts: z
+    .object({
+      heading: z.string().optional(),
+      sans: z.string().optional(),
+      code: z.string().optional(),
+      zh: z.string().optional(),
+    })
+    .optional(),
+  radius: z.string().optional(),
+});
+
+export type PlatformTheme = z.infer<typeof platformThemeSchema>;
+
+// === Platform Theme Meta (for listing) ===
+
+export const platformThemeMetaSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  name_zh: z.string().optional(),
+  active: z.boolean(),
+});
+
+export type PlatformThemeMeta = z.infer<typeof platformThemeMetaSchema>;
+
 // === Hackathon Theme Schema (partial overrides) ===
 
 export const hackathonThemeSchema = z.object({
@@ -104,9 +136,14 @@ export type HackathonTheme = z.infer<typeof hackathonThemeSchema>;
 // === Theme Submission Schema (POST body) ===
 
 export const themeSubmissionSchema = z.object({
-  target: z.string().min(1),
-  light: tokenMapSchema,
-  dark: tokenMapSchema,
+  type: z.enum(['platform', 'hackathon-variant', 'activate']),
+  themeName: z.string().min(1),
+  hackathonSlug: z.string().optional(),
+  name: z.string().optional(),
+  name_zh: z.string().optional(),
+  description: z.string().optional(),
+  light: tokenMapSchema.optional(),
+  dark: tokenMapSchema.optional(),
   fonts: z
     .object({
       heading: z.string().optional(),
