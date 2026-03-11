@@ -75,3 +75,4 @@ cp .dev.vars.example .dev.vars
 - `prebuild` 脚本（`scripts/generate-static-data.mjs`）在 `dev` 和 `build` 前自动运行，将 YAML 数据转为 JSON
 - 使用 `pnpm run deploy` 而非 `pnpm deploy`（后者是 pnpm 内置命令）
 - 无测试框架（测试在 `@synnovator/shared` 包中，使用 Vitest）
+- **禁止在运行时使用 `node:fs` 读取 YAML/数据文件**。Cloudflare Workers 没有 `fs` 模块，运行时调用会导致 HTTP 500。所有 YAML 数据（hackathons、profiles、themes 等）必须通过 `scripts/generate-static-data.mjs` 在构建时预生成为 JSON，然后通过 `app/_generated/data.ts` 导入使用。如需新增数据源，扩展 generate 脚本，不要在 API Route 或 Server Component 中 `import fs`。

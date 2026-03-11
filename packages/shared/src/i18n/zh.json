@@ -163,6 +163,8 @@
     "theme_mode_dark": "深色",
     "theme_cancel": "取消",
     "theme_loading": "加载中...",
+    "theme_error": "加载主题失败",
+    "theme_retry": "重试",
     "theme_group_surfaces": "表面",
     "theme_group_primary": "主色",
     "theme_group_muted": "弱化",

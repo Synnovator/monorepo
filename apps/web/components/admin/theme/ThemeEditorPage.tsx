@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import { TOKEN_NAMES, type TokenName } from '@synnovator/shared/schemas/theme';
 import type { ThemeConfig, HackathonTheme, PlatformThemeMeta } from '@synnovator/shared/schemas/theme';
+import { Alert, AlertTitle, AlertDescription } from '@synnovator/ui';
 import { Button } from '@synnovator/ui';
 import { Input } from '@synnovator/ui';
 import { Label } from '@synnovator/ui';
@@ -533,7 +534,20 @@ export function ThemeEditorPage() {
         </div>
       ) : error ? (
         <div className="flex items-center justify-center flex-1">
-          <p className="text-destructive text-sm">{error}</p>
+          <Alert variant="destructive" className="max-w-md">
+            <AlertTitle>{t(lang, 'admin.theme_error')}</AlertTitle>
+            <AlertDescription className="flex flex-col gap-3">
+              <p>{error}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-fit"
+                onClick={() => window.location.reload()}
+              >
+                {t(lang, 'admin.theme_retry')}
+              </Button>
+            </AlertDescription>
+          </Alert>
         </div>
       ) : (
         <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">

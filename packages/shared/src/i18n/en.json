@@ -165,6 +165,8 @@
     "theme_mode_dark": "Dark",
     "theme_cancel": "Cancel",
     "theme_loading": "Loading...",
+    "theme_error": "Failed to load themes",
+    "theme_retry": "Retry",
     "theme_group_surfaces": "Surfaces",
     "theme_group_primary": "Primary",
     "theme_group_muted": "Muted",

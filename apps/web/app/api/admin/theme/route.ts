@@ -2,23 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@synnovator/shared/auth';
 import { themeSubmissionSchema } from '@synnovator/shared/schemas/theme';
 import { getInstallationOctokit } from '@/lib/github-app';
-import fs from 'node:fs';
-import path from 'node:path';
+import { listThemes, getTheme, getThemeVariant } from '@/app/_generated/data';
 import yaml from 'js-yaml';
 
-const REPO_ROOT = path.resolve(process.cwd(), '..', '..');
 const OWNER = process.env.GITHUB_OWNER || 'Synnovator';
 const REPO = process.env.GITHUB_REPO || 'monorepo';
 const SLUG_RE = /^[a-z0-9][a-z0-9-]*[a-z0-9]$/;
-
-function readYamlFile(filePath: string): Record<string, unknown> | null {
-  try {
-    const content = fs.readFileSync(filePath, 'utf-8');
-    return yaml.load(content) as Record<string, unknown>;
-  } catch {
-    return null;
-  }
-}
 
 /** Base64-encode a UTF-8 string (works in both Node.js and Cloudflare Workers). */
 function toBase64(str: string): string {
@@ -51,48 +40,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid hackathon slug' }, { status: 400 });
     }
 
-    const themesDir = path.join(REPO_ROOT, 'config', 'themes');
-    const activeFile = path.join(themesDir, '.active');
-
-    // Action: list all platform themes
+    // Action: list all platform themes (from pre-generated data)
     if (action === 'list') {
-      const activeTheme = fs.existsSync(activeFile)
-        ? fs.readFileSync(activeFile, 'utf-8').trim()
-        : '';
-
-      const files = fs.readdirSync(themesDir).filter((f) => f.endsWith('.yml'));
-      const themes = files.map((f) => {
-        const id = f.replace(/\.yml$/, '');
-        const data = readYamlFile(path.join(themesDir, f));
-        return {
-          id,
-          name: (data?.name as string) || id,
-          name_zh: (data?.name_zh as string) || undefined,
-          active: id === activeTheme,
-        };
-      });
-
+      const themes = listThemes();
+      const activeTheme = themes.find(t => t.active)?.id ?? '';
       return NextResponse.json({ themes, activeTheme });
     }
 
     // Get specific platform theme
     if (themeName) {
-      const themeFile = path.join(themesDir, `${themeName}.yml`);
-      const themeData = readYamlFile(themeFile);
-      if (!themeData) {
+      const themeEntry = getTheme(themeName);
+      if (!themeEntry) {
         return NextResponse.json({ error: `Theme "${themeName}" not found` }, { status: 404 });
       }
 
+      // Strip internal _id field from response
+      const { _id, ...themeResponse } = themeEntry;
+
       // With hackathon variant
       if (hackathonSlug) {
-        const variantFile = path.join(
-          REPO_ROOT, 'hackathons', hackathonSlug, 'themes', `${themeName}.yml`
-        );
-        const overrides = readYamlFile(variantFile) ?? {};
-        return NextResponse.json({ base: themeData, overrides });
+        const overrides = getThemeVariant(hackathonSlug, themeName) ?? {};
+        return NextResponse.json({ base: themeResponse, overrides });
       }
 
-      return NextResponse.json(themeData);
+      return NextResponse.json(themeResponse);
     }
 
     // Fallback: legacy ?target= support
@@ -101,25 +72,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid target slug' }, { status: 400 });
     }
     if (target === 'global') {
-      const activeTheme = fs.existsSync(activeFile)
-        ? fs.readFileSync(activeFile, 'utf-8').trim()
-        : 'warm-orange';
-      const themeFile = path.join(themesDir, `${activeTheme}.yml`);
-      const themeData = readYamlFile(themeFile);
-      if (!themeData) {
+      const themes = listThemes();
+      const activeId = themes.find(t => t.active)?.id ?? 'warm-orange';
+      const themeEntry = getTheme(activeId);
+      if (!themeEntry) {
         return NextResponse.json({ error: 'Active theme not found' }, { status: 404 });
       }
-      return NextResponse.json(themeData);
+      const { _id, ...themeResponse } = themeEntry;
+      return NextResponse.json(themeResponse);
     }
     if (target) {
-      const activeTheme = fs.existsSync(activeFile)
-        ? fs.readFileSync(activeFile, 'utf-8').trim()
-        : 'warm-orange';
-      const themeFile = path.join(themesDir, `${activeTheme}.yml`);
-      const themeData = readYamlFile(themeFile);
-      const variantFile = path.join(REPO_ROOT, 'hackathons', target, 'themes', `${activeTheme}.yml`);
-      const overrides = readYamlFile(variantFile) ?? {};
-      return NextResponse.json({ global: themeData, overrides });
+      const themes = listThemes();
+      const activeId = themes.find(t => t.active)?.id ?? 'warm-orange';
+      const themeEntry = getTheme(activeId);
+      const { _id, ...themeResponse } = themeEntry ?? {};
+      const overrides = getThemeVariant(target, activeId) ?? {};
+      return NextResponse.json({ global: themeResponse, overrides });
     }
 
     return NextResponse.json({ error: 'Missing query parameters' }, { status: 400 });

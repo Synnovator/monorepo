@@ -20,6 +20,23 @@ const profiles = staticData.profiles as unknown as Profile[];
 const submissions = staticData.submissions as unknown as SubmissionWithMeta[];
 const results = staticData.results as unknown as Record<string, any[]>;
 
+interface ThemeEntry {
+  _id: string;
+  name?: string;
+  name_zh?: string;
+  description?: string;
+  light?: Record<string, string>;
+  dark?: Record<string, string>;
+  fonts?: Record<string, string>;
+  radius?: string;
+}
+
+const themeData = (staticData as any).themes as {
+  activeTheme: string;
+  themes: ThemeEntry[];
+  variants: Record<string, Record<string, unknown>>;
+} | undefined;
+
 export function listHackathons(): Hackathon[] {
   return hackathons;
 }
@@ -42,4 +59,31 @@ export function listSubmissions(): SubmissionWithMeta[] {
 
 export function getResults(hackathonSlug: string): any[] {
   return results[hackathonSlug] ?? [];
+}
+
+// --- Theme data ---
+
+export function getActiveThemeName(): string {
+  return themeData?.activeTheme ?? '';
+}
+
+export function listThemes(): { id: string; name: string; name_zh?: string; active: boolean }[] {
+  if (!themeData) return [];
+  const active = themeData.activeTheme;
+  return themeData.themes.map(t => ({
+    id: t._id,
+    name: t.name ?? t._id,
+    name_zh: t.name_zh,
+    active: t._id === active,
+  }));
+}
+
+export function getTheme(id: string): ThemeEntry | null {
+  if (!themeData) return null;
+  return themeData.themes.find(t => t._id === id) ?? null;
+}
+
+export function getThemeVariant(hackathonSlug: string, themeName: string): Record<string, unknown> | null {
+  if (!themeData) return null;
+  return (themeData.variants[`${hackathonSlug}/${themeName}`] as Record<string, unknown>) ?? null;
 }
