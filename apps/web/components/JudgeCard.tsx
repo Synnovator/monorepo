@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { localize, t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 import { ShieldCheckIcon } from './icons';
 
 interface JudgeCardProps {
@@ -22,7 +23,7 @@ export function JudgeCard({ judge, lang, profileSlug }: JudgeCardProps) {
   const displayName = localize(lang, judge.name, judge.name_zh);
 
   return (
-    <div className="flex items-start gap-4 p-4 rounded-lg border border-border bg-card">
+    <Card className="flex items-start gap-4 p-4">
       {profileUrl ? (
         <Link href={profileUrl} className="shrink-0 group">
           <img
@@ -63,6 +64,6 @@ export function JudgeCard({ judge, lang, profileSlug }: JudgeCardProps) {
           </a>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

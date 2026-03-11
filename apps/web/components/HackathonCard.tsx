@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getCurrentStage, t, localize } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 import { TrophyIcon } from './icons';
 import { hackathonCardClass, hackathonHoverClass, hackathonTypeIcon } from '@/lib/hackathon-theme';
 import { SketchCircle } from '@/components/sketch';
@@ -35,11 +36,14 @@ export function HackathonCard({ hackathon, lang }: HackathonCardProps) {
   const TypeIcon = hackathonTypeIcon(hackathon.type);
 
   return (
-    <Link
-      href={`/hackathons/${hackathon.slug}`}
+    <Card
       data-hackathon={hackathon.slug}
-      className={`block group border border-border bg-card hover:border-primary/40 transition-all duration-200 p-6 h-full flex flex-col ${hackathonCardClass(hackathon.type)} ${hackathonHoverClass(hackathon.type)}`}
+      className={`hover:border-primary/40 transition-all duration-200 h-full flex flex-col ${hackathonCardClass(hackathon.type)} ${hackathonHoverClass(hackathon.type)}`}
     >
+      <Link
+        href={`/hackathons/${hackathon.slug}`}
+        className="block p-6 h-full flex flex-col group"
+      >
       {/* Type + Stage badges */}
       <div className="flex items-center gap-2 mb-3">
         <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
@@ -79,6 +83,7 @@ export function HackathonCard({ hackathon, lang }: HackathonCardProps) {
           {t(lang, 'stage.registration')}: {new Date(hackathon.timeline.registration.start).toLocaleDateString()} — {new Date(hackathon.timeline.registration.end).toLocaleDateString()}
         </div>
       )}
-    </Link>
+      </Link>
+    </Card>
   );
 }

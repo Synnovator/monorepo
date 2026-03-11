@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { localize } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 import { HeartIcon } from './icons';
 
 interface ProjectCardProps {
@@ -23,7 +24,8 @@ export function ProjectCard({ project, hackathonSlug, teamSlug, lang }: ProjectC
   const detailUrl = `/projects/${hackathonSlug}/${teamSlug}`;
 
   return (
-    <Link href={detailUrl} className="block rounded-lg border border-border bg-card p-5 hover:border-primary/30 transition-colors group">
+    <Card className="hover:border-primary/30 transition-colors group">
+      <Link href={detailUrl} className="block p-5">
       <div className="flex items-start justify-between mb-3">
         <div>
           <h4 className="text-foreground font-medium text-sm group-hover:text-primary transition-colors">
@@ -69,6 +71,7 @@ export function ProjectCard({ project, hackathonSlug, teamSlug, lang }: ProjectC
           ))}
         </div>
       )}
-    </Link>
+      </Link>
+    </Card>
   );
 }

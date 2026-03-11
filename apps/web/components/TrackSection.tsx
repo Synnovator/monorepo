@@ -1,5 +1,6 @@
 import { t, localize } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 
 interface TrackSectionProps {
   track: {
@@ -17,7 +18,7 @@ interface TrackSectionProps {
 
 export function TrackSection({ track, lang }: TrackSectionProps) {
   return (
-    <div className="rounded-lg border border-border bg-card p-6">
+    <Card className="p-6">
       <h3 className="text-xl font-heading font-bold text-foreground mb-2">
         {localize(lang, track.name, track.name_zh)}
       </h3>
@@ -92,6 +93,6 @@ export function TrackSection({ track, lang }: TrackSectionProps) {
           )}
         </div>
       )}
-    </div>
+    </Card>
   );
 }
