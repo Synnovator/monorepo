@@ -1309,18 +1309,20 @@ export function ThemeEditorPage() {
           lang={lang}
         />
         <div className="flex-1" />
-        {/* Activate button — only show when not the active theme, creates a PR */}
-        {!isActiveTheme && selectedTheme && !selectedVariant && (
+        {/* Activate button — disabled when already active or editing a variant */}
+        {selectedTheme && !selectedVariant && (
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={handleActivate}
-              disabled={activating}
+              disabled={isActiveTheme || activating}
             >
-              {activating
-                ? t(lang, 'admin.theme_activating')
-                : t(lang, 'admin.theme_activate')}
+              {isActiveTheme
+                ? t(lang, 'admin.theme_active')
+                : activating
+                  ? t(lang, 'admin.theme_activating')
+                  : t(lang, 'admin.theme_activate')}
             </Button>
             {activatePrUrl && (
               <a
@@ -1333,11 +1335,6 @@ export function ThemeEditorPage() {
               </a>
             )}
           </div>
-        )}
-        {isActiveTheme && !selectedVariant && (
-          <span className="text-xs text-muted-foreground px-2 py-1 rounded-md bg-muted">
-            {t(lang, 'admin.theme_active')}
-          </span>
         )}
         <button
           type="button"
