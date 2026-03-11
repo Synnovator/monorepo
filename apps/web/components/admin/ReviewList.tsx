@@ -1,6 +1,7 @@
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import type { PendingReview } from '@synnovator/shared/data';
+import { Card } from '@synnovator/ui';
 import { ReviewActions } from './ReviewActions';
 
 interface ReviewListProps {
@@ -21,9 +22,9 @@ export function ReviewList({ items, lang }: ReviewListProps) {
   return (
     <div className="space-y-4">
       {items.map(item => (
-        <div
+        <Card
           key={item.id}
-          className="bg-card border border-border rounded-lg p-5 flex items-start justify-between gap-4"
+          className="p-5 flex items-start justify-between gap-4"
         >
           <div className="flex-1 min-w-0">
             <a
@@ -52,7 +53,7 @@ export function ReviewList({ items, lang }: ReviewListProps) {
             )}
           </div>
           <ReviewActions prNumber={item.id} lang={lang} />
-        </div>
+        </Card>
       ))}
     </div>
   );

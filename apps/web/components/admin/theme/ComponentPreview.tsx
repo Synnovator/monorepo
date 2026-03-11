@@ -5,6 +5,7 @@ import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Button } from '@synnovator/ui';
 import { Badge } from '@synnovator/ui';
+import { Card } from '@synnovator/ui';
 import { Input } from '@synnovator/ui';
 import { Textarea } from '@synnovator/ui';
 import { Label } from '@synnovator/ui';
@@ -88,20 +89,20 @@ export function ComponentPreview({ lang }: ComponentPreviewProps) {
       <section>
         <h3 className="text-sm font-semibold text-foreground mb-3">{t(lang, 'admin.theme_comp_cards')}</h3>
         <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-lg border border-border bg-card p-4">
+          <Card className="p-4">
             <h4 className="text-sm font-semibold text-card-foreground mb-1">Card Title</h4>
             <p className="text-xs text-muted-foreground mb-3">
               This card uses bg-card with card-foreground text.
             </p>
             <Button size="sm">Action</Button>
-          </div>
-          <div className="rounded-lg border border-border bg-muted p-4">
+          </Card>
+          <Card className="bg-muted p-4">
             <h4 className="text-sm font-semibold text-foreground mb-1">Muted Card</h4>
             <p className="text-xs text-muted-foreground mb-3">
               This card uses bg-muted with muted-foreground text.
             </p>
             <Button size="sm" variant="secondary">Action</Button>
-          </div>
+          </Card>
         </div>
       </section>
 

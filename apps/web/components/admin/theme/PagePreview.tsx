@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { Button } from '@synnovator/ui';
 import { Badge } from '@synnovator/ui';
+import { Card } from '@synnovator/ui';
 import { listHackathons } from '@/app/_generated/data';
 
 interface PagePreviewProps {
@@ -90,9 +91,9 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
             </h2>
             <div className="grid grid-cols-2 gap-4">
               {h.tracks.map((track) => (
-                <div
+                <Card
                   key={track.slug}
-                  className={`${cardRounding} border border-border bg-card p-4`}
+                  className={`${cardRounding} p-4`}
                   style={borderStyle}
                 >
                   <h3 className="text-sm font-semibold text-card-foreground mb-1">
@@ -103,7 +104,7 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
                       {track.description}
                     </p>
                   )}
-                </div>
+                </Card>
               ))}
             </div>
           </section>
@@ -127,7 +128,7 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
               </Badge>
             )}
           </div>
-          <div className={`${cardRounding} border border-border bg-card p-4`}>
+          <Card className={`${cardRounding} p-4`}>
             <h3 className="text-base font-heading font-semibold text-card-foreground mb-2">
               {h.name}
             </h3>
@@ -136,7 +137,7 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
                 {h.description}
               </p>
             )}
-          </div>
+          </Card>
         </section>
       </div>
     );
@@ -172,8 +173,8 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
         </h2>
         <div className="grid grid-cols-2 gap-4">
           {/* Community card: rounded-xl, top border brand */}
-          <div
-            className="rounded-xl border border-border bg-card p-4"
+          <Card
+            className="rounded-xl p-4"
             style={{ borderTopWidth: '3px', borderTopColor: 'var(--brand)' }}
           >
             <Badge
@@ -193,11 +194,11 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
               <span>&middot;</span>
               <span>Mar 15–20</span>
             </div>
-          </div>
+          </Card>
 
           {/* Enterprise card: rounded-sm, left border info */}
-          <div
-            className="rounded-sm border border-border bg-card p-4"
+          <Card
+            className="rounded-sm p-4"
             style={{ borderLeftWidth: '3px', borderLeftColor: 'var(--info)' }}
           >
             <Badge
@@ -217,7 +218,7 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
               <span>&middot;</span>
               <span>Apr 1–7</span>
             </div>
-          </div>
+          </Card>
         </div>
       </section>
 
@@ -234,7 +235,7 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
             Submissions Open
           </Badge>
         </div>
-        <div className="rounded-lg border border-border bg-card p-4">
+        <Card className="p-4">
           <h3 className="text-base font-heading font-semibold text-card-foreground mb-2">
             Project: Neural Canvas
           </h3>
@@ -268,7 +269,7 @@ export function PagePreview({ hackathonSlug }: PagePreviewProps) {
               WebSocket
             </span>
           </div>
-        </div>
+        </Card>
       </section>
     </div>
   );
