@@ -45,6 +45,8 @@ export const TOKEN_NAMES = [
   'highlight-foreground',
   'info',
   'info-foreground',
+  'warning',
+  'warning-foreground',
 ] as const;
 
 export type TokenName = (typeof TOKEN_NAMES)[number];

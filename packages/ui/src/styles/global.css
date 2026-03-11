@@ -41,6 +41,8 @@
   --color-highlight-foreground: var(--highlight-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
 
   /* Radius */
   --radius-sm: calc(var(--radius) - 4px);

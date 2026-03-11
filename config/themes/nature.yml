@@ -28,6 +28,8 @@ light:
   highlight-foreground: "oklch(0.30 0.036 30)"
   info: "oklch(0.50 0.18 270)"
   info-foreground: "oklch(0.35 0.12 270)"
+  warning: "oklch(0.75 0.15 78)"
+  warning-foreground: "oklch(0.38 0.12 78)"
 
 dark:
   background: "oklch(0.27 0.028 151)"
@@ -55,6 +57,8 @@ dark:
   highlight-foreground: "oklch(0.27 0.028 151)"
   info: "oklch(0.60 0.16 270)"
   info-foreground: "oklch(0.94 0.01 73)"
+  warning: "oklch(0.81 0.15 78)"
+  warning-foreground: "oklch(0.27 0.028 151)"
 
 fonts:
   heading: "Montserrat"

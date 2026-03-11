@@ -28,6 +28,8 @@ light:
   highlight-foreground: "oklch(0.38 0.1 128)"
   info: "oklch(0.50 0.18 270)"
   info-foreground: "oklch(0.35 0.12 270)"
+  warning: "oklch(0.75 0.15 82)"
+  warning-foreground: "oklch(0.40 0.12 82)"
 
 dark:
   background: "oklch(0.22 0.006 56)"
@@ -55,6 +57,8 @@ dark:
   highlight-foreground: "oklch(0.22 0.006 56)"
   info: "oklch(0.60 0.16 270)"
   info-foreground: "oklch(0.97 0.001 106)"
+  warning: "oklch(0.80 0.15 82)"
+  warning-foreground: "oklch(0.22 0.006 56)"
 
 fonts:
   heading: "Oxanium"
