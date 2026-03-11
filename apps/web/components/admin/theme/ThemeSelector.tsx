@@ -49,6 +49,7 @@ export function ThemeSelector({
       <Select value={selectedTheme} onValueChange={onThemeChange}>
         <SelectTrigger
           className="w-48"
+          size="sm"
           aria-label={t(lang, 'admin.theme_select_theme')}
         >
           <SelectValue placeholder={t(lang, 'admin.theme_select_theme')} />
@@ -77,6 +78,7 @@ export function ThemeSelector({
       >
         <SelectTrigger
           className="w-48"
+          size="sm"
           aria-label={t(lang, 'admin.theme_select_variant')}
         >
           <SelectValue placeholder={t(lang, 'admin.theme_select_variant')} />

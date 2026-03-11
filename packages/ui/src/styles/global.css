@@ -24,6 +24,16 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
+  /* Sidebar */
+  --color-sidebar: var(--background);
+  --color-sidebar-foreground: var(--foreground);
+  --color-sidebar-accent: var(--muted);
+  --color-sidebar-accent-foreground: var(--foreground);
+  --color-sidebar-border: var(--border);
+  --color-sidebar-ring: var(--ring);
+  --color-sidebar-primary: var(--primary);
+  --color-sidebar-primary-foreground: var(--primary-foreground);
+
   /* Synnovator brand extensions */
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);

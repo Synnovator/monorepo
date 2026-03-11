@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { decrypt, type Session } from '@synnovator/shared/auth';
 import { createGitHubClient } from '@synnovator/shared/data';
 import { t } from '@synnovator/shared/i18n';
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@synnovator/ui';
 import { NavBar } from '@/components/NavBar';
 import { Footer } from '@/components/Footer';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
@@ -47,11 +48,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <>
       <Suspense><NavBar /></Suspense>
-      <div className="flex min-h-screen pt-16">
-        <Suspense>
-          <AdminSidebar user={session} />
-        </Suspense>
-        <div className="flex-1 p-8">{children}</div>
+      <div className="pt-16">
+        <SidebarProvider className="min-h-[calc(100svh-4rem)]">
+          <Suspense>
+            <AdminSidebar user={session} />
+          </Suspense>
+          <SidebarInset>
+            <header className="flex items-center gap-2 px-4 py-2 md:hidden">
+              <SidebarTrigger />
+            </header>
+            <div className="p-8">{children}</div>
+          </SidebarInset>
+        </SidebarProvider>
       </div>
       <Suspense><Footer /></Suspense>
     </>
