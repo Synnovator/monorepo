@@ -1,7 +1,7 @@
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import type { PendingReview } from '@synnovator/shared/data';
-import { Card } from '@synnovator/ui';
+import { Badge, Card } from '@synnovator/ui';
 import { ReviewActions } from './ReviewActions';
 
 interface ReviewListProps {
@@ -42,12 +42,7 @@ export function ReviewList({ items, lang }: ReviewListProps) {
             {item.labels.length > 0 && (
               <div className="flex gap-1.5 mt-2">
                 {item.labels.map(label => (
-                  <span
-                    key={label}
-                    className="px-2 py-0.5 text-xs rounded-full bg-muted text-foreground"
-                  >
-                    {label}
-                  </span>
+                  <Badge key={label} variant="secondary">{label}</Badge>
                 ))}
               </div>
             )}

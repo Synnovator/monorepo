@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import { Card, ScrollArea } from '@synnovator/ui';
+import { Badge, Card, ScrollArea } from '@synnovator/ui';
 import { formatYaml } from './form-utils';
 import { TimelineEditor, DEFAULT_STAGES, type Stage } from './TimelineEditor';
 
@@ -148,9 +148,9 @@ const TrackEditor = memo(function TrackEditor({
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <label className="text-xs text-muted-foreground">{t(lang, 'form.create_hackathon.judging_criteria')}</label>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${weightOk ? 'bg-primary/20 text-primary' : 'bg-warning/20 text-warning'}`}>
+                  <Badge variant={weightOk ? 'brand' : 'warning'}>
                     {t(lang, 'form.create_hackathon.weight_total')}: {weightSum.toFixed(2)} {weightOk ? '\u2713' : t(lang, 'form.create_hackathon.should_be_one')}
-                  </span>
+                  </Badge>
                 </div>
 
                 {/* Criteria cards */}
