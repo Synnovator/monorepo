@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getHackathon, getResults, listHackathons } from '@/app/_generated/data';
 import { t, localize, getCurrentStage, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import { Card } from '@synnovator/ui';
+import { Card, ScrollArea } from '@synnovator/ui';
 
 export const dynamic = 'force-static';
 
@@ -70,7 +70,7 @@ export default async function ResultsPage({
                     {tr.data.total_teams} {t(lang, 'result.teams_count')}
                   </div>
                 )}
-                <div className="overflow-x-auto">
+                <ScrollArea className="w-full">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border text-muted-foreground">
@@ -95,7 +95,7 @@ export default async function ResultsPage({
                       ))}
                     </tbody>
                   </table>
-                </div>
+                </ScrollArea>
               </section>
             );
           })}

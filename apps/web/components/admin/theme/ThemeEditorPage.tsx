@@ -8,6 +8,7 @@ import type { ThemeConfig, HackathonTheme, PlatformThemeMeta } from '@synnovator
 import { Button } from '@synnovator/ui';
 import { Input } from '@synnovator/ui';
 import { Label } from '@synnovator/ui';
+import { ScrollArea } from '@synnovator/ui';
 import { ThemeSelector } from './ThemeSelector';
 import { TokenGroup, TOKEN_GROUPS } from './TokenGroup';
 import { PreviewPanel } from './PreviewPanel';
@@ -39,7 +40,7 @@ export function ThemeEditorPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const injectedPropsRef = useRef<string[]>([]);
-  const previewRef = useRef<HTMLDivElement>(null);
+  const originalDarkRef = useRef<boolean | null>(null);
 
   // Create theme flow
   const skipNextFetchRef = useRef(false);
@@ -138,12 +139,10 @@ export function ThemeEditorPage() {
       });
   }, [selectedTheme, selectedVariant]);
 
-  // --- Apply CSS variable preview (scoped to wrapper, not document root) ---
+  // --- Apply CSS variable preview to document root for full-page preview ---
   const applyPreview = useCallback(
     (tokenList: TokenEntry[]) => {
-      const el = previewRef.current;
-      if (!el) return;
-      const style = el.style;
+      const style = document.documentElement.style;
       for (const prop of injectedPropsRef.current) {
         style.removeProperty(prop);
       }
@@ -158,13 +157,19 @@ export function ThemeEditorPage() {
     [],
   );
 
-  // Cleanup injected styles on unmount
+  // Sync initial mode with document dark state; restore on unmount
   useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    originalDarkRef.current = isDark;
+    setMode(isDark ? 'dark' : 'light');
     return () => {
-      const el = previewRef.current;
-      if (!el) return;
+      // Restore original dark mode class
+      if (originalDarkRef.current !== null) {
+        document.documentElement.classList.toggle('dark', originalDarkRef.current);
+      }
+      // Clean up injected CSS vars
       for (const prop of injectedPropsRef.current) {
-        el.style.removeProperty(prop);
+        document.documentElement.style.removeProperty(prop);
       }
     };
   }, []);
@@ -325,7 +330,11 @@ export function ThemeEditorPage() {
 
   // --- Toggle light/dark mode (preview only, doesn't touch site dark mode) ---
   const toggleMode = () => {
-    setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
+    setMode((prev) => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      document.documentElement.classList.toggle('dark', next === 'dark');
+      return next;
+    });
   };
 
   // --- Activate handler ---
@@ -527,9 +536,9 @@ export function ThemeEditorPage() {
           <p className="text-destructive text-sm">{error}</p>
         </div>
       ) : (
-        <div ref={previewRef} className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0 bg-background text-foreground rounded-lg p-4 -mx-4">
+        <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
           {/* Left: editor panel */}
-          <div className="w-full lg:w-80 shrink-0 overflow-y-auto pr-2">
+          <ScrollArea className="w-full lg:w-80 shrink-0 pr-2">
             {TOKEN_GROUPS.map((group) => {
               const labelKey = `admin.theme_group_${group.label.toLowerCase()}`;
               return (
@@ -548,11 +557,11 @@ export function ThemeEditorPage() {
               );
             })}
             <ContrastChecker tokens={valuesMap} lang={lang} />
-          </div>
+          </ScrollArea>
           {/* Right: preview panel */}
-          <div className="flex-1 overflow-y-auto border border-border rounded-lg p-4 bg-background">
+          <ScrollArea className="flex-1 border border-border rounded-lg p-4 bg-background">
             <PreviewPanel hackathonSlug={selectedVariant} lang={lang} />
-          </div>
+          </ScrollArea>
         </div>
       )}
     </div>

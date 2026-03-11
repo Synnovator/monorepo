@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import { Card } from '@synnovator/ui';
+import { Card, ScrollArea } from '@synnovator/ui';
 import { formatYaml } from './form-utils';
 
 interface ProfileCreateFormProps {
@@ -518,9 +518,11 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
           <>
             <div>
               <label className={labelClass}>{t(lang, 'form.profile.preview_yaml')}</label>
-              <pre className="w-full bg-background border border-border rounded-md px-4 py-3 text-primary text-sm font-mono overflow-x-auto whitespace-pre-wrap">
-                {yamlContent}
-              </pre>
+              <ScrollArea className="w-full">
+                <pre className="bg-background border border-border rounded-md px-4 py-3 text-primary text-sm font-mono whitespace-pre-wrap">
+                  {yamlContent}
+                </pre>
+              </ScrollArea>
             </div>
             <p className="text-xs text-muted-foreground">
               {lang === 'zh'

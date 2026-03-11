@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import { Card } from '@synnovator/ui';
+import { Card, ScrollArea } from '@synnovator/ui';
 import { formatYaml } from './form-utils';
 import { TimelineEditor, DEFAULT_STAGES, type Stage } from './TimelineEditor';
 
@@ -453,26 +453,28 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
   return (
     <Card className="p-6">
       {/* Step indicators */}
-      <div aria-label="Progress" className="flex items-center justify-between mb-8 overflow-x-auto">
-        {stepLabels.map((label, idx) => (
-          <div key={idx} className="flex items-center" aria-current={idx === step ? 'step' : undefined}>
-            <div className="flex flex-col items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                idx === step ? 'bg-primary text-primary-foreground'
-                  : idx < step ? (isStepValid(idx) ? 'bg-primary/30 text-primary' : 'bg-warning/30 text-warning') : 'bg-muted text-muted-foreground'
-              }`}>
-                {idx < step ? (isStepValid(idx) ? '\u2713' : '!') : idx + 1}
+      <ScrollArea className="w-full mb-8">
+        <div aria-label="Progress" className="flex items-center justify-between">
+          {stepLabels.map((label, idx) => (
+            <div key={idx} className="flex items-center" aria-current={idx === step ? 'step' : undefined}>
+              <div className="flex flex-col items-center">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                  idx === step ? 'bg-primary text-primary-foreground'
+                    : idx < step ? (isStepValid(idx) ? 'bg-primary/30 text-primary' : 'bg-warning/30 text-warning') : 'bg-muted text-muted-foreground'
+                }`}>
+                  {idx < step ? (isStepValid(idx) ? '\u2713' : '!') : idx + 1}
+                </div>
+                <span className={`mt-1 text-xs whitespace-nowrap hidden sm:block ${idx === step ? 'text-primary' : 'text-muted-foreground'}`}>
+                  {label}
+                </span>
               </div>
-              <span className={`mt-1 text-xs whitespace-nowrap hidden sm:block ${idx === step ? 'text-primary' : 'text-muted-foreground'}`}>
-                {label}
-              </span>
+              {idx < TOTAL_STEPS - 1 && (
+                <div className={`hidden sm:block w-6 h-px mx-0.5 mt-[-1rem] ${idx < step ? 'bg-primary/30' : 'bg-muted'}`} />
+              )}
             </div>
-            {idx < TOTAL_STEPS - 1 && (
-              <div className={`hidden sm:block w-6 h-px mx-0.5 mt-[-1rem] ${idx < step ? 'bg-primary/30' : 'bg-muted'}`} />
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </ScrollArea>
 
       {/* Login prompt */}
       {!loading && !isLoggedIn && (
@@ -695,9 +697,11 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
           <>
             <div>
               <label className={labelClass}>{t(lang, 'form.create_hackathon.preview_yaml')}</label>
-              <pre className="w-full bg-background border border-border rounded-md px-4 py-3 text-primary text-sm font-mono overflow-x-auto whitespace-pre-wrap">
-                {yamlContent}
-              </pre>
+              <ScrollArea className="w-full">
+                <pre className="bg-background border border-border rounded-md px-4 py-3 text-primary text-sm font-mono whitespace-pre-wrap">
+                  {yamlContent}
+                </pre>
+              </ScrollArea>
             </div>
             <p className="text-xs text-muted-foreground">
               {t(lang, 'form.create_hackathon.submit_hint')}{' '}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { ScrollArea } from '@synnovator/ui';
 import { ComponentPreview } from './ComponentPreview';
 import { PagePreview } from './PagePreview';
 
@@ -53,18 +54,18 @@ export function PreviewPanel({ hackathonSlug, lang }: PreviewPanelProps) {
       </div>
 
       {/* Tab content */}
-      <div
+      <ScrollArea
         role="tabpanel"
         id={`panel-${activeTab}`}
         aria-labelledby={`tab-${activeTab}`}
-        className="flex-1 overflow-y-auto"
+        className="flex-1"
       >
         {activeTab === 'components' ? (
           <ComponentPreview lang={lang} />
         ) : (
           <PagePreview hackathonSlug={hackathonSlug ?? undefined} />
         )}
-      </div>
+      </ScrollArea>
     </div>
   );
 }
