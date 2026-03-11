@@ -170,7 +170,16 @@
     "theme_group_muted": "Muted",
     "theme_group_status": "Status",
     "theme_group_borders": "Borders",
-    "theme_group_brand": "Brand"
+    "theme_group_brand": "Brand",
+    "theme_comp_buttons": "Buttons",
+    "theme_comp_badges": "Badges",
+    "theme_comp_cards": "Cards",
+    "theme_comp_forms": "Form Controls",
+    "theme_comp_tabs": "Tabs",
+    "theme_comp_accordion": "Accordion",
+    "theme_comp_alerts": "Alerts",
+    "theme_comp_dropdown": "Dropdown Menu",
+    "theme_comp_palette": "Color Palette"
   },
   "common": {
     "back_home": "Back to Home",

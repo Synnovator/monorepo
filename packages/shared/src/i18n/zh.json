@@ -168,7 +168,16 @@
     "theme_group_muted": "弱化",
     "theme_group_status": "状态",
     "theme_group_borders": "边框",
-    "theme_group_brand": "品牌"
+    "theme_group_brand": "品牌",
+    "theme_comp_buttons": "按钮",
+    "theme_comp_badges": "徽标",
+    "theme_comp_cards": "卡片",
+    "theme_comp_forms": "表单控件",
+    "theme_comp_tabs": "标签页",
+    "theme_comp_accordion": "手风琴",
+    "theme_comp_alerts": "警告",
+    "theme_comp_dropdown": "下拉菜单",
+    "theme_comp_palette": "调色板"
   },
   "common": {
     "back_home": "返回首页",

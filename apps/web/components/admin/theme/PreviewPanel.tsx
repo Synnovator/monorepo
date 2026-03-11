@@ -60,7 +60,7 @@ export function PreviewPanel({ hackathonSlug, lang }: PreviewPanelProps) {
         className="flex-1 overflow-y-auto"
       >
         {activeTab === 'components' ? (
-          <ComponentPreview />
+          <ComponentPreview lang={lang} />
         ) : (
           <PagePreview hackathonSlug={hackathonSlug ?? undefined} />
         )}

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { t } from '@synnovator/shared/i18n';
+import type { Lang } from '@synnovator/shared/i18n';
 import { parseOklch, formatOklch, oklchToHex } from '@/lib/oklch';
 import type { OklchColor } from '@/lib/oklch';
 
@@ -9,6 +11,7 @@ interface ColorTokenEditorProps {
   value: string;
   inherited: boolean;
   isVariant?: boolean;
+  lang: Lang;
   onChange: (name: string, value: string) => void;
   onOverride: (name: string) => void;
   onReset: (name: string) => void;
@@ -19,6 +22,7 @@ export function ColorTokenEditor({
   value,
   inherited,
   isVariant,
+  lang,
   onChange,
   onOverride,
   onReset,
@@ -64,7 +68,7 @@ export function ColorTokenEditor({
           style={{ backgroundColor: value }}
         />
         {/* Token name */}
-        <span className="text-sm font-mono text-foreground flex-1 truncate">
+        <span className="text-sm font-mono text-foreground flex-1 truncate" title={name}>
           {name}
         </span>
         {/* Hex preview */}
@@ -133,7 +137,7 @@ export function ColorTokenEditor({
               onClick={() => onReset(name)}
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              Reset to inherited
+              {t(lang, 'admin.theme_reset')}
             </button>
           )}
         </div>

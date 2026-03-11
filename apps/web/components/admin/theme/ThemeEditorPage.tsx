@@ -39,6 +39,7 @@ export function ThemeEditorPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const injectedPropsRef = useRef<string[]>([]);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   // Create theme flow
   const skipNextFetchRef = useRef(false);
@@ -137,10 +138,12 @@ export function ThemeEditorPage() {
       });
   }, [selectedTheme, selectedVariant]);
 
-  // --- Apply CSS variable preview ---
+  // --- Apply CSS variable preview (scoped to wrapper, not document root) ---
   const applyPreview = useCallback(
     (tokenList: TokenEntry[]) => {
-      const style = document.documentElement.style;
+      const el = previewRef.current;
+      if (!el) return;
+      const style = el.style;
       for (const prop of injectedPropsRef.current) {
         style.removeProperty(prop);
       }
@@ -158,9 +161,10 @@ export function ThemeEditorPage() {
   // Cleanup injected styles on unmount
   useEffect(() => {
     return () => {
-      const style = document.documentElement.style;
+      const el = previewRef.current;
+      if (!el) return;
       for (const prop of injectedPropsRef.current) {
-        style.removeProperty(prop);
+        el.style.removeProperty(prop);
       }
     };
   }, []);
@@ -319,11 +323,9 @@ export function ThemeEditorPage() {
     return m;
   }, [themeData, overrides, selectedVariant]);
 
-  // --- Toggle light/dark mode ---
+  // --- Toggle light/dark mode (preview only, doesn't touch site dark mode) ---
   const toggleMode = () => {
-    const next: ThemeMode = mode === 'light' ? 'dark' : 'light';
-    setMode(next);
-    document.documentElement.classList.toggle('dark', next === 'dark');
+    setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
   // --- Activate handler ---
@@ -525,7 +527,7 @@ export function ThemeEditorPage() {
           <p className="text-destructive text-sm">{error}</p>
         </div>
       ) : (
-        <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
+        <div ref={previewRef} className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0 bg-background text-foreground rounded-lg p-4 -mx-4">
           {/* Left: editor panel */}
           <div className="w-full lg:w-80 shrink-0 overflow-y-auto pr-2">
             {TOKEN_GROUPS.map((group) => {
@@ -538,6 +540,7 @@ export function ThemeEditorPage() {
                   values={valuesMap}
                   inherited={inheritedMap}
                   isVariant={!!selectedVariant}
+                  lang={lang}
                   onChange={handleTokenChange}
                   onOverride={handleOverride}
                   onReset={handleReset}

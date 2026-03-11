@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { t } from '@synnovator/shared/i18n';
+import type { Lang } from '@synnovator/shared/i18n';
 import { Button } from '@synnovator/ui';
 import { Badge } from '@synnovator/ui';
 import { Input } from '@synnovator/ui';
@@ -32,14 +34,18 @@ const COLOR_SWATCHES = [
   { label: 'Muted', cssVar: '--muted' },
 ] as const;
 
-export function ComponentPreview() {
+interface ComponentPreviewProps {
+  lang: Lang;
+}
+
+export function ComponentPreview({ lang }: ComponentPreviewProps) {
   const [checked, setChecked] = useState(false);
 
   return (
     <div className="space-y-8">
       {/* Section 1: Buttons */}
       <section>
-        <h3 className="text-sm font-semibold text-foreground mb-3">Buttons</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">{t(lang, 'admin.theme_comp_buttons')}</h3>
         <div className="flex flex-wrap gap-2">
           <Button variant="default">Default</Button>
           <Button variant="secondary">Secondary</Button>
@@ -51,7 +57,7 @@ export function ComponentPreview() {
 
       {/* Section 2: Badges */}
       <section>
-        <h3 className="text-sm font-semibold text-foreground mb-3">Badges</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">{t(lang, 'admin.theme_comp_badges')}</h3>
         <div className="flex flex-wrap gap-2">
           <Badge variant="default">Default</Badge>
           <Badge variant="secondary">Secondary</Badge>
@@ -80,7 +86,7 @@ export function ComponentPreview() {
 
       {/* Section 3: Cards */}
       <section>
-        <h3 className="text-sm font-semibold text-foreground mb-3">Cards</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">{t(lang, 'admin.theme_comp_cards')}</h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-lg border border-border bg-card p-4">
             <h4 className="text-sm font-semibold text-card-foreground mb-1">Card Title</h4>
@@ -101,7 +107,7 @@ export function ComponentPreview() {
 
       {/* Section 4: Form Controls */}
       <section>
-        <h3 className="text-sm font-semibold text-foreground mb-3">Form Controls</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">{t(lang, 'admin.theme_comp_forms')}</h3>
         <div className="space-y-4 max-w-sm">
           <div className="space-y-1.5">
             <Label htmlFor="preview-input">Input</Label>
@@ -137,7 +143,7 @@ export function ComponentPreview() {
 
       {/* Section 5: Tabs */}
       <section>
-        <h3 className="text-sm font-semibold text-foreground mb-3">Tabs</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">{t(lang, 'admin.theme_comp_tabs')}</h3>
         <Tabs defaultValue="tab-1" className="max-w-sm">
           <TabsList>
             <TabsTrigger value="tab-1">Overview</TabsTrigger>
@@ -158,7 +164,7 @@ export function ComponentPreview() {
 
       {/* Section 6: Accordion */}
       <section>
-        <h3 className="text-sm font-semibold text-foreground mb-3">Accordion</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">{t(lang, 'admin.theme_comp_accordion')}</h3>
         <Accordion type="single" collapsible className="max-w-sm">
           <AccordionItem value="item-1">
             <AccordionTrigger>How do I register?</AccordionTrigger>
@@ -181,7 +187,7 @@ export function ComponentPreview() {
 
       {/* Section 7: Alerts */}
       <section>
-        <h3 className="text-sm font-semibold text-foreground mb-3">Alerts</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">{t(lang, 'admin.theme_comp_alerts')}</h3>
         <div className="space-y-3 max-w-sm">
           <Alert>
             <AlertTitle>Default Alert</AlertTitle>
@@ -200,7 +206,7 @@ export function ComponentPreview() {
 
       {/* Section 8: Dropdown Menu */}
       <section>
-        <h3 className="text-sm font-semibold text-foreground mb-3">Dropdown Menu</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">{t(lang, 'admin.theme_comp_dropdown')}</h3>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">Open Menu</Button>
@@ -215,7 +221,7 @@ export function ComponentPreview() {
 
       {/* Section 9: Color Palette */}
       <section>
-        <h3 className="text-sm font-semibold text-foreground mb-3">Color Palette</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">{t(lang, 'admin.theme_comp_palette')}</h3>
         <div className="grid grid-cols-3 gap-3">
           {COLOR_SWATCHES.map(({ label, cssVar }) => (
             <div key={cssVar} className="flex items-center gap-2">

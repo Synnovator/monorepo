@@ -52,7 +52,7 @@ export function ContrastChecker({ tokens, lang }: ContrastCheckerProps) {
             <span className="text-foreground truncate mr-2">{result.label}</span>
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-muted-foreground tabular-nums">
-                {result.ratio > 0 ? `${result.ratio.toFixed(1)}:1` : '--'}
+                {result.ratio > 0 ? `${result.ratio.toFixed(2)}:1` : '--'}
               </span>
               <span
                 className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${

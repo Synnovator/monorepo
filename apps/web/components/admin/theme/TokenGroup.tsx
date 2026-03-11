@@ -1,5 +1,6 @@
 'use client';
 
+import type { Lang } from '@synnovator/shared/i18n';
 import { ColorTokenEditor } from './ColorTokenEditor';
 import type { TokenName } from '@synnovator/shared/schemas/theme';
 
@@ -55,6 +56,7 @@ interface TokenGroupProps {
   values: Record<string, string>;
   inherited: Record<string, boolean>;
   isVariant?: boolean;
+  lang: Lang;
   onChange: (name: string, value: string) => void;
   onOverride: (name: string) => void;
   onReset: (name: string) => void;
@@ -66,6 +68,7 @@ export function TokenGroup({
   values,
   inherited,
   isVariant,
+  lang,
   onChange,
   onOverride,
   onReset,
@@ -83,6 +86,7 @@ export function TokenGroup({
             value={values[tokenName] ?? ''}
             inherited={inherited[tokenName] ?? false}
             isVariant={isVariant}
+            lang={lang}
             onChange={onChange}
             onOverride={onOverride}
             onReset={onReset}
