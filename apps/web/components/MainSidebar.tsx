@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
+import { usePathname } from 'next/navigation';
+import { t } from '@synnovator/shared/i18n';
+import { useLangHref } from '@/hooks/useLangHref';
 import {
   Collapsible,
   CollapsibleTrigger,
@@ -76,15 +77,7 @@ interface MainSidebarProps {
 
 export function MainSidebar({ showAdmin = false }: MainSidebarProps) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const lang = getLangFromSearchParams(searchParams);
-  function langHref(path: string) {
-    if (lang === 'en') {
-      const sep = path.includes('?') ? '&' : '?';
-      return `${path}${sep}lang=en`;
-    }
-    return path;
-  }
+  const { lang, langHref } = useLangHref();
 
   function isGroupActive(items: NavItem[]) {
     return items.some(item => pathname === item.href || pathname.startsWith(item.href + '/'));

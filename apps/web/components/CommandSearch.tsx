@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { t } from '@synnovator/shared/i18n';
+import { useLangHref } from '@/hooks/useLangHref';
 import {
   CommandDialog,
   CommandInput,
@@ -29,16 +30,7 @@ const pageItems = [
 export function CommandSearch() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const lang = getLangFromSearchParams(searchParams);
-
-  function langHref(path: string) {
-    if (lang === 'en') {
-      const sep = path.includes('?') ? '&' : '?';
-      return `${path}${sep}lang=en`;
-    }
-    return path;
-  }
+  const { lang, langHref } = useLangHref();
 
   // Cmd+K / Ctrl+K keyboard shortcut
   useEffect(() => {
@@ -52,15 +44,12 @@ export function CommandSearch() {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, []);
 
-  const handleSelect = useCallback(
-    (href: string) => {
-      setOpen(false);
-      router.push(langHref(href));
-    },
-    [router, lang],
-  );
+  function handleSelect(href: string) {
+    setOpen(false);
+    router.push(langHref(href));
+  }
 
-  const hackathons = listHackathons();
+  const hackathons = useMemo(() => listHackathons(), []);
 
   return (
     <>

@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
+import { t } from '@synnovator/shared/i18n';
+import { useLangHref } from '@/hooks/useLangHref';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -16,16 +16,7 @@ import { ModeToggle } from './ModeToggle';
 import { ChevronDownIcon } from './icons';
 
 export function SlimHeader() {
-  const searchParams = useSearchParams();
-  const lang = getLangFromSearchParams(searchParams);
-
-  function langHref(path: string) {
-    if (lang === 'en') {
-      const sep = path.includes('?') ? '&' : '?';
-      return `${path}${sep}lang=en`;
-    }
-    return path;
-  }
+  const { lang, langHref } = useLangHref();
 
   function handleLangSwitch() {
     const url = new URL(window.location.href);
