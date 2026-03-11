@@ -134,9 +134,9 @@ export default async function HackathonDetailPage({
             </a>
           )}
           {h.legal?.nda?.required && (
-            <span className="inline-flex items-center text-xs text-warning px-3 py-2 rounded-lg bg-warning/10">
+            <Badge variant="warning">
               {t(lang, 'hackathon.nda_warning')}
-            </span>
+            </Badge>
           )}
         </div>
       </div>

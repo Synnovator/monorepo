@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import { Card, ScrollArea } from '@synnovator/ui';
+import { Card, ScrollArea, Badge } from '@synnovator/ui';
 import { formatYaml } from './form-utils';
 
 interface TrackInfo {
@@ -298,10 +298,10 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
               <p className="text-xs text-muted-foreground mb-2">{t(lang, 'form.create_proposal.tech_stack_hint')}</p>
               <div className="flex flex-wrap gap-2 mb-2">
                 {techStack.map((tag, idx) => (
-                  <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/15 text-primary text-xs">
+                  <Badge key={idx} variant="brand" className="gap-1">
                     {tag}
                     <button type="button" onClick={() => removeTech(idx)} className="hover:text-foreground">{'\u2715'}</button>
-                  </span>
+                  </Badge>
                 ))}
               </div>
               <input type="text" value={techInput} onChange={e => setTechInput(e.target.value)}

@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { getProfile, listProfiles } from '@/app/_generated/data';
 import { t, localize, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import { Card, Avatar, AvatarImage, AvatarFallback } from '@synnovator/ui';
+import { Card, Avatar, AvatarImage, AvatarFallback, Badge } from '@synnovator/ui';
 import { SkillBadge } from '@/components/SkillBadge';
 import { SparklesIcon } from '@/components/icons';
 import { EditProfileButton } from '@/components/EditProfileButton';
@@ -127,7 +127,7 @@ export default async function HackerProfilePage({
                     <p className="text-xs text-muted-foreground">{t(lang, 'profile.seeking')}:</p>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {h.looking_for.roles.map((r: string) => (
-                        <span key={r} className="text-xs px-2 py-0.5 rounded-full bg-info/10 text-info">{r}</span>
+                        <Badge key={r} variant="info">{r}</Badge>
                       ))}
                     </div>
                   </div>
