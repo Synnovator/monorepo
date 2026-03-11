@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { NavBar } from '@/components/NavBar';
+import { AppShell } from '@/components/AppShell';
 import { Footer } from '@/components/Footer';
 import { WelcomeDialog } from '@/components/WelcomeDialog';
 
@@ -10,11 +10,12 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         Skip to main content
       </a>
       <Suspense>
-        <NavBar />
-      </Suspense>
-      <main id="main-content" className="pt-16">{children}</main>
-      <Suspense>
-        <Footer />
+        <AppShell>
+          <main id="main-content">{children}</main>
+          <Suspense>
+            <Footer />
+          </Suspense>
+        </AppShell>
       </Suspense>
       <Suspense>
         <WelcomeDialog />
