@@ -8,7 +8,12 @@ import type { Lang } from '@synnovator/shared/i18n';
 type PublishState = 'idle' | 'loading' | 'success' | 'error';
 
 interface PublishButtonProps {
-  target: string;
+  type: 'platform' | 'hackathon-variant';
+  themeName: string;
+  hackathonSlug?: string;
+  name?: string;
+  nameZh?: string;
+  description?: string;
   light: Record<string, string>;
   dark: Record<string, string>;
   fonts?: Record<string, string>;
@@ -17,7 +22,12 @@ interface PublishButtonProps {
 }
 
 export function PublishButton({
-  target,
+  type,
+  themeName,
+  hackathonSlug,
+  name,
+  nameZh,
+  description,
   light,
   dark,
   fonts,
@@ -34,7 +44,16 @@ export function PublishButton({
     setErrorMsg(null);
 
     try {
-      const body: Record<string, unknown> = { target, light, dark };
+      const body: Record<string, unknown> = {
+        type,
+        themeName,
+        light,
+        dark,
+      };
+      if (hackathonSlug) body.hackathonSlug = hackathonSlug;
+      if (name) body.name = name;
+      if (nameZh) body.name_zh = nameZh;
+      if (description) body.description = description;
       if (fonts) body.fonts = fonts;
       if (radius) body.radius = radius;
 
@@ -65,7 +84,7 @@ export function PublishButton({
       <Button
         size="sm"
         onClick={handlePublish}
-        disabled={state === 'loading'}
+        disabled={!themeName || state === 'loading'}
       >
         {state === 'loading'
           ? t(lang, 'admin.theme_publishing')
