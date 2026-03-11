@@ -365,6 +365,7 @@ export function ThemeEditorPage() {
       setActivatePrUrl(data.url);
     } catch (err) {
       console.error('Failed to create activate PR:', err);
+      setError(err instanceof Error ? err.message : 'Failed to activate theme');
     } finally {
       setActivating(false);
     }
