@@ -53,7 +53,7 @@ export function ThemeSelector({
         >
           <SelectValue placeholder={t(lang, 'admin.theme_select_theme')} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent position="popper" sideOffset={4}>
           <SelectGroup>
             <SelectLabel>{t(lang, 'admin.theme_platform_themes')}</SelectLabel>
             {themes.map((theme) => (
@@ -81,7 +81,7 @@ export function ThemeSelector({
         >
           <SelectValue placeholder={t(lang, 'admin.theme_select_variant')} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent position="popper" sideOffset={4}>
           <SelectGroup>
             <SelectLabel>
               {t(lang, 'admin.theme_hackathon_variants')}
