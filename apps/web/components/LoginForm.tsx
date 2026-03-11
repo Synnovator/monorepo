@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getLangFromSearchParams, t } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 import { GitHubIcon } from './icons';
 
 export function LoginForm() {
@@ -48,7 +49,7 @@ export function LoginForm() {
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
-      <div className="w-full max-w-sm bg-card border border-border rounded-lg p-8">
+      <Card className="w-full max-w-sm p-8">
         <h1 className="text-2xl font-heading text-foreground mb-6 text-center">
           {t(lang, 'auth.login')}
         </h1>
@@ -151,7 +152,7 @@ export function LoginForm() {
             </button>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 import { formatYaml } from './form-utils';
 
 interface ProfileCreateFormProps {
@@ -181,7 +182,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
   const selectClass = 'w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none';
 
   return (
-    <div className="rounded-lg border border-border bg-card p-6">
+    <Card className="p-6">
       {/* Step indicators */}
       <div aria-label="Progress" className="flex items-center justify-between mb-8">
         {stepLabels.map((label, idx) => (
@@ -587,7 +588,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
           )}
         </div>
       </fieldset>
-    </div>
+    </Card>
   );
 }
 

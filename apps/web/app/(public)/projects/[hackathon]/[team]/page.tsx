@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { listSubmissions, listProfiles, getHackathon } from '@/app/_generated/data';
 import { t, localize, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 import { EditProjectButton } from '@/components/EditProjectButton';
 
 export const dynamic = 'force-static';
@@ -75,9 +76,9 @@ export default async function ProjectDetailPage({
               <p>{localize(lang, project.description, project.description_zh)}</p>
             </div>
           ) : (
-            <div className="rounded-lg border border-border bg-card p-12 text-center">
+            <Card className="p-12 text-center">
               <p className="text-muted-foreground">{t(lang, 'project.no_readme')}</p>
-            </div>
+            </Card>
           )}
         </div>
 

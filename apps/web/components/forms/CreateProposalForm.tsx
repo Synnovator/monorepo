@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 import { formatYaml } from './form-utils';
 
 interface TrackInfo {
@@ -181,7 +182,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
   const btnAdd = 'text-sm text-primary hover:text-primary/80 transition-colors';
 
   return (
-    <div className="rounded-lg border border-border bg-card p-6">
+    <Card className="p-6">
       {/* Step indicators */}
       <div aria-label="Progress" className="flex items-center justify-between mb-8 overflow-x-auto">
         {stepLabels.map((label, idx) => (
@@ -430,7 +431,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
           )}
         </div>
       </fieldset>
-    </div>
+    </Card>
   );
 }
 

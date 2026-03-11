@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getProfile, listProfiles } from '@/app/_generated/data';
 import { t, localize, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 import { SkillBadge } from '@/components/SkillBadge';
 import { SparklesIcon } from '@/components/icons';
 import { EditProfileButton } from '@/components/EditProfileButton';
@@ -88,7 +89,7 @@ export default async function HackerProfilePage({
               <h2 className="text-lg font-heading font-bold text-foreground mb-4">{t(lang, 'profile.projects')}</h2>
               <div className="space-y-3">
                 {h.experience.projects.map((proj: { name: string; description?: string; url?: string }, i: number) => (
-                  <div key={i} className="rounded-lg border border-border bg-card p-4">
+                  <Card key={i} className="p-4">
                     <p className="text-foreground text-sm font-medium">{proj.name}</p>
                     {proj.description && <p className="text-muted-foreground text-xs mt-1">{proj.description}</p>}
                     {proj.url && (
@@ -96,7 +97,7 @@ export default async function HackerProfilePage({
                         {t(lang, 'profile.view_project')}
                       </a>
                     )}
-                  </div>
+                  </Card>
                 ))}
               </div>
             </section>
@@ -107,10 +108,10 @@ export default async function HackerProfilePage({
               <h2 className="text-lg font-heading font-bold text-foreground mb-4">{t(lang, 'profile.hackathons')}</h2>
               <div className="space-y-3">
                 {h.experience.hackathons.map((hack: { name: string; result?: string }, i: number) => (
-                  <div key={i} className="rounded-lg border border-border bg-card p-4">
+                  <Card key={i} className="p-4">
                     <p className="text-foreground text-sm font-medium">{hack.name}</p>
                     {hack.result && <p className="text-primary text-xs mt-1">{hack.result}</p>}
-                  </div>
+                  </Card>
                 ))}
               </div>
             </section>
@@ -122,7 +123,7 @@ export default async function HackerProfilePage({
           {h.looking_for && (
             <section>
               <h2 className="text-sm font-heading font-bold text-foreground mb-3">{t(lang, 'profile.looking_for')}</h2>
-              <div className="rounded-lg border border-border bg-card p-4 space-y-2">
+              <Card className="p-4 space-y-2">
                 {h.looking_for.roles && (
                   <div>
                     <p className="text-xs text-muted-foreground">{t(lang, 'profile.seeking')}:</p>
@@ -135,17 +136,17 @@ export default async function HackerProfilePage({
                 )}
                 {h.looking_for.team_size && <p className="text-xs text-muted-foreground">{t(lang, 'profile.team_size')}: {h.looking_for.team_size}</p>}
                 {h.looking_for.collaboration_style && <p className="text-xs text-muted-foreground">{t(lang, 'profile.collab_style')}: {h.looking_for.collaboration_style}</p>}
-              </div>
+              </Card>
             </section>
           )}
 
           {h.identity && (
             <section>
               <h2 className="text-sm font-heading font-bold text-foreground mb-3">{t(lang, 'profile.identity')}</h2>
-              <div className="rounded-lg border border-border bg-card p-4 space-y-1">
+              <Card className="p-4 space-y-1">
                 {h.identity.type && <p className="text-xs text-foreground capitalize">{h.identity.type}</p>}
                 {h.identity.affiliation && <p className="text-xs text-muted-foreground">{h.identity.affiliation}</p>}
-              </div>
+              </Card>
             </section>
           )}
 

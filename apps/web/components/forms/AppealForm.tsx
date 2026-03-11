@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { buildIssueUrl, openGitHubUrl } from '@/lib/github-url';
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 import type { Track, TeamInfo } from './form-utils';
 
 interface AppealFormProps {
@@ -57,7 +58,7 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-6">
+    <Card className="p-6">
       <h3 className="text-lg font-heading font-bold text-foreground mb-6">
         {t(lang, 'form.appeal.title')}
       </h3>
@@ -141,7 +142,7 @@ export function AppealForm({ hackathonSlug, tracks, teams, lang }: AppealFormPro
           {t(lang, 'form.appeal.submit_appeal')} →
         </button>
       </fieldset>
-    </div>
+    </Card>
   );
 }
 

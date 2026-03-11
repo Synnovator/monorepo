@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
+import { Card } from '@synnovator/ui';
 import { formatYaml } from './form-utils';
 import { TimelineEditor, DEFAULT_STAGES, type Stage } from './TimelineEditor';
 
@@ -450,7 +451,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
   const labelClass = 'block text-sm text-muted-foreground mb-2';
 
   return (
-    <div className="rounded-lg border border-border bg-card p-6">
+    <Card className="p-6">
       {/* Step indicators */}
       <div aria-label="Progress" className="flex items-center justify-between mb-8 overflow-x-auto">
         {stepLabels.map((label, idx) => (
@@ -751,7 +752,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
           )}
         </div>
       </fieldset>
-    </div>
+    </Card>
   );
 }
 
