@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { NavBar } from '@/components/NavBar';
 import { Footer } from '@/components/Footer';
+import { WelcomeDialog } from '@/components/WelcomeDialog';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,6 +15,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <main id="main-content" className="pt-16">{children}</main>
       <Suspense>
         <Footer />
+      </Suspense>
+      <Suspense>
+        <WelcomeDialog />
       </Suspense>
     </>
   );
