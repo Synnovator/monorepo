@@ -1,23 +1,14 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { t, getLangFromSearchParams } from '@synnovator/shared/i18n';
+import { t } from '@synnovator/shared/i18n';
+import { useLangHref } from '@/hooks/useLangHref';
 import { GitHubIcon } from './icons';
 
 export function Footer() {
-  const searchParams = useSearchParams();
-  const lang = getLangFromSearchParams(searchParams);
+  const { lang, langHref } = useLangHref();
   const currentYear = new Date().getFullYear();
-
-  function langHref(path: string) {
-    if (lang === 'en') {
-      const sep = path.includes('?') ? '&' : '?';
-      return `${path}${sep}lang=en`;
-    }
-    return path;
-  }
 
   return (
     <footer className="border-t border-border bg-background py-12 mt-24">

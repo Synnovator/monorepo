@@ -4,10 +4,8 @@ import { redirect } from 'next/navigation';
 import { decrypt, type Session } from '@synnovator/shared/auth';
 import { createGitHubClient } from '@synnovator/shared/data';
 import { t } from '@synnovator/shared/i18n';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@synnovator/ui';
-import { NavBar } from '@/components/NavBar';
+import { AppShell } from '@/components/AppShell';
 import { Footer } from '@/components/Footer';
-import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
@@ -31,37 +29,27 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!['admin', 'maintain', 'write'].includes(permission)) {
     return (
-      <>
-        <Suspense><NavBar /></Suspense>
-        <div className="min-h-screen pt-16 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-heading text-destructive mb-2">{t('zh', 'admin.access_denied')}</h1>
-            <p className="text-muted-foreground">{t('zh', 'admin.access_denied_desc')}</p>
-            <p className="text-muted-foreground text-sm mt-1">{t('en', 'admin.access_denied_desc')}</p>
+      <Suspense>
+        <AppShell>
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <h1 className="text-2xl font-heading text-destructive mb-2">{t('zh', 'admin.access_denied')}</h1>
+              <p className="text-muted-foreground">{t('zh', 'admin.access_denied_desc')}</p>
+              <p className="text-muted-foreground text-sm mt-1">{t('en', 'admin.access_denied_desc')}</p>
+            </div>
           </div>
-        </div>
-        <Suspense><Footer /></Suspense>
-      </>
+          <Suspense><Footer /></Suspense>
+        </AppShell>
+      </Suspense>
     );
   }
 
   return (
-    <>
-      <Suspense><NavBar /></Suspense>
-      <div className="pt-16">
-        <SidebarProvider className="min-h-[calc(100svh-4rem)]">
-          <Suspense>
-            <AdminSidebar user={session} />
-          </Suspense>
-          <SidebarInset>
-            <header className="flex items-center gap-2 px-4 py-2 md:hidden">
-              <SidebarTrigger />
-            </header>
-            <div className="p-8">{children}</div>
-          </SidebarInset>
-        </SidebarProvider>
-      </div>
-      <Suspense><Footer /></Suspense>
-    </>
+    <Suspense>
+      <AppShell>
+        <div className="p-8">{children}</div>
+        <Suspense><Footer /></Suspense>
+      </AppShell>
+    </Suspense>
   );
 }

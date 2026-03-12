@@ -75,10 +75,11 @@ export function setSessionCookie(headers: Headers, token: string, secure?: boole
   );
 }
 
-export function clearSessionCookie(headers: Headers): void {
+export function clearSessionCookie(headers: Headers, secure?: boolean): void {
+  const securePart = secure === false ? '' : ' Secure;';
   headers.append(
     'Set-Cookie',
-    `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`,
+    `${COOKIE_NAME}=; Path=/; HttpOnly;${securePart} SameSite=Lax; Max-Age=0`,
   );
 }
 

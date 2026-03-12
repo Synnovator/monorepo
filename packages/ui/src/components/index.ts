@@ -4,6 +4,18 @@ export { Avatar, AvatarImage, AvatarFallback } from './avatar';
 export { Badge, badgeVariants } from './badge';
 export { Button, buttonVariants } from './button';
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './card';
+export { Collapsible, CollapsibleTrigger, CollapsibleContent } from './collapsible';
+export {
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandShortcut,
+  CommandSeparator,
+} from './command';
 export {
   Dialog,
   DialogTrigger,
