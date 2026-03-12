@@ -34,64 +34,64 @@ export function SlimHeader() {
       {/* Sidebar toggle */}
       <SidebarTrigger />
 
-      {/* Search trigger — fills center space */}
-      <div className="flex-1 max-w-lg">
+      {/* Search trigger — fills available space */}
+      <div className="flex-1 min-w-0">
         <CommandSearch />
       </div>
 
-      {/* Spacer to push actions to the right */}
-      <div className="flex-1" />
-
-      {/* "+ 创建" CTA dropdown */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-            aria-label={t(lang, 'nav.create_btn')}
+      {/* Right actions — shrink to fit, never steal space from search */}
+      <div className="flex items-center gap-2 shrink-0">
+        {/* "+ 创建" CTA dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+              aria-label={t(lang, 'nav.create_btn')}
+            >
+              <span>{t(lang, 'nav.create_btn')}</span>
+              <ChevronDownIcon size={16} aria-hidden="true" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="min-w-[10rem] bg-card border border-border rounded-lg shadow-lg"
           >
-            <span>{t(lang, 'nav.create_btn')}</span>
-            <ChevronDownIcon size={16} aria-hidden="true" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          className="min-w-[10rem] bg-card border border-border rounded-lg shadow-lg"
+            <DropdownMenuItem asChild>
+              <Link
+                href={langHref('/create-hackathon')}
+                className="block px-4 py-2.5 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors"
+              >
+                {t(lang, 'nav.create_hackathon')}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                href={langHref('/create-proposal')}
+                className="block px-4 py-2.5 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors"
+              >
+                {t(lang, 'nav.create_proposal')}
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Language switch */}
+        <button
+          type="button"
+          onClick={handleLangSwitch}
+          className="cursor-pointer py-2 px-2 min-h-11 min-w-11 text-muted-foreground hover:text-foreground text-sm transition-colors relative z-10 inline-flex items-center justify-center"
+          aria-label="Switch language"
         >
-          <DropdownMenuItem asChild>
-            <Link
-              href={langHref('/create-hackathon')}
-              className="block px-4 py-2.5 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors"
-            >
-              {t(lang, 'nav.create_hackathon')}
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link
-              href={langHref('/create-proposal')}
-              className="block px-4 py-2.5 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors"
-            >
-              {t(lang, 'nav.create_proposal')}
-            </Link>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          {t(lang, 'nav.lang_switch')}
+        </button>
 
-      {/* Language switch */}
-      <button
-        type="button"
-        onClick={handleLangSwitch}
-        className="cursor-pointer py-2 px-2 min-h-11 min-w-11 text-muted-foreground hover:text-foreground text-sm transition-colors relative z-10 inline-flex items-center justify-center"
-        aria-label="Switch language"
-      >
-        {t(lang, 'nav.lang_switch')}
-      </button>
+        {/* Theme toggle */}
+        <ModeToggle />
 
-      {/* Theme toggle */}
-      <ModeToggle />
-
-      {/* Auth / user menu */}
-      <OAuthButton />
+        {/* Auth / user menu */}
+        <OAuthButton />
+      </div>
     </header>
   );
 }

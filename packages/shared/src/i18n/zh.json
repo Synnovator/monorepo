@@ -12,7 +12,12 @@
     "create_hackathon": "创建活动",
     "create_proposal": "创建提案",
     "lang_switch": "EN / 中",
-    "admin": "管理"
+    "admin": "管理",
+    "search_placeholder": "搜索活动、页面...",
+    "search_hint": "⌘K",
+    "search_no_results": "没有找到结果",
+    "search_group_events": "活动",
+    "search_group_pages": "页面"
   },
   "footer": {
     "platform": "平台",
@@ -529,6 +534,20 @@
     "hacker_bullets": "注册 档案|浏览并报名活动|组建团队|提交项目",
     "organizer_bullets": "创建活动仓库|配置赛道与时间线|管理报名与提交|配置评委与评审",
     "judge_bullets": "设置评委 档案|查看提交作品|使用评分卡评分|声明利益冲突"
+  },
+  "sidebar": {
+    "events": "活动",
+    "proposals": "提案",
+    "guides": "指南",
+    "guide_hacker": "参赛者指南",
+    "guide_organizer": "组织者指南",
+    "guide_judge": "评委指南",
+    "admin": "管理",
+    "admin_dashboard": "仪表盘",
+    "admin_hackathons": "活动管理",
+    "admin_profiles": "档案管理",
+    "admin_submissions": "提交管理",
+    "admin_theme": "主题编辑"
   },
   "proposals": {
     "title": "提案",

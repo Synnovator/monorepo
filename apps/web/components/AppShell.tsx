@@ -6,18 +6,16 @@ import { SlimHeader } from './SlimHeader';
 
 interface AppShellProps {
   children: React.ReactNode;
-  showAdmin?: boolean;
   defaultOpen?: boolean;
 }
 
 export function AppShell({
   children,
-  showAdmin = false,
   defaultOpen = true,
 }: AppShellProps) {
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <MainSidebar showAdmin={showAdmin} />
+      <MainSidebar />
       <SidebarInset>
         <SlimHeader />
         <div className="flex-1">{children}</div>

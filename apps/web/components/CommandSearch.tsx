@@ -57,7 +57,7 @@ export function CommandSearch() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-muted/50 text-muted-foreground text-sm hover:bg-muted transition-colors cursor-pointer"
+        className="w-full inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-muted/50 text-muted-foreground text-sm hover:bg-muted transition-colors cursor-pointer"
         aria-label={t(lang, 'nav.search_placeholder')}
       >
         <svg
@@ -74,10 +74,10 @@ export function CommandSearch() {
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.3-4.3" />
         </svg>
-        <span className="hidden sm:inline">
+        <span className="hidden sm:inline flex-1 text-left">
           {t(lang, 'nav.search_placeholder')}
         </span>
-        <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-border bg-background px-1.5 py-0.5 text-xs font-mono text-muted-foreground">
+        <kbd className="hidden sm:inline-flex ml-auto items-center gap-0.5 rounded border border-border bg-background px-1.5 py-0.5 text-xs font-mono text-muted-foreground">
           {t(lang, 'nav.search_hint')}
         </kbd>
       </button>

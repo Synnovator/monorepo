@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { t } from '@synnovator/shared/i18n';
 import { useLangHref } from '@/hooks/useLangHref';
@@ -71,11 +72,7 @@ const adminGroup: CollapsibleNavGroup = {
   ],
 };
 
-interface MainSidebarProps {
-  showAdmin?: boolean;
-}
-
-export function MainSidebar({ showAdmin = false }: MainSidebarProps) {
+export function MainSidebar() {
   const pathname = usePathname();
   const { lang, langHref } = useLangHref();
 
@@ -86,11 +83,9 @@ export function MainSidebar({ showAdmin = false }: MainSidebarProps) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="p-4">
-        <Link href={langHref('/')} className="flex items-center gap-2">
-          <TrophyIcon size={24} className="shrink-0" />
-          <span className="font-heading text-lg text-primary group-data-[collapsible=icon]:hidden">
-            Synnovator
-          </span>
+        <Link href={langHref('/')}>
+          <Image src="/logo-dark.svg" alt="Synnovator" width={72} height={36} className="dark:hidden" />
+          <Image src="/logo-light.svg" alt="Synnovator" width={72} height={36} className="hidden dark:block" />
         </Link>
       </SidebarHeader>
 
@@ -126,16 +121,14 @@ export function MainSidebar({ showAdmin = false }: MainSidebarProps) {
                 defaultOpen={isGroupActive(guidesGroup.items)}
               />
 
-              {/* Admin collapsible group (conditional) */}
-              {showAdmin && (
-                <CollapsibleGroup
-                  group={adminGroup}
-                  lang={lang}
-                  pathname={pathname}
-                  langHref={langHref}
-                  defaultOpen={isGroupActive(adminGroup.items)}
-                />
-              )}
+              {/* Admin collapsible group */}
+              <CollapsibleGroup
+                group={adminGroup}
+                lang={lang}
+                pathname={pathname}
+                langHref={langHref}
+                defaultOpen={isGroupActive(adminGroup.items)}
+              />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

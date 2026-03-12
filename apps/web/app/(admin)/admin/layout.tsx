@@ -46,7 +46,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <Suspense>
-      <AppShell showAdmin>
+      <AppShell>
         <div className="p-8">{children}</div>
         <Suspense><Footer /></Suspense>
       </AppShell>

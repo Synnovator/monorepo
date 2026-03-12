@@ -12,7 +12,12 @@
     "create_hackathon": "Create Hackathon",
     "create_proposal": "Create Proposal",
     "lang_switch": "中 / EN",
-    "admin": "Admin"
+    "admin": "Admin",
+    "search_placeholder": "Search events, pages...",
+    "search_hint": "⌘K",
+    "search_no_results": "No results found",
+    "search_group_events": "Events",
+    "search_group_pages": "Pages"
   },
   "footer": {
     "platform": "Platform",
@@ -530,6 +535,20 @@
     "hacker_bullets": "Register your Profile|Browse & join events|Form a team|Submit your project",
     "organizer_bullets": "Create event repo|Configure tracks & timeline|Manage registrations|Set up judges & review",
     "judge_bullets": "Set up Judge Profile|Review submissions|Score with Score Card|Declare conflicts of interest"
+  },
+  "sidebar": {
+    "events": "Events",
+    "proposals": "Proposals",
+    "guides": "Guides",
+    "guide_hacker": "Hacker Guide",
+    "guide_organizer": "Organizer Guide",
+    "guide_judge": "Judge Guide",
+    "admin": "Admin",
+    "admin_dashboard": "Dashboard",
+    "admin_hackathons": "Hackathons",
+    "admin_profiles": "Profiles",
+    "admin_submissions": "Submissions",
+    "admin_theme": "Theme Editor"
   },
   "proposals": {
     "title": "Proposals",
