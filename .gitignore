@@ -13,6 +13,10 @@ Thumbs.db
 .claude/settings.local.json
 .claude/worktrees/
 .claude/plugins/cache/
+.claude/.template-checksums
+.claude/.template-version
+.agents/
+claude.local.sh
 
 # Git worktrees
 .worktrees/

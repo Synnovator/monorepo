@@ -31,13 +31,14 @@ fi
 # Ensure common paths are included as fallback (Homebrew on Apple Silicon / Intel, npm global)
 export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.npm-global/bin:$HOME/.local/bin:$PATH"
 
-# Proxy settings
-export ALL_PROXY=http://127.0.0.1:7897
-export HTTP_PROXY=http://127.0.0.1:7897
-export HTTPS_PROXY=http://127.0.0.1:7897
-
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Source user-local overrides (proxy, API keys, etc.)
+[ -f "$SCRIPT_DIR/claude.local.sh" ] && source "$SCRIPT_DIR/claude.local.sh"
+
+# Source MCP server secrets (API keys, tokens)
+[ -f "$SCRIPT_DIR/.mcp.env" ] && set -a && source "$SCRIPT_DIR/.mcp.env" && set +a
 
 # Get project name from directory (sanitize for tmux session name)
 PROJECT_NAME=$(basename "$SCRIPT_DIR" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9_-]/-/g')
@@ -231,6 +232,11 @@ if [ -z "$TMUX" ]; then
     read -p "Session name [$DEFAULT_NAME]: " -r SESSION_NAME
     SESSION_NAME=${SESSION_NAME:-$DEFAULT_NAME}
     echo ""
+
+    # --- Enable tmux passthrough for iTerm2 escape sequences ---
+    # Allows notifications (e.g., zchat notify_command) to reach
+    # the outer terminal (iTerm2) through tmux, even over SSH.
+    tmux set-option -g allow-passthrough on 2>/dev/null
 
     # --- Create tmux session (all modes go through tmux) ---
     echo "🚀 Creating tmux session: $SESSION_NAME"

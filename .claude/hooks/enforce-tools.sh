@@ -30,6 +30,38 @@ if echo "$COMMAND" | grep -qE '(^|[;&|])[[:space:]]*(python|python3)[[:space:]]+
   exit 2
 fi
 
+# --- Python: python/python3 → uv run ---
+# Block bare python/python3 invocations (allow inside uv run / uvx / curl pipes)
+if echo "$COMMAND" | grep -qE '(^|[;&|])[[:space:]]*(python|python3)([[:space:]]|$)' \
+   && ! echo "$COMMAND" | grep -qE '(uv run|uvx)'; then
+  cat >&2 <<'MSG'
+BLOCKED: Direct python/python3 is not allowed. Use uv run instead.
+
+  python script.py        → uv run python script.py
+  python -m pytest        → uv run pytest
+  python3 -m pytest       → uv run pytest
+  python3 -c "..."        → uv run python3 -c "..."
+
+See CONTRIBUTING.md for details.
+MSG
+  exit 2
+fi
+
+# --- Python: .venv/bin/* → uv run ---
+# Block direct .venv/bin/ invocations (should use uv run instead)
+if echo "$COMMAND" | grep -qE '(^|[;&|])[[:space:]]*\.?/?\.venv/bin/'; then
+  cat >&2 <<'MSG'
+BLOCKED: Direct .venv/bin/ invocations are not allowed. Use uv run instead.
+
+  .venv/bin/pytest        → uv run pytest
+  .venv/bin/zchat         → uv run zchat
+  .venv/bin/python        → uv run python
+
+See CONTRIBUTING.md for details.
+MSG
+  exit 2
+fi
+
 # --- JavaScript: npm/npx → pnpm ---
 if echo "$COMMAND" | grep -qE '(^|[;&|])[[:space:]]*npm([[:space:]]|$)'; then
   cat >&2 <<'MSG'
