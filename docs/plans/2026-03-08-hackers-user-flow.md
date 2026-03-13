@@ -24,8 +24,8 @@
 | H6 | 签署 NDA | 表单 → PR | **应改为 Issue → Action → PR** | ⚠️ 需重构 |
 | H7 | 提交项目/提案 | 表单 → PR | Layer 1 (PR) | ✅ 已实现 |
 | H8 | 编辑已提交项目 | — | Layer 1 (PR) | ❌ 缺失 |
-| H9 | 发起组队/找队友 | 表单 → Issue | Layer 2 (Issue) | ✅ 已实现 |
-| H10 | 申请加入队伍 | — | Layer 2 (Issue comment) | ❌ 缺失 |
+| H9 | 创建队伍 | 表单 → PR (teams/) | Layer 1 (PR) | ⚠️ 需重构 (Issue → PR) |
+| H10 | 申请加入队伍 | PR 编辑 team.yml + /approve | Layer 1 (PR) | ⚠️ 需重构 (Issue comment → PR) |
 | H11 | 提交申诉 | 表单 → Issue | Layer 2 (Issue) | ✅ 已实现 |
 | H12 | 点赞项目 | — | Layer 3 (D1) | ❌ 缺失 |
 | H13 | 公投 (Reactions) | — | Layer 3 (D1/GitHub Reactions) | ❌ 缺失 |
@@ -113,19 +113,19 @@ Hacker 访问 /create-profile (需 GitHub 登录)
 **当前实现** (PR 方式):
 ```
 Hacker 在活动详情页 → RegisterForm
-  → 选择 track, role, team
+  → 选择 track, role (participant | mentor | observer)
   → 勾选 terms + profile 确认
   → 调用 /api/check-profile 验证 profile 存在
   → 检查是否已注册 (查 profile YAML 中 registrations[])
   → buildPRUrl() → PR 修改 profiles/{username}-{uuid}.yml
-    追加: registrations[]: [{hackathon, track, role, team, registered_at}]
+    追加: registrations[]: [{hackathon, track, role, registered_at}]
   → Auto-merge
 ```
 
 **重构为 Issue → Action → PR 方式**:
 ```
 Hacker 在活动详情页 → RegisterForm
-  → 填写 track, role, team
+  → 填写 track, role (participant | mentor | observer)
   → buildIssueUrl() → 创建 [Register] Issue
     template: register.yml
     labels: registration, hackathon:{slug}
@@ -190,7 +190,7 @@ Hacker 访问 /create-proposal
   → 填写 5 步表单 (CreateProposalForm)
   → Step 0: 选择活动
   → Step 1: 项目信息 (name, tagline, track, tech_stack)
-  → Step 2: 团队成员 (github, role)
+  → Step 2: 关联队伍 (team_ref → teams/{slug})
   → Step 3: 交付物 (repo, demo, video, description)
   → Step 4: YAML 预览 & 提交
   → buildPRUrl() → PR
@@ -218,44 +218,60 @@ Hacker 访问 /create-proposal
   → 表单预填现有数据 → 修改 → 提交 PR 覆盖
 ```
 
-### H9: 发起组队/找队友 ✅
+### H9: 创建队伍 ⚠️ 需重构 (Issue → PR)
 
+**旧方案** (Issue-based): TeamFormationForm → 创建 [Team] Issue → team-formation.yml
+
+**新方案** (PR-based team.yml):
 ```
-Hacker 在活动详情页 → TeamFormationForm
-  → 填写: team_name, track, purpose (looking/formed), members, looking_for, project_idea
-  → buildIssueUrl() → 创建 [Team] Issue
-    template: team-formation.yml
-    labels: team-formation, hackathon:{slug}
-  → (当前无 validate workflow)
-```
-
-**UI 组件**: `apps/web/components/forms/TeamFormationForm.tsx`
-**Issue Template**: `.github/ISSUE_TEMPLATE/team-formation.yml`
-**Actions**: ❌ 缺失 `validate-team.yml`
-
-### H10: 申请加入队伍 ❌
-
-**当前状态**: 无申请机制。
-
-**期望流程**:
-```
-Hacker B 浏览 [Team] Issues (在活动详情页 "Teams" tab 或 GitHub Issues 页面)
-  → 看到 Hacker A 的 [Team] Issue (purpose: "Looking for teammates")
-  → B 在 Issue 下用结构化 comment 申请:
-    "**申请加入**
-    - GitHub: @B-username
-    - Role: developer
-    - Skills: React, TypeScript, ML"
-  → A 回复确认 (或用 👍 Reaction)
-  → 最终在提交项目 PR 时, team[] 包含 A 和 B
-  → PR body 包含 "Closes #{team-issue-number}"
-  → PR 合并 → Team Issue 自动关闭
+Hacker 访问 /create-team (需 GitHub 登录)
+  → 填写 CreateTeamForm (team_name, looking_for, hackathon/track)
+  → buildPRUrl() → 打开 GitHub 创建 PR
+  → PR 文件: teams/{team-slug}/team.yml
+    内容: synnovator_team: "1.0", name, leader, members: [], looking_for, status: recruiting
+  → Actions: validate-team.yml 校验
+    ├─ 验证 team.yml schema 合法
+    ├─ 验证 leader 的 Profile 存在
+    ├─ 验证 team slug 唯一
+    └─ 校验通过 → PR 获得 team-valid Label
+  → sync-team-data.yml 写入 leader 的 profile.yml hacker.team 字段
+  → Auto-merge
 ```
 
-**需要实现**:
-- 活动详情页 "Teams" tab (展示该活动的 team-formation Issues)
-- Issue comment 的结构化申请模板
-- validate-team.yml 校验 Issue 合法性
+**UI 组件**: `apps/web/components/forms/CreateTeamForm.tsx`
+**数据提交**: `buildPRUrl()` → GitHub PR
+**分支**: `data/team-{slug}`
+**Actions**: `validate-team.yml`, `sync-team-data.yml`
+**Schema**: `packages/shared/src/schemas/team.ts`
+
+### H10: 申请加入队伍 ⚠️ 需重构 (Issue comment → PR + /approve)
+
+**旧方案** (Issue comment): Hacker B 在 Team Issue 评论申请 → A 回复确认
+
+**新方案** (PR-based + leader /approve):
+```
+Hacker B 浏览 teams/ 目录或站点 Teams 页面
+  → 看到 Hacker A 的 team (status: recruiting)
+  → B 创建 PR 编辑 teams/{slug}/team.yml:
+    追加 members[]: [{github: "B-username", role: "developer", joined_at: "..."}]
+  → Actions: validate-team.yml 校验
+    ├─ 验证 B 的 Profile 存在
+    ├─ 验证 B 不在其他 team 中（一人一队）
+    ├─ 验证 team status = recruiting
+    ├─ 验证成员数未超过 team_size.max
+    └─ 校验通过 → 请求 leader review
+  → Leader A 在 PR 中评论 `/approve`
+  → team-join-approval.yml 检测 /approve 命令
+    ├─ 验证评论者 = leader
+    └─ 通过 → 合并 PR
+  → sync-team-data.yml 写入 B 的 profile.yml hacker.team 字段
+```
+
+**自行退出**: 成员 PR 从 team.yml members[] 中移除自己 → validate-team.yml 校验 → Auto-merge → sync-team-data.yml 清除 profile.yml hacker.team
+
+**Leader 移除成员**: Leader PR 从 team.yml members[] 中移除成员 → validate-team.yml 校验（验证 PR author = leader）→ Auto-merge → sync-team-data.yml 清除被移除者的 profile.yml hacker.team
+
+**Actions 需要**: `validate-team.yml`, `team-join-approval.yml`, `sync-team-data.yml`
 
 ### H11: 提交申诉 ✅
 
@@ -371,7 +387,7 @@ Hacker B 浏览 [Team] Issues (在活动详情页 "Teams" tab 或 GitHub Issues 
 | RegisterForm | `apps/web/components/forms/RegisterForm.tsx` | ⚠️ 需重构 (PR → Issue) |
 | NDASignForm | `apps/web/components/forms/NDASignForm.tsx` | ⚠️ 需重构 (PR → Issue) |
 | CreateProposalForm | `apps/web/components/forms/CreateProposalForm.tsx` | ✅ |
-| TeamFormationForm | `apps/web/components/forms/TeamFormationForm.tsx` | ✅ |
+| CreateTeamForm | `apps/web/components/forms/CreateTeamForm.tsx` | ⚠️ 需重构 (TeamFormationForm → CreateTeamForm, PR-based) |
 | ScoreCard | `apps/web/components/ScoreCard.tsx` | ✅ |
 | AppealForm | `apps/web/components/forms/AppealForm.tsx` | ✅ |
 | HackathonFilter | `apps/web/components/HackathonFilter.tsx` | ✅ |
@@ -391,7 +407,7 @@ Hacker B 浏览 [Team] Issues (在活动详情页 "Teams" tab 或 GitHub Issues 
 | nda-sign.yml | `.github/ISSUE_TEMPLATE/nda-sign.yml` | `nda-sign` | ✅ validate-nda.yml | ✅ |
 | judge-score.yml | `.github/ISSUE_TEMPLATE/judge-score.yml` | `judge-score` | ✅ validate-score.yml | ✅ |
 | appeal.yml | `.github/ISSUE_TEMPLATE/appeal.yml` | `appeal` | ✅ validate-appeal.yml | ✅ |
-| team-formation.yml | `.github/ISSUE_TEMPLATE/team-formation.yml` | `team-formation` | ❌ 缺 validate-team.yml | ⚠️ |
+| ~~team-formation.yml~~ | 已删除（组队改为 PR-based teams/ 目录） | — | `validate-team.yml` (PR 触发) | ⚠️ 需新建 |
 
 ### Actions Workflows
 
@@ -403,7 +419,9 @@ Hacker B 浏览 [Team] Issues (在活动详情页 "Teams" tab 或 GitHub Issues 
 | validate-score | `.github/workflows/validate-score.yml` | Issue (judge-score) | ✅ |
 | validate-appeal | `.github/workflows/validate-appeal.yml` | Issue (appeal) | ✅ |
 | validate-register | — | — | ❌ 缺失 |
-| validate-team | — | — | ❌ 缺失 |
+| validate-team | — | PR (teams/**) | ❌ 缺失 |
+| team-join-approval | — | PR comment `/approve` | ❌ 缺失 |
+| sync-team-data | — | PR merged (teams/**) | ❌ 缺失 |
 | sync-registrations | — | — | ❌ 缺失 |
 | sync-nda | — | — | ❌ 缺失 |
 | aggregate-scores | `.github/workflows/aggregate-scores.yml` | Cron + manual | ✅ |
@@ -433,8 +451,9 @@ Hacker B 浏览 [Team] Issues (在活动详情页 "Teams" tab 或 GitHub Issues 
 
 不适用操作 (直接 PR):
 - **创建 Profile**: 直接 PR (用户主动编辑的数据)
-- **提交项目**: 直接 PR (包含文件)
+- **提交项目**: 直接 PR (包含文件，使用 `team_ref` 引用 teams/ 队伍)
 - **创建/编辑活动**: 直接 PR (organizer 操作)
+- **创建/管理队伍**: 直接 PR (teams/{slug}/team.yml，成员加入需 leader /approve)
 
 ---
 
@@ -443,19 +462,19 @@ Hacker B 浏览 [Team] Issues (在活动详情页 "Teams" tab 或 GitHub Issues 
 | # | 缺失项 | 优先级 | 层 | 所需工作 |
 |---|--------|--------|---|---------|
 | G1 | validate-register.yml | P0 | Actions | 新建 workflow |
-| G2 | validate-team.yml | P1 | Actions | 新建 workflow |
+| G2 | validate-team.yml | P1 | Actions | 新建 workflow (PR-based teams/) |
 | G3 | sync-registrations.yml | P1 | Actions | 新建 workflow (Issue → PR) |
 | G4 | sync-nda.yml | P1 | Actions | 新建 workflow (Issue → PR) |
 | G5 | RegisterForm 重构 | P1 | 前端 | PR → Issue 方式 |
 | G6 | NDASignForm 重构 | P1 | 前端 | PR → Issue 方式 |
 | G7 | 编辑 Profile 入口 | P2 | 前端 | EditProfileButton |
 | G8 | 编辑项目入口 | P2 | 前端 | EditProjectButton |
-| G9 | Teams tab (活动详情页) | P1 | 前端 | TeamsTab 组件 |
-| G10 | 申请加入队伍流程 | P2 | 前端+文档 | comment 模板 + 文档 |
+| G9 | Teams tab (活动详情页) | P1 | 前端 | TeamsTab 组件 (读取 teams/ 数据) |
+| G10 | 申请加入队伍流程 | P1 | PR + Actions | PR 编辑 team.yml + leader /approve + team-join-approval.yml |
 | G11 | 点赞功能 | P2 | D1 + Functions + 前端 | LikeButton + API + D1 |
 | G12 | 公投功能 | P2 | D1 + Functions + 前端 | 与点赞共用基础设施 |
 | G13 | Dataset 下载按钮 | P2 | 前端 | DatasetDownloadButton |
-| G14 | 删除 AI 组队匹配 | P0 | 全局 | 清理 11 个文件 |
+| G14 | 删除 AI 组队匹配 + 迁移 Issue → PR-based teams/ | P0 | 全局 | 清理旧文件 + 新建 CreateTeamForm / validate-team / sync-team-data |
 | G15 | 创建 GitHub labels | P0 | Admin | `registration`, `registered`, `nda-approved` 等 |
 | G16 | 更新 CONTRIBUTING.md | P0 | 文档 | 删除 dev 分支引用 |
 | G17 | 更新分支命名规范 | P0 | 文档+Skill | `data/*` 前缀用于数据操作 |

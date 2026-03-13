@@ -273,20 +273,56 @@
 
 ---
 
-## US-H-008: 组队/找队友 [P1]
+## US-H-008: 组队 [P1]
 
-> **前置条件**: 用户已创建 Profile 且有 `looking_for` 字段
-> **涉及层**: Site → Issue Template `team-formation.yml`
+> **前置条件**: 用户已创建 Profile
+> **涉及层**: Site → PR teams/{slug}/team.yml → validate-team.yml → sync-team-data.yml
 
-### SC-H-008.1: 提交组队请求
+### SC-H-008.1: 创建队伍（PR-based）
 
-- **Given** 用户希望找队友
-- **When** 用户在活动详情页点击「找队友」按钮
-- **Then** GitHubRedirect 生成预填 Issue URL：
-  - template: `team-formation.yml`
-  - title: `[Team] {username} 寻找队友 — {hackathon-slug}`
-  - labels: `team-formation`, `hackathon:{slug}`
-- **And** Issue 作为公开的队友招募帖子存在，其他参赛者可通过 Issue 评论联系
+- **Given** 用户已创建 Profile 且希望组建队伍
+- **When** 用户在站点点击「创建队伍」按钮
+- **Then** CreateTeamForm 通过 `buildPRUrl()` 生成预填 PR URL：
+  - path: `teams/{team-slug}/team.yml`
+  - branch: `data/team-{slug}`
+  - 内容：team.yml 包含 `synnovator_team: "1.0"`, `name`, `leader`, `members: []`, `looking_for`, `status: recruiting`
+- **And** 浏览器跳转到 GitHub 新文件创建页
+
+### SC-H-008.2: 队伍 YAML 校验通过
+
+- **Given** 用户提交了包含 `teams/{slug}/team.yml` 的 PR
+- **And** YAML 内容符合 Team Schema（包含必填字段：`synnovator_team`, `name`, `leader`, `status`, `created_at`）
+- **When** GitHub Actions `validate-team.yml` workflow 被触发
+- **Then** 校验通过 → PR 获得 `team-valid` Label
+- **And** Bot 评论 "队伍创建校验通过，等待合并"
+- **And** `sync-team-data.yml` 在合并后将 leader 的 profile.yml `hacker.team` 字段设为该队伍 slug
+
+### SC-H-008.3: 申请加入队伍（PR + leader /approve）
+
+- **Given** 队伍 `teams/{slug}/team.yml` 已存在且 `status = recruiting`
+- **And** 用户 B 已创建 Profile 且不在任何队伍中
+- **When** 用户 B 创建 PR 编辑 `teams/{slug}/team.yml`，在 `members[]` 中追加自己的信息
+- **Then** `validate-team.yml` 校验：B 的 Profile 存在、B 不在其他队伍、团队未满
+- **And** 校验通过后请求 leader review
+- **And** Leader 在 PR 中评论 `/approve`
+- **And** `team-join-approval.yml` 验证评论者为 leader → 合并 PR
+- **And** `sync-team-data.yml` 将 B 的 profile.yml `hacker.team` 字段设为该队伍 slug
+
+### SC-H-008.4: 成员自行退出队伍
+
+- **Given** 用户 B 是 `teams/{slug}/team.yml` 的成员
+- **When** 用户 B 创建 PR 从 `members[]` 中移除自己
+- **Then** `validate-team.yml` 校验 PR author 为被移除的成员本人
+- **And** 校验通过 → Auto-merge
+- **And** `sync-team-data.yml` 清除 B 的 profile.yml `hacker.team` 字段
+
+### SC-H-008.5: Leader 移除成员
+
+- **Given** 用户 A 是 `teams/{slug}/team.yml` 的 leader
+- **When** 用户 A 创建 PR 从 `members[]` 中移除成员 B
+- **Then** `validate-team.yml` 校验 PR author 为 leader
+- **And** 校验通过 → Auto-merge
+- **And** `sync-team-data.yml` 清除 B 的 profile.yml `hacker.team` 字段
 
 ---
 
