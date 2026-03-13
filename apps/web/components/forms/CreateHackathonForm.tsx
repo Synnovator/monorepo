@@ -9,6 +9,14 @@ import { Badge, Card, ScrollArea } from '@synnovator/ui';
 import { formatYaml } from './form-utils';
 import { TimelineEditor, DEFAULT_STAGES, type Stage } from './TimelineEditor';
 
+// MDX templates (raw imports for build-time bundling)
+import descriptionTemplate from '../../../../config/templates/hackathon/description.mdx?raw';
+import descriptionZhTemplate from '../../../../config/templates/hackathon/description.zh.mdx?raw';
+import trackTemplate from '../../../../config/templates/hackathon/track.mdx?raw';
+import trackZhTemplate from '../../../../config/templates/hackathon/track.zh.mdx?raw';
+import stageTemplate from '../../../../config/templates/hackathon/stage.mdx?raw';
+import stageZhTemplate from '../../../../config/templates/hackathon/stage.zh.mdx?raw';
+
 interface CreateHackathonFormProps {
   templates: Record<string, unknown>;
   lang: Lang;
@@ -47,6 +55,70 @@ const TOTAL_STEPS = 8;
 
 function toSlug(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+interface MdxFile {
+  path: string;
+  content: string;
+}
+
+function generateMdxFiles(opts: {
+  slug: string;
+  name: string;
+  tracks: TrackData[];
+  timelineStages: Stage[];
+}): MdxFile[] {
+  const { slug, name, tracks, timelineStages } = opts;
+  const files: MdxFile[] = [];
+
+  // Description MDX (en + zh)
+  files.push({
+    path: `hackathons/${slug}/description.mdx`,
+    content: descriptionTemplate.replace(/__HACKATHON_NAME__/g, name),
+  });
+  files.push({
+    path: `hackathons/${slug}/description.zh.mdx`,
+    content: descriptionZhTemplate.replace(/__HACKATHON_NAME__/g, name),
+  });
+
+  // Track MDX files (en + zh for each track)
+  for (const tr of tracks) {
+    if (!tr.name) continue;
+    const trackSlug = tr.slug || toSlug(tr.name);
+    const trackName = tr.name;
+    const trackNameZh = tr.name_zh || tr.name;
+    files.push({
+      path: `hackathons/${slug}/tracks/${trackSlug}.mdx`,
+      content: trackTemplate.replace(/__TRACK_NAME__/g, trackName),
+    });
+    files.push({
+      path: `hackathons/${slug}/tracks/${trackSlug}.zh.mdx`,
+      content: trackZhTemplate.replace(/__TRACK_NAME__/g, trackNameZh),
+    });
+  }
+
+  // Stage MDX files (en + zh for each active stage)
+  for (const stage of timelineStages) {
+    if (!stage.start && !stage.end) continue; // skip stages without dates
+    const stageName = stage.label;
+    const stageNameZh = stage.labelZh || stage.label;
+    files.push({
+      path: `hackathons/${slug}/stages/${stage.key}.mdx`,
+      content: stageTemplate
+        .replace(/__STAGE_NAME__/g, stageName)
+        .replace(/__START_DATE__/g, stage.start || 'TBD')
+        .replace(/__END_DATE__/g, stage.end || 'TBD'),
+    });
+    files.push({
+      path: `hackathons/${slug}/stages/${stage.key}.zh.mdx`,
+      content: stageZhTemplate
+        .replace(/__STAGE_NAME__/g, stageNameZh)
+        .replace(/__START_DATE__/g, stage.start || 'TBD')
+        .replace(/__END_DATE__/g, stage.end || 'TBD'),
+    });
+  }
+
+  return files;
 }
 
 // Shared CSS classes — hoisted outside components to avoid re-creation
@@ -422,14 +494,25 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
     setSubmitting(true);
     setSubmitError('');
     try {
+      // Build files array: hackathon.yml + MDX templates
+      const mdxFiles = generateMdxFiles({
+        slug: finalSlug,
+        name,
+        tracks,
+        timelineStages,
+      });
+      const files = [
+        { path: `hackathons/${finalSlug}/hackathon.yml`, content: yamlContent },
+        ...mdxFiles,
+      ];
+
       const res = await fetch('/api/submit-pr', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'hackathon',
-          filename: `hackathons/${finalSlug}/hackathon.yml`,
-          content: yamlContent,
           slug: finalSlug,
+          files,
         }),
       });
       const text = await res.text();

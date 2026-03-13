@@ -8,6 +8,10 @@ import type { Lang } from '@synnovator/shared/i18n';
 import { Card, ScrollArea, Badge } from '@synnovator/ui';
 import { formatYaml } from './form-utils';
 
+// MDX templates (raw imports for build-time bundling)
+import readmeTemplate from '../../../../config/templates/proposal/README.mdx?raw';
+import readmeZhTemplate from '../../../../config/templates/proposal/README.zh.mdx?raw';
+
 interface TrackInfo {
   name: string;
   name_zh?: string;
@@ -149,14 +153,32 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
     setSubmitting(true);
     setSubmitError('');
     try {
+      // Build files array: project.yml + MDX templates
+      const basePath = `hackathons/${selectedHackathon}/submissions/${teamSlug}`;
+      const leaderGithub = members[0]?.github?.trim() || '';
+      const files = [
+        { path: `${basePath}/project.yml`, content: yamlContent },
+        {
+          path: `${basePath}/README.mdx`,
+          content: readmeTemplate
+            .replace(/__PROJECT_NAME__/g, name)
+            .replace(/__LEADER_GITHUB__/g, leaderGithub),
+        },
+        {
+          path: `${basePath}/README.zh.mdx`,
+          content: readmeZhTemplate
+            .replace(/__PROJECT_NAME__/g, nameZh || name)
+            .replace(/__LEADER_GITHUB__/g, leaderGithub),
+        },
+      ];
+
       const res = await fetch('/api/submit-pr', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'proposal',
-          filename: `hackathons/${selectedHackathon}/submissions/${teamSlug}/project.yml`,
-          content: yamlContent,
           slug: teamSlug,
+          files,
         }),
       });
       const text = await res.text();
