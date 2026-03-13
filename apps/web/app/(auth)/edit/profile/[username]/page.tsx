@@ -36,8 +36,9 @@ export default async function ProfileEditorPage({
     );
   }
 
-  // Authorization: only the profile owner can edit
-  if (entry.hacker.github !== session.login) {
+  // Authorization: dev-token users can edit everything; otherwise only owner
+  const isDevUser = session.access_token === 'dev-token';
+  if (!isDevUser && entry.hacker.github !== session.login) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">

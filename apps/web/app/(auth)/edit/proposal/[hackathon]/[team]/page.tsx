@@ -40,8 +40,9 @@ export default async function ProposalEditorPage({
     );
   }
 
-  // Authorization: check if current user is a team member
-  const isTeamMember = entry.project.team.some(
+  // Authorization: dev-token users can edit everything; otherwise check team membership
+  const isDevUser = session.access_token === 'dev-token';
+  const isTeamMember = isDevUser || entry.project.team.some(
     (member) => member.github === session.login,
   );
 

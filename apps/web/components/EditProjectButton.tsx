@@ -16,7 +16,8 @@ interface EditProjectButtonProps {
 export function EditProjectButton({ hackathonSlug, teamSlug, teamMembers, lang }: EditProjectButtonProps) {
   const { user, loading } = useAuth();
 
-  if (loading || !user || !teamMembers.includes(user.login)) {
+  // Dev users (non-GitHub) can edit all pages; GitHub users must be team members
+  if (loading || !user || (user.isGitHub && !teamMembers.includes(user.login))) {
     return null;
   }
 

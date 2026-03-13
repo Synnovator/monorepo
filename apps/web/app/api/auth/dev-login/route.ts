@@ -4,7 +4,7 @@ import { encrypt, setSessionCookie } from '@synnovator/shared/auth';
 const DEV_USERS: Record<string, { password: string; login: string; avatar_url: string }> = {
   admin: {
     password: '12345',
-    login: 'admin',
+    login: 'allenwoods',
     avatar_url: 'https://avatars.githubusercontent.com/u/0?v=4',
   },
 };
