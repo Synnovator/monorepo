@@ -7,13 +7,7 @@ project:
   tagline_zh: "面向一人公司的AI跨境市场研究助手"
   track: "ai-application"
 
-  team:
-    - github: "alice-dev"
-      role: "Lead Developer"
-    - github: "bob-ml"
-      role: "ML Engineer"
-    - github: "carol-design"
-      role: "Product Designer"
+  team_ref: "team-ai-voyager"
 
   deliverables:
     repo: "https://github.com/team-ai-voyager/ai-voyager"
