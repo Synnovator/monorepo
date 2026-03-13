@@ -16,7 +16,6 @@ import { ClipboardListIcon, ShieldCheckIcon } from '@/components/icons';
 import { RegisterForm } from '@/components/forms/RegisterForm';
 import { NDASignForm } from '@/components/forms/NDASignForm';
 import { AppealForm } from '@/components/forms/AppealForm';
-import { TeamFormationForm } from '@/components/forms/TeamFormationForm';
 import { TeamsTab } from '@/components/TeamsTab';
 import { SketchUnderline, SketchDoodle } from '@/components/sketch';
 import { Separator, Badge } from '@synnovator/ui';
@@ -298,20 +297,6 @@ export default async function HackathonDetailPage({
                     hackathonName={localize(lang, h.name, h.name_zh)}
                     tracks={formTracks}
                     ndaRequired={!!h.legal?.nda?.required}
-                    lang={lang}
-                  />
-                </section>
-              )}
-
-              {/* Team Formation (during registration/development stages) */}
-              {(['registration', 'development'].includes(stage)) && (
-                <section id="team-formation-section" className="mt-12">
-                  <h2 className="text-xl font-heading font-bold text-foreground mb-4">
-                    {t(lang, 'hackathon.team_formation')}
-                  </h2>
-                  <TeamFormationForm
-                    hackathonSlug={h.slug}
-                    tracks={formTracks}
                     lang={lang}
                   />
                 </section>
