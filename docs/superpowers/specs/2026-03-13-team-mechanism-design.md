@@ -39,23 +39,27 @@
 TopLevelRole
 ├── Hacker
 │   ├── developer
-│   ├── production
+│   ├── product         # 产品经理/产品负责人
 │   ├── designer
 │   ├── marketing
 │   └── researcher
 ├── Mentor
 ├── Judge
-└── Watcher (= PRD 中的 observer，统一术语)
+└── Observer
 ```
 
 **各场景使用范围**：
 
 | 场景 | 允许的角色 | 字段 |
 |------|-----------|------|
-| team.yml `members[].role` | Hacker 子类型（developer / production / designer / marketing / researcher） | `role` |
+| team.yml `members[].role` | Hacker 子类型（developer / product / designer / marketing / researcher） | `role` |
+| team.yml `looking_for.roles` | Hacker 子类型枚举值 | `roles[]` |
 | profile `registrations[].role` | participant / mentor / observer | `role` |
+| profile `looking_for.roles` | 自由文本数组（如 "Frontend Developer"），不受枚举限制（面向人类阅读的标签） | `roles[]` |
 | hackathon.yml `judges[]` | 由 organizer 配置，不通过注册表单 | — |
-| submission `project.yml` | 不再包含角色（通过 `team_ref` 关联） | — |
+| submission `project.yml` | 不再包含团队角色（通过 `team_ref` 关联），保留 `mentors[]` | — |
+
+**PRD 更新**：PRD §6.4 中 `project.team[].role` 枚举（leader / developer / designer / researcher / mentor）已废弃，由 `team.yml` 的 `members[].role` + 独立 `leader` 字段替代。需在 PRD 更新中移除该枚举行，新增 `team.yml` 角色枚举说明。
 
 组队场景下 `members[].role` 限定为 Hacker 子类型。`Mentor` 角色不参与组队，但可在 hackathon 级别通过 `mentor_rules` 配置参与贡献。
 
@@ -77,7 +81,7 @@ members:                              # 不含队长
     role: designer
     joined_at: "2026-03-11"
 looking_for:                          # 可选，status=recruiting 时有意义
-  roles: ["researcher", "designer"]
+  roles: ["researcher", "designer"]       # Hacker 子类型枚举值
   description: "需要一位有 ML 经验的研究员和一位 UI 设计师"
 hackathons:                           # team 的参赛记录
   - hackathon: "ai-hackathon-2026"
@@ -334,7 +338,7 @@ getTeamByMember(github)        // 通过 members + leader 匹配
 | `packages/shared/src/i18n/en.json` | 移除旧 key，新增 team 管理 key |
 | `packages/shared/src/i18n/zh.json` | 同上 |
 | `profiles/_schema.yml` | 新增 `hacker.team` 顶级字段说明，移除 `registrations[].team` |
-| `docs/specs/synnovator-prd.md` | H9/H10 重写，角色简化，角色枚举更新 |
+| `docs/specs/synnovator-prd.md` | H9/H10 重写，角色简化，§6.4 移除 `project.team[].role` 枚举、新增 `team.yml` 角色枚举 |
 | `docs/plans/2026-03-08-hackers-user-flow.md` | 更新组队流程描述 |
 | `docs/acceptance/hacker.spec.md` | 更新组队验收场景 |
 | `CLAUDE.md` | 目录导航新增 `teams/` |
