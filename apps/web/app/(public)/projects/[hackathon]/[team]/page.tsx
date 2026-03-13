@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { listSubmissions, listProfiles, getHackathon } from '@/app/_generated/data';
+import { listSubmissions, listProfiles, getHackathon, listTeams } from '@/app/_generated/data';
 import { t, localize, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Card, Avatar, AvatarImage, AvatarFallback } from '@synnovator/ui';
@@ -47,6 +47,13 @@ export default async function ProjectDetailPage({
     }
   }
 
+  // Look up team by team_ref
+  const allTeams = listTeams();
+  const teamData = allTeams.find(t => t._slug === (project as any).team_ref);
+  const teamMembers = teamData
+    ? [{ github: teamData.leader, role: 'leader' }, ...teamData.members]
+    : [];
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <Link href={`/hackathons/${hackathon}#submissions`} className="text-sm text-muted-foreground hover:text-foreground mb-6 inline-block">
@@ -86,7 +93,7 @@ export default async function ProjectDetailPage({
           <section>
             <h3 className="text-sm font-medium text-muted-foreground mb-3">{t(lang, 'project.team_members')}</h3>
             <div className="space-y-2">
-              {project.team.map((member: { github: string; role?: string }) => {
+              {teamMembers.map((member) => {
                 const profileId = githubToProfile.get(member.github);
                 const inner = (
                   <>
@@ -150,7 +157,7 @@ export default async function ProjectDetailPage({
           <EditProjectButton
             hackathonSlug={hackathon}
             teamSlug={team}
-            teamMembers={project.team.map((m: { github: string }) => m.github)}
+            teamMembers={teamMembers.map(m => m.github)}
             lang={lang}
           />
         </aside>
