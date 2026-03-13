@@ -53,4 +53,4 @@ hacker:
   judge_profile:                     # Fill when serving as judge
     available: false
     expertise: []
-    conflict_declaration: ""         # R2 PDF URL
+    conflict_declaration: ""         # PDF URL (external link or Git path)

@@ -8,6 +8,14 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  webpack(config) {
+    // Support `import foo from './file.mdx?raw'` as raw text string
+    config.module.rules.push({
+      resourceQuery: /raw/,
+      type: 'asset/source',
+    });
+    return config;
+  },
 };
 
 export default nextConfig;

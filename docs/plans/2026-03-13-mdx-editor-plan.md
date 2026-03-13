@@ -151,7 +151,7 @@ apps/web/components/forms/ProfileCreateForm.tsx     # add template files to PR
 - [ ] **Step 1: Add dependencies to packages/ui**
 
 ```bash
-cd packages/ui && pnpm add @mdx-js/mdx remark-gfm rehype-highlight recma-no-import-export @uiw/react-codemirror @codemirror/lang-markdown @codemirror/lang-javascript
+cd packages/ui && pnpm add @mdx-js/mdx remark-gfm rehype-highlight remark-mdx-remove-esm @uiw/react-codemirror @codemirror/lang-markdown @codemirror/lang-javascript
 ```
 
 - [ ] **Step 2: Add dependencies to packages/shared**
@@ -1544,7 +1544,7 @@ Create `packages/ui/src/components/editor/EditorPane.tsx`. Key points:
 
 Create `packages/ui/src/components/editor/PreviewPane.tsx`. Key points:
 - Accept MDX source string + component map
-- Use `@mdx-js/mdx` `evaluate()` with `remarkGfm` and `recma-no-import-export` plugin (package: `recma-no-import-export`) to strip `import`/`export` statements for browser security
+- Use `@mdx-js/mdx` `evaluate()` with `remarkGfm` and `remark-mdx-remove-esm` plugin (package: `remark-mdx-remove-esm`) to strip `import`/`export` statements for browser security
 - Debounce compilation (300ms)
 - Show compilation errors in `Alert` component
 - Apply custom prose styles (font-heading for h1-h3, font-sans for body, etc.)
