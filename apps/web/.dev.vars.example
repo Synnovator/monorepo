@@ -7,3 +7,6 @@ GITHUB_APP_INSTALLATION_ID=<your-installation-id>
 # Auth (existing)
 AUTH_SECRET=<random-secret-for-session-encryption>
 GITHUB_CLIENT_SECRET=<oauth-client-secret>
+
+# Dev login (admin/password login for local testing)
+DEV_ADMIN_PASSWORD=<strong-password-for-dev-admin>

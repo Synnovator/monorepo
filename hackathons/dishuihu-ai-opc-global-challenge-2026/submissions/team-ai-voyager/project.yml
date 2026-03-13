@@ -19,7 +19,7 @@ project:
     repo: "https://github.com/team-ai-voyager/ai-voyager"
     document:
       local_path: ""
-      r2_url: ""
+      url: ""
     video: "https://example.com/ai-voyager-demo"
 
   tech_stack: ["Python", "LangChain", "Next.js", "Tailwind CSS", "OpenAI API", "Supabase"]

@@ -8,6 +8,10 @@ import type { Lang } from '@synnovator/shared/i18n';
 import { Card, ScrollArea } from '@synnovator/ui';
 import { formatYaml } from './form-utils';
 
+// MDX templates (raw imports for build-time bundling)
+import bioTemplate from '../../../../config/templates/profile/bio.mdx?raw';
+import bioZhTemplate from '../../../../config/templates/profile/bio.zh.mdx?raw';
+
 interface ProfileCreateFormProps {
   lang: Lang;
 }
@@ -146,17 +150,35 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
   async function handleSubmit() {
     if (!user) return;
     const uuid = generateUUID8();
+    const profileId = `${user.login}-${uuid}`;
     setSubmitting(true);
     setSubmitError('');
     try {
+      // Build files array: profile YAML + bio MDX templates
+      const displayName = name || user.login;
+      const files = [
+        { path: `profiles/${profileId}.yml`, content: yamlContent },
+        {
+          path: `profiles/${profileId}/bio.mdx`,
+          content: bioTemplate
+            .replace(/__GITHUB_USERNAME__/g, user.login)
+            .replace(/__DISPLAY_NAME__/g, displayName),
+        },
+        {
+          path: `profiles/${profileId}/bio.zh.mdx`,
+          content: bioZhTemplate
+            .replace(/__GITHUB_USERNAME__/g, user.login)
+            .replace(/__DISPLAY_NAME__/g, nameZh || displayName),
+        },
+      ];
+
       const res = await fetch('/api/submit-pr', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'profile',
-          filename: `profiles/${user.login}-${uuid}.yml`,
-          content: yamlContent,
           slug: user.login,
+          files,
         }),
       });
       const text = await res.text();

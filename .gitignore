@@ -33,6 +33,7 @@ dist/
 
 # Build artifacts
 apps/web/app/_generated/static-data.json
+apps/web/app/_generated/static-mdx/
 
 # Logs
 *.log

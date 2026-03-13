@@ -19,6 +19,7 @@ import { AppealForm } from '@/components/forms/AppealForm';
 import { TeamFormationForm } from '@/components/forms/TeamFormationForm';
 import { TeamsTab } from '@/components/TeamsTab';
 import { SketchUnderline, SketchDoodle } from '@/components/sketch';
+import { EditHackathonButton } from '@/components/EditHackathonButton';
 import { Separator, Badge } from '@synnovator/ui';
 
 export const dynamic = 'force-static';
@@ -111,9 +112,16 @@ export default async function HackathonDetailPage({
           </Badge>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
-          {localize(lang, h.name, h.name_zh)}
-        </h1>
+        <div className="flex items-center gap-3 mb-3">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-foreground">
+            {localize(lang, h.name, h.name_zh)}
+          </h1>
+          <EditHackathonButton
+            slug={h.slug}
+            organizers={(h.organizers ?? []).map((o: any) => o.github).filter(Boolean)}
+            lang={lang}
+          />
+        </div>
 
         <p className="text-lg text-muted-foreground max-w-3xl mb-6">
           {localize(lang, h.tagline, h.tagline_zh)}
@@ -229,7 +237,7 @@ export default async function HackathonDetailPage({
                 <Separator />
                 <section className="mt-12 mb-8">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.datasets')}</h2>
-                  <DatasetSection datasets={h.datasets as any} hackathonSlug={h.slug} lang={lang} />
+                  <DatasetSection datasets={h.datasets as any} lang={lang} />
                 </section>
                 </>
               )}
@@ -281,7 +289,6 @@ export default async function HackathonDetailPage({
                     {t(lang, 'hackathon.nda_sign')}
                   </h2>
                   <NDASignForm
-                    hackathonSlug={h.slug}
                     ndaDocumentUrl={h.legal.nda.document_url}
                     ndaSummary={h.legal.nda.summary}
                     lang={lang}

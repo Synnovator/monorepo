@@ -82,7 +82,8 @@
     "team_size_label": "Team size",
     "solo_allowed": "(solo allowed)",
     "license_label": "License",
-    "ip_label": "IP"
+    "ip_label": "IP",
+    "edit": "Edit Hackathon"
   },
   "stage": {
     "draft": "Draft",
@@ -254,10 +255,7 @@
     "public": "Public",
     "nda_required": "NDA Required",
     "download": "Download",
-    "get_download_link": "Get Download Link",
-    "sign_nda_link": "→ Sign NDA",
-    "nda_first": "Please sign the NDA first",
-    "network_error": "Network error. Please try again."
+    "link_pending": "Download link pending — organizer will provide it soon"
   },
   "project": {
     "submissions": "Submissions",
@@ -348,20 +346,10 @@
       "name_required": "Please enter a display name"
     },
     "nda": {
-      "operation_failed": "Operation failed, please try again",
-      "terms_1": "I have read and agree to the NDA terms",
-      "terms_2": "I understand the confidentiality and data handling requirements",
-      "terms_3": "I acknowledge violations may result in disqualification and legal action",
       "requires_nda": "This hackathon requires NDA signing",
       "nda_summary": "NDA Summary",
       "download_nda": "Download NDA Document",
-      "sign_in_to_sign": "Please sign in to sign the NDA",
-      "signer": "Signer",
-      "processing": "Processing...",
-      "sign_and_pr": "Sign NDA & Create PR",
-      "create_profile": "Create Profile",
-      "create_profile_first": "Please create your profile first before signing NDA",
-      "already_signed": "You have already signed the NDA for this event"
+      "contact_organizer": "NDA signing is handled by the event organizer. Please contact them for signing instructions."
     },
     "create_hackathon": {
       "sign_in_first": "Please sign in with GitHub first",
@@ -568,5 +556,30 @@
     "submit_title": "Submit Project",
     "submit_desc": "Join a team, submit your work, earn recognition",
     "cta": "Start Exploring"
+  },
+  "editor": {
+    "save": "Submit Changes",
+    "preview": "Preview",
+    "insertComponent": "Insert Component",
+    "uploadImage": "Upload Image",
+    "uploadPdf": "Upload PDF",
+    "switchLang": "Switch Language",
+    "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?",
+    "imageExceedsLimit": "Image size cannot exceed 5MB",
+    "pdfExceedsLimit": "PDF size cannot exceed 20MB",
+    "submitPr": "Submit PR",
+    "prCreated": "PR Created",
+    "editContent": "Edit Content",
+    "autoSaved": "Auto-saved",
+    "draftDetected": "Unsaved draft detected. Restore it?",
+    "restore": "Restore",
+    "discard": "Discard",
+    "compileError": "MDX Compile Error",
+    "noPermission": "You do not have permission to edit this content",
+    "uploading": "Uploading...",
+    "submitSuccess": "PR created, awaiting review",
+    "description": "Description",
+    "trackDescription": "Track Description",
+    "stageDescription": "Stage Description"
   }
 }

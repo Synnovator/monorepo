@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { encrypt, setSessionCookie } from '@synnovator/shared/auth';
 
-const DEV_USERS: Record<string, { password: string; login: string; avatar_url: string }> = {
+const DEV_USERS: Record<string, { login: string; avatar_url: string }> = {
   admin: {
-    password: '12345',
-    login: 'admin',
+    login: 'allenwoods',
     avatar_url: 'https://avatars.githubusercontent.com/u/0?v=4',
   },
 };
@@ -19,8 +18,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing credentials' }, { status: 400 });
   }
 
+  const expectedPassword = process.env.DEV_ADMIN_PASSWORD;
+  if (!expectedPassword) {
+    return NextResponse.json({ error: 'Dev login not configured' }, { status: 503 });
+  }
+
   const user = DEV_USERS[username];
-  if (!user || user.password !== password) {
+  if (!user || password !== expectedPassword) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 

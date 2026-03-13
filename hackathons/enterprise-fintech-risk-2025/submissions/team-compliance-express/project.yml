@@ -18,7 +18,7 @@ project:
     repo: "https://github.com/team-compliance-express/explainability"
     document:
       local_path: ""
-      r2_url: ""
+      url: ""
     video: "https://example.com/compliance-demo"
 
   tech_stack: ["Python", "SHAP", "scikit-learn", "Jinja2"]
