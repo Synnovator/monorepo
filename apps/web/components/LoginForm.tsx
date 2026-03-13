@@ -196,9 +196,6 @@ export function LoginForm() {
                 </button>
               </form>
 
-              <p className="text-muted-foreground text-xs text-center mt-4">
-                admin / 12345
-              </p>
             </div>
           ) : (
             <div role="tabpanel" id="login-panel-github" aria-labelledby="login-tab-github" className="space-y-4">
