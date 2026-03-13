@@ -23,6 +23,9 @@ export function CreateTeamForm({ lang }: CreateTeamFormProps) {
   const { user, loading, isLoggedIn } = useAuth();
   const [teamName, setTeamName] = useState('');
   const [teamNameZh, setTeamNameZh] = useState('');
+  const [description, setDescription] = useState('');
+  const [descriptionZh, setDescriptionZh] = useState('');
+  const [githubUrl, setGithubUrl] = useState('');
   const [lookingForRoles, setLookingForRoles] = useState<string[]>([]);
   const [lookingForDesc, setLookingForDesc] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -45,6 +48,9 @@ export function CreateTeamForm({ lang }: CreateTeamFormProps) {
     let yamlContent = `synnovator_team: "1.0"\n`;
     yamlContent += `name: "${teamName}"\n`;
     if (teamNameZh) yamlContent += `name_zh: "${teamNameZh}"\n`;
+    if (description) yamlContent += `description: "${description}"\n`;
+    if (descriptionZh) yamlContent += `description_zh: "${descriptionZh}"\n`;
+    if (githubUrl) yamlContent += `github_url: "${githubUrl}"\n`;
     yamlContent += `status: recruiting\n`;
     yamlContent += `leader: "${user.login}"\n`;
     yamlContent += `members: []\n`;
@@ -114,6 +120,43 @@ export function CreateTeamForm({ lang }: CreateTeamFormProps) {
           <input
             id="team-name-zh" type="text" value={teamNameZh}
             onChange={e => setTeamNameZh(e.target.value)}
+            className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="team-desc" className="block text-sm text-muted-foreground mb-2">
+            {t(lang, 'team.description')} <span className="text-muted-foreground/60">({t(lang, 'form.team.optional')})</span>
+          </label>
+          <textarea
+            id="team-desc" value={description}
+            onChange={e => setDescription(e.target.value)}
+            rows={3}
+            placeholder={lang === 'zh' ? '介绍你的队伍和项目方向...' : 'Introduce your team and project direction...'}
+            className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none resize-y"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="team-desc-zh" className="block text-sm text-muted-foreground mb-2">
+            {t(lang, 'team.description')} (中文) <span className="text-muted-foreground/60">({t(lang, 'form.team.optional')})</span>
+          </label>
+          <textarea
+            id="team-desc-zh" value={descriptionZh}
+            onChange={e => setDescriptionZh(e.target.value)}
+            rows={3}
+            className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none resize-y"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="team-github" className="block text-sm text-muted-foreground mb-2">
+            {t(lang, 'team.github_repo')} <span className="text-muted-foreground/60">({t(lang, 'form.team.optional')})</span>
+          </label>
+          <input
+            id="team-github" type="url" value={githubUrl}
+            onChange={e => setGithubUrl(e.target.value)}
+            placeholder="https://github.com/org/repo"
             className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none"
           />
         </div>

@@ -75,7 +75,7 @@
     "appeal_window": "申诉窗口",
     "team_formation": "组队 / 寻找队友",
     "teams_browse": "浏览参加此活动的队伍，或创建你自己的队伍。",
-    "teams_not_available": "组队功能仅在报名和开发阶段开放。",
+    "teams_not_available": "暂无队伍信息。",
     "team_size_label": "团队规模",
     "solo_allowed": "（允许个人参赛）",
     "license_label": "许可证",
@@ -95,7 +95,7 @@
     "details": "详情",
     "submissions": "提案",
     "leaderboard": "排行榜",
-    "teams": "组队"
+    "teams": "队伍"
   },
   "team": {
     "list_title": "队伍",
@@ -119,7 +119,10 @@
     "created_at": "创建于",
     "not_in_team": "你还没有加入任何队伍",
     "browse_teams": "浏览队伍",
-    "my_team": "我的队伍"
+    "my_team": "我的队伍",
+    "description": "关于",
+    "github_repo": "GitHub 仓库",
+    "edit": "编辑队伍"
   },
   "profile": {
     "skills": "技能",
@@ -556,7 +559,8 @@
     "admin_hackathons": "活动管理",
     "admin_profiles": "档案管理",
     "admin_submissions": "提交管理",
-    "admin_theme": "主题编辑"
+    "admin_theme": "主题编辑",
+    "teams": "队伍"
   },
   "proposals": {
     "title": "提案",

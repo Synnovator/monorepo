@@ -1,4 +1,5 @@
 import { CreateTeamForm } from '@/components/forms/CreateTeamForm';
+import { ClosePageButton } from '@/components/ClosePageButton';
 import { getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 
@@ -14,6 +15,9 @@ export default async function CreateTeamPage({
 
   return (
     <main className="container mx-auto px-4 py-12 max-w-2xl">
+      <div className="flex justify-end mb-4">
+        <ClosePageButton />
+      </div>
       <CreateTeamForm lang={lang} />
     </main>
   );

@@ -7,6 +7,10 @@ synnovator_team: "1.0"           # Required. Schema version.
 name: "Team Name"                # Required. Team display name.
 name_zh: "队伍中文名"             # Optional. Chinese name.
 
+description: "About the team..." # Optional. Team description / project direction.
+description_zh: "队伍简介..."     # Optional. Chinese description.
+github_url: "https://github.com/org/repo"  # Optional. Team's GitHub repository URL.
+
 status: recruiting               # Required. One of: recruiting | formed | disbanded
 
 leader: "github-username"        # Required. GitHub username of the team leader (creator).

@@ -77,7 +77,7 @@
     "appeal_window": "Appeal Window",
     "team_formation": "Team Formation",
     "teams_browse": "Browse teams registered for this hackathon, or create your own.",
-    "teams_not_available": "Team formation is only available during registration and development stages.",
+    "teams_not_available": "No teams yet.",
     "team_size_label": "Team size",
     "solo_allowed": "(solo allowed)",
     "license_label": "License",
@@ -121,7 +121,10 @@
     "created_at": "Created",
     "not_in_team": "You haven't joined a team yet.",
     "browse_teams": "Browse teams",
-    "my_team": "My Team"
+    "my_team": "My Team",
+    "description": "About",
+    "github_repo": "GitHub Repository",
+    "edit": "Edit Team"
   },
   "profile": {
     "skills": "Skills",
@@ -557,7 +560,8 @@
     "admin_hackathons": "Hackathons",
     "admin_profiles": "Profiles",
     "admin_submissions": "Submissions",
-    "admin_theme": "Theme Editor"
+    "admin_theme": "Theme Editor",
+    "teams": "Teams"
   },
   "proposals": {
     "title": "Proposals",

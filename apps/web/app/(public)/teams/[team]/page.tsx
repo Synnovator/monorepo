@@ -4,11 +4,53 @@ import { getTeam, listTeams } from '@/app/_generated/data';
 import { getLangFromSearchParams, t, localize } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Card, Badge, Avatar, AvatarImage, AvatarFallback } from '@synnovator/ui';
+import { GitHubIcon, ExternalLinkIcon } from '@/components/icons';
+import { TeamActions } from '@/components/TeamActions';
 
 export const dynamic = 'force-static';
 
 export function generateStaticParams() {
   return listTeams().map(t => ({ team: t._slug }));
+}
+
+/** Reconstruct YAML from team data for PR-based edit operations */
+function buildTeamYaml(team: ReturnType<typeof getTeam> & {}) {
+  let yaml = `synnovator_team: "${team.synnovator_team}"\n`;
+  yaml += `name: "${team.name}"\n`;
+  if (team.name_zh) yaml += `name_zh: "${team.name_zh}"\n`;
+  if (team.description) yaml += `description: "${team.description}"\n`;
+  if (team.description_zh) yaml += `description_zh: "${team.description_zh}"\n`;
+  if (team.github_url) yaml += `github_url: "${team.github_url}"\n`;
+  yaml += `status: ${team.status}\n`;
+  yaml += `leader: "${team.leader}"\n`;
+  if (team.members.length === 0) {
+    yaml += `members: []\n`;
+  } else {
+    yaml += `members:\n`;
+    for (const m of team.members) {
+      yaml += `  - github: "${m.github}"\n`;
+      yaml += `    role: ${m.role}\n`;
+      yaml += `    joined_at: "${m.joined_at}"\n`;
+    }
+  }
+  if (team.looking_for) {
+    yaml += `looking_for:\n`;
+    if (team.looking_for.roles?.length) {
+      yaml += `  roles:\n`;
+      for (const r of team.looking_for.roles) yaml += `    - ${r}\n`;
+    }
+    if (team.looking_for.description) yaml += `  description: "${team.looking_for.description}"\n`;
+  }
+  if (team.hackathons?.length) {
+    yaml += `hackathons:\n`;
+    for (const h of team.hackathons) {
+      yaml += `  - hackathon: "${h.hackathon}"\n`;
+      yaml += `    track: "${h.track}"\n`;
+      yaml += `    registered_at: "${h.registered_at}"\n`;
+    }
+  }
+  yaml += `created_at: "${team.created_at}"\n`;
+  return yaml;
 }
 
 export default async function TeamDetailPage({
@@ -25,7 +67,10 @@ export default async function TeamDetailPage({
   const team = getTeam(teamSlug);
   if (!team) notFound();
 
-  const displayName = lang === 'zh' && team.name_zh ? team.name_zh : team.name;
+  const displayName = localize(lang, team.name, team.name_zh);
+  const displayDescription = team.description
+    ? localize(lang, team.description, team.description_zh)
+    : null;
 
   const STATUS_COLORS: Record<string, string> = {
     recruiting: 'bg-green-500/10 text-green-600 border-green-500/30',
@@ -33,26 +78,62 @@ export default async function TeamDetailPage({
     disbanded: 'bg-muted text-muted-foreground border-border',
   };
 
+  const memberGithubs = team.members.map(m => m.github);
+  const teamYaml = buildTeamYaml(team);
+
   return (
     <main className="max-w-4xl mx-auto px-4 py-12">
       <Link href="/teams" className="text-sm text-muted-foreground hover:text-foreground mb-6 inline-block">
-        ← {t(lang, 'team.list_title')}
+        &larr; {t(lang, 'team.list_title')}
       </Link>
 
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-heading font-bold text-foreground mb-2">{displayName}</h1>
-          <p className="text-sm text-muted-foreground">
-            {t(lang, 'team.created_at')}: {team.created_at}
-          </p>
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-3xl font-heading font-bold text-foreground">{displayName}</h1>
+          <Badge className={`text-xs border ${STATUS_COLORS[team.status] ?? ''}`}>
+            {t(lang, `team.status_${team.status}`)}
+          </Badge>
         </div>
-        <Badge className={`text-xs border ${STATUS_COLORS[team.status] ?? ''}`}>
-          {t(lang, `team.status_${team.status}`)}
-        </Badge>
+        <p className="text-sm text-muted-foreground mb-4">
+          {t(lang, 'team.created_at')}: {team.created_at}
+        </p>
+        <TeamActions
+          teamSlug={teamSlug}
+          leader={team.leader}
+          members={memberGithubs}
+          status={team.status}
+          teamYamlContent={teamYaml}
+          lang={lang}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
+          {/* Description */}
+          {displayDescription && (
+            <section>
+              <h2 className="text-sm font-medium text-muted-foreground mb-3">{t(lang, 'team.description')}</h2>
+              <p className="text-foreground text-sm leading-relaxed">{displayDescription}</p>
+            </section>
+          )}
+
+          {/* GitHub Link */}
+          {team.github_url && (
+            <section>
+              <h2 className="text-sm font-medium text-muted-foreground mb-3">{t(lang, 'team.github_repo')}</h2>
+              <a
+                href={team.github_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border hover:border-primary/40 transition-colors text-sm text-foreground"
+              >
+                <GitHubIcon size={18} />
+                <span>{team.github_url.replace('https://github.com/', '')}</span>
+                <ExternalLinkIcon size={14} className="text-muted-foreground" />
+              </a>
+            </section>
+          )}
+
           {/* Leader */}
           <section>
             <h2 className="text-sm font-medium text-muted-foreground mb-3">{t(lang, 'team.leader')}</h2>

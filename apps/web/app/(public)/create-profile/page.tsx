@@ -1,6 +1,7 @@
 import { getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { ProfileCreateForm } from '@/components/forms/ProfileCreateForm';
+import { ClosePageButton } from '@/components/ClosePageButton';
 
 export default async function CreateProfilePage({
   searchParams,
@@ -12,7 +13,10 @@ export default async function CreateProfilePage({
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-heading font-bold text-foreground mb-8">Create Your Profile</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-heading font-bold text-foreground">Create Your Profile</h1>
+        <ClosePageButton />
+      </div>
       <ProfileCreateForm lang={lang} />
     </div>
   );

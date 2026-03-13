@@ -17,22 +17,11 @@ interface TeamData {
 
 interface TeamsTabProps {
   hackathonSlug: string;
-  stage: string;
   lang: Lang;
   teams: TeamData[];
 }
 
-export function TeamsTab({ hackathonSlug, stage, lang, teams }: TeamsTabProps) {
-  const isActive = ['registration', 'development'].includes(stage);
-
-  if (!isActive) {
-    return (
-      <Card className="p-12 text-center">
-        <p className="text-muted-foreground text-lg">{t(lang, 'hackathon.teams_not_available')}</p>
-      </Card>
-    );
-  }
-
+export function TeamsTab({ hackathonSlug, lang, teams }: TeamsTabProps) {
   const statusOrder = { recruiting: 0, formed: 1, disbanded: 2 };
   const sortedTeams = [...teams].sort(
     (a, b) => (statusOrder[a.status as keyof typeof statusOrder] ?? 3) - (statusOrder[b.status as keyof typeof statusOrder] ?? 3)
