@@ -80,7 +80,8 @@
     "team_size_label": "Team size",
     "solo_allowed": "(solo allowed)",
     "license_label": "License",
-    "ip_label": "IP"
+    "ip_label": "IP",
+    "edit": "Edit Hackathon"
   },
   "stage": {
     "draft": "Draft",

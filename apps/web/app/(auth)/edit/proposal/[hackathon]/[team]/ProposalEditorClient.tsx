@@ -74,27 +74,6 @@ interface ProposalEditorClientProps {
   login: string;
 }
 
-async function uploadFile(
-  file: File,
-  context: string,
-): Promise<{ url: string; filename: string }> {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('context', context);
-
-  const res = await fetch('/api/r2/upload', {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({ error: 'Upload failed' }));
-    throw new Error(data.error || `Upload failed (${res.status})`);
-  }
-
-  return res.json();
-}
-
 export function ProposalEditorClient({
   hackathonSlug,
   teamSlug,
@@ -107,13 +86,6 @@ export function ProposalEditorClient({
     message: string;
     prUrl?: string;
   } | null>(null);
-
-  const handleUpload = useCallback(
-    async (file: File, context: string) => {
-      return uploadFile(file, context);
-    },
-    [],
-  );
 
   const handleSave = useCallback(
     async (contentEn: string, contentZh: string, assets: Asset[]) => {
@@ -250,7 +222,6 @@ export function ProposalEditorClient({
           availableComponents={proposalComponentDefs}
           onSave={handleSave}
           lang="en"
-          onUpload={(file) => handleUpload(file, 'proposal')}
           draftKey={`proposal-draft-${hackathonSlug}-${teamSlug}`}
         />
       </div>

@@ -118,6 +118,7 @@ export default async function HackathonDetailPage({
           <EditHackathonButton
             slug={h.slug}
             organizers={(h.organizers ?? []).map((o: any) => o.github).filter(Boolean)}
+            lang={lang}
           />
         </div>
 
