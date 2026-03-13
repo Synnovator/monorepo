@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getHackathon, listHackathons, listSubmissions, listProfiles } from '@/app/_generated/data';
+import { getHackathon, listHackathons, listSubmissions, listProfiles, getTeamsByHackathon } from '@/app/_generated/data';
 import { t, localize, getCurrentStage, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Timeline } from '@/components/Timeline';
@@ -372,7 +372,7 @@ export default async function HackathonDetailPage({
           {/* Tab 4: Teams */}
           <div data-tab-panel="teams" role="tabpanel" id="panel-teams" aria-labelledby="tab-teams" className="hidden">
             <div className="space-y-8 pt-6">
-              <TeamsTab hackathonSlug={h.slug} stage={stage} lang={lang} />
+              <TeamsTab hackathonSlug={h.slug} stage={stage} lang={lang} teams={getTeamsByHackathon(h.slug) as any} />
             </div>
           </div>
         </div>
