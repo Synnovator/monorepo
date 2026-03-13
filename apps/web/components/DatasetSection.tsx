@@ -53,7 +53,7 @@ function DatasetItem({ dataset: ds, hackathonSlug, lang }: { dataset: Dataset; h
       return;
     }
     try {
-      const res = await fetch('/api/presign', {
+      const res = await fetch('/api/r2/download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: `hackathons/${hackathonSlug}/datasets/${ds.name}` }),
