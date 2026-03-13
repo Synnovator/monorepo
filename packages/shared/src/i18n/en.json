@@ -580,5 +580,30 @@
     "submit_title": "Submit Project",
     "submit_desc": "Join a team, submit your work, earn recognition",
     "cta": "Start Exploring"
+  },
+  "editor": {
+    "save": "Submit Changes",
+    "preview": "Preview",
+    "insertComponent": "Insert Component",
+    "uploadImage": "Upload Image",
+    "uploadPdf": "Upload PDF",
+    "switchLang": "Switch Language",
+    "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?",
+    "imageExceedsLimit": "Image size cannot exceed 5MB",
+    "pdfExceedsLimit": "PDF size cannot exceed 20MB",
+    "submitPr": "Submit PR",
+    "prCreated": "PR Created",
+    "editContent": "Edit Content",
+    "autoSaved": "Auto-saved",
+    "draftDetected": "Unsaved draft detected. Restore it?",
+    "restore": "Restore",
+    "discard": "Discard",
+    "compileError": "MDX Compile Error",
+    "noPermission": "You do not have permission to edit this content",
+    "uploading": "Uploading...",
+    "submitSuccess": "PR created, awaiting review",
+    "description": "Description",
+    "trackDescription": "Track Description",
+    "stageDescription": "Stage Description"
   }
 }
