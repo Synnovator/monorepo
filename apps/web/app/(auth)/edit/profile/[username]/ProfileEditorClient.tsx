@@ -104,28 +104,6 @@ export function ProfileEditorClient({
     prUrl?: string;
   } | null>(null);
 
-  const handleUpload = useCallback(
-    async (file: File, _context: string): Promise<{ url: string; filename: string }> => {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('context', 'profile');
-
-      const res = await fetch('/api/r2/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({ error: 'Upload failed' }));
-        throw new Error(data.error || `Upload failed (${res.status})`);
-      }
-
-      const data = await res.json();
-      return { url: data.url, filename: data.filename };
-    },
-    [],
-  );
-
   const handleSave = useCallback(
     async (contentEn: string, contentZh: string, assets: Asset[]) => {
       setSubmitResult(null);
@@ -259,7 +237,6 @@ export function ProfileEditorClient({
           lang="en"
           templateContent={PROFILE_BIO_TEMPLATE}
           templateContentAlt={PROFILE_BIO_TEMPLATE_ZH}
-          onUpload={handleUpload}
           draftKey={`profile-bio-${username}`}
         />
       </div>

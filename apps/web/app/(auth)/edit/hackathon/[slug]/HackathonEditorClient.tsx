@@ -74,27 +74,6 @@ const hackathonComponentDefs: ComponentDefinition[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Upload handler — POST file to /api/r2/upload
-// ---------------------------------------------------------------------------
-
-async function handleUpload(
-  file: File,
-  context: string,
-): Promise<{ url: string; filename: string }> {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('context', context);
-
-  const res = await fetch('/api/r2/upload', { method: 'POST', body: formData });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({ error: 'Upload failed' }));
-    throw new Error(data.error ?? 'Upload failed');
-  }
-  const data = await res.json();
-  return { url: data.url, filename: data.filename };
-}
-
-// ---------------------------------------------------------------------------
 // Props
 // ---------------------------------------------------------------------------
 
@@ -112,6 +91,20 @@ interface HackathonEditorClientProps {
   descriptionZh: string;
   tracks: TrackInfo[];
   login: string;
+}
+
+// ---------------------------------------------------------------------------
+// Helper — encode asset blob to base64
+// ---------------------------------------------------------------------------
+
+async function assetToBase64(asset: Asset): Promise<string> {
+  const buffer = await asset.blob.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
 }
 
 // ---------------------------------------------------------------------------
@@ -135,6 +128,7 @@ export function HackathonEditorClient({
 
   // -----------------------------------------------------------------------
   // Save handler — collect MDX content and submit PR
+  // MDX content already has blob URLs rewritten to ./assets/ paths by MdxEditor
   // -----------------------------------------------------------------------
   const handleDescriptionSave = React.useCallback(
     async (contentEn: string, contentZh: string, assets: Asset[]) => {
@@ -160,13 +154,7 @@ export function HackathonEditorClient({
 
         // Add asset files as base64
         for (const asset of assets) {
-          const buffer = await asset.blob.arrayBuffer();
-          const bytes = new Uint8Array(buffer);
-          let binary = '';
-          for (let i = 0; i < bytes.length; i++) {
-            binary += String.fromCharCode(bytes[i]);
-          }
-          const base64 = btoa(binary);
+          const base64 = await assetToBase64(asset);
           files.push({
             path: `hackathons/${slug}/assets/${asset.filename}`,
             base64Content: base64,
@@ -200,11 +188,6 @@ export function HackathonEditorClient({
       }
     },
     [slug],
-  );
-
-  const uploadHandler = React.useCallback(
-    (file: File, context: string) => handleUpload(file, context),
-    [],
   );
 
   return (
@@ -266,7 +249,6 @@ export function HackathonEditorClient({
               availableComponents={hackathonComponentDefs}
               onSave={handleDescriptionSave}
               lang="en"
-              onUpload={uploadHandler}
               draftKey={`editor-hackathon-${slug}-description`}
             />
           </div>
@@ -306,13 +288,7 @@ export function HackathonEditorClient({
                     ];
 
                     for (const asset of assets) {
-                      const buffer = await asset.blob.arrayBuffer();
-                      const bytes = new Uint8Array(buffer);
-                      let binary = '';
-                      for (let i = 0; i < bytes.length; i++) {
-                        binary += String.fromCharCode(bytes[i]);
-                      }
-                      const base64 = btoa(binary);
+                      const base64 = await assetToBase64(asset);
                       files.push({
                         path: `hackathons/${slug}/assets/${asset.filename}`,
                         base64Content: base64,
@@ -345,7 +321,6 @@ export function HackathonEditorClient({
                   }
                 }}
                 lang="en"
-                onUpload={uploadHandler}
                 draftKey={`editor-hackathon-${slug}-track-${track.slug}`}
               />
             </div>

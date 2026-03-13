@@ -17,6 +17,18 @@ interface DraftData {
   savedAt: number
 }
 
+/**
+ * Rewrite blob:// URLs in MDX content to relative ./assets/ paths.
+ * This converts preview-only blob URLs to Git-committable relative paths.
+ */
+function rewriteBlobUrls(content: string, assets: Asset[]): string {
+  let result = content
+  for (const asset of assets) {
+    result = result.replaceAll(asset.tempUrl, `./assets/${asset.filename}`)
+  }
+  return result
+}
+
 function MdxEditor({
   initialContent,
   initialContentAlt = '',
@@ -25,7 +37,6 @@ function MdxEditor({
   lang: initialLang,
   templateContent,
   templateContentAlt,
-  onUpload,
   draftKey,
 }: MdxEditorProps) {
   const { resolvedTheme } = useTheme()
@@ -196,11 +207,13 @@ function MdxEditor({
     [handleInsert, handleAssetAdded]
   )
 
-  // Save handler
+  // Save handler — rewrites blob URLs to ./assets/ paths before calling onSave
   const handleSave = React.useCallback(async () => {
     setSaving(true)
     try {
-      await onSave(contentEn, contentZh, assets)
+      const finalEn = rewriteBlobUrls(contentEn, assets)
+      const finalZh = rewriteBlobUrls(contentZh, assets)
+      await onSave(finalEn, finalZh, assets)
       setHasUnsavedChanges(false)
       clearDraft()
     } catch (err) {
@@ -238,7 +251,6 @@ function MdxEditor({
             ref={editorRef}
             value={currentContent}
             onChange={handleContentChange}
-            onUpload={onUpload}
             onAssetAdded={handleAssetAdded}
             theme={editorTheme}
           />
@@ -253,9 +265,7 @@ function MdxEditor({
       {/* Hidden file input for image upload */}
       <ImageUploader
         ref={uploaderRef}
-        onUpload={onUpload}
         onInserted={handleImageInserted}
-        context="editor-toolbar"
       />
     </div>
   )

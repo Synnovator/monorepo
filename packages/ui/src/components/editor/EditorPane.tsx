@@ -7,11 +7,11 @@ import { LanguageDescription } from '@codemirror/language'
 import { EditorView } from '@codemirror/view'
 import { ScrollArea } from '../scroll-area'
 import type { Asset } from './types'
+import { generateAssetFilename } from './types'
 
 export interface EditorPaneProps {
   value: string
   onChange: (value: string) => void
-  onUpload?: (file: File, context: string) => Promise<{ url: string; filename: string }>
   onAssetAdded?: (asset: Asset) => void
   theme?: 'light' | 'dark'
 }
@@ -69,9 +69,19 @@ function createEditorTheme(isDark: boolean) {
 }
 
 const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
+const ALLOWED_TYPES = [...IMAGE_TYPES, 'application/pdf']
+
+function processFile(file: File): { asset: Asset; markdown: string } {
+  const filename = generateAssetFilename(file)
+  const tempUrl = URL.createObjectURL(file)
+  const asset: Asset = { filename, blob: file, tempUrl }
+  const isImage = IMAGE_TYPES.includes(file.type)
+  const md = isImage ? `![${filename}](${tempUrl})` : `[${filename}](${tempUrl})`
+  return { asset, markdown: md }
+}
 
 const EditorPane = React.forwardRef<EditorPaneHandle, EditorPaneProps>(
-  ({ value, onChange, onUpload, onAssetAdded, theme = 'light' }, ref) => {
+  ({ value, onChange, onAssetAdded, theme = 'light' }, ref) => {
     const cmRef = React.useRef<ReactCodeMirrorRef>(null)
     const isDark = theme === 'dark'
 
@@ -111,45 +121,38 @@ const EditorPane = React.forwardRef<EditorPaneHandle, EditorPaneProps>(
       },
     }))
 
+    const insertAtCursor = React.useCallback((text: string) => {
+      const view = cmRef.current?.view
+      if (!view) return
+      const pos = view.state.selection.main.head
+      view.dispatch({
+        changes: { from: pos, insert: text },
+      })
+    }, [])
+
     const handleDrop = React.useCallback(
-      async (e: React.DragEvent) => {
-        if (!onUpload || !onAssetAdded) return
+      (e: React.DragEvent) => {
+        if (!onAssetAdded) return
 
         const files = Array.from(e.dataTransfer.files).filter(
-          (f) => IMAGE_TYPES.includes(f.type) || f.type === 'application/pdf'
+          (f) => ALLOWED_TYPES.includes(f.type)
         )
         if (files.length === 0) return
 
         e.preventDefault()
 
         for (const file of files) {
-          try {
-            const { url, filename } = await onUpload(file, 'editor-drop')
-            const tempUrl = URL.createObjectURL(file)
-            const asset: Asset = { filename, blob: file, tempUrl }
-            onAssetAdded(asset)
-
-            const isImage = IMAGE_TYPES.includes(file.type)
-            const mdText = isImage ? `![${filename}](${url})` : `[${filename}](${url})`
-
-            const view = cmRef.current?.view
-            if (view) {
-              const pos = view.state.selection.main.head
-              view.dispatch({
-                changes: { from: pos, insert: `\n${mdText}\n` },
-              })
-            }
-          } catch (err) {
-            console.error('Upload failed:', err)
-          }
+          const { asset, markdown: md } = processFile(file)
+          onAssetAdded(asset)
+          insertAtCursor(`\n${md}\n`)
         }
       },
-      [onUpload, onAssetAdded]
+      [onAssetAdded, insertAtCursor]
     )
 
     const handlePaste = React.useCallback(
-      async (e: React.ClipboardEvent) => {
-        if (!onUpload || !onAssetAdded) return
+      (e: React.ClipboardEvent) => {
+        if (!onAssetAdded) return
 
         const items = Array.from(e.clipboardData.items)
         const imageItems = items.filter((item) => IMAGE_TYPES.includes(item.type))
@@ -162,27 +165,12 @@ const EditorPane = React.forwardRef<EditorPaneHandle, EditorPaneProps>(
           const file = item.getAsFile()
           if (!file) continue
 
-          try {
-            const { url, filename } = await onUpload(file, 'editor-paste')
-            const tempUrl = URL.createObjectURL(file)
-            const asset: Asset = { filename, blob: file, tempUrl }
-            onAssetAdded(asset)
-
-            const mdText = `![${filename}](${url})`
-
-            const view = cmRef.current?.view
-            if (view) {
-              const pos = view.state.selection.main.head
-              view.dispatch({
-                changes: { from: pos, insert: mdText },
-              })
-            }
-          } catch (err) {
-            console.error('Paste upload failed:', err)
-          }
+          const { asset, markdown: md } = processFile(file)
+          onAssetAdded(asset)
+          insertAtCursor(md)
         }
       },
-      [onUpload, onAssetAdded]
+      [onAssetAdded, insertAtCursor]
     )
 
     return (

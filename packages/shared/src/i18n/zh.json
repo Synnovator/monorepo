@@ -80,7 +80,8 @@
     "team_size_label": "团队规模",
     "solo_allowed": "（允许个人参赛）",
     "license_label": "许可证",
-    "ip_label": "知识产权"
+    "ip_label": "知识产权",
+    "edit": "编辑活动"
   },
   "stage": {
     "draft": "筹备中",
