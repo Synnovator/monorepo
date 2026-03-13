@@ -687,7 +687,8 @@ export interface DataProvider {
   listHackathons(): Hackathon[]
   getHackathon(slug: string): Hackathon | null
   listProfiles(): Profile[]
-  getProfile(github: string): Profile | null
+  getProfile(github: string): Profile | null            // 按 hacker.github 查找
+  getProfileByFilestem(filestem: string): Profile | null // 按文件名 stem 查找
   listSubmissions(): SubmissionWithMeta[]
   getResults(hackathonSlug: string): any[]
 
@@ -698,6 +699,12 @@ export interface DataProvider {
   getSubmissionMdx(hackathonSlug: string, teamSlug: string, lang: Lang): SerializedMDX | null
   getProfileMdx(filestem: string, lang: Lang): SerializedMDX | null
 }
+
+// 注：Profile 有两种标识符：
+// - github: hacker.github 字段（如 "allenwoods"），用于业务逻辑查找
+// - filestem: YAML 文件名去掉 .yml（如 "lin-xiaohui-c3d4e5f6"），用于文件系统定位
+// getProfile(github) 用于权限校验等场景
+// getProfileByFilestem(filestem) + getProfileMdx(filestem) 用于文件关联
 ```
 
 ### 两种实现
