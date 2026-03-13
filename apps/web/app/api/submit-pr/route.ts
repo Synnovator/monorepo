@@ -12,6 +12,16 @@ const FILENAME_PATTERNS: RegExp[] = [
   /^hackathons\/[a-z0-9-]+\/hackathon\.yml$/,
   /^hackathons\/[a-z0-9-]+\/submissions\/[a-z0-9-]+\/project\.yml$/,
   /^profiles\/[a-z0-9][\w.-]*\.yml$/,
+  // MDX content
+  /^hackathons\/[a-z0-9-]+\/description(\.zh)?\.mdx$/,
+  /^hackathons\/[a-z0-9-]+\/tracks\/[a-z0-9-]+(\.zh)?\.mdx$/,
+  /^hackathons\/[a-z0-9-]+\/stages\/(draft|registration|development|submission|judging|announcement|award)(\.zh)?\.mdx$/,
+  /^hackathons\/[a-z0-9-]+\/submissions\/[a-z0-9-]+\/README(\.zh)?\.mdx$/,
+  /^profiles\/[a-z0-9][\w.-]*\/bio(\.zh)?\.mdx$/,
+  // Assets
+  /^hackathons\/[a-z0-9-]+\/assets\/[a-z0-9._-]+\.(png|jpg|jpeg|gif|webp|pdf)$/i,
+  /^hackathons\/[a-z0-9-]+\/submissions\/[a-z0-9-]+\/assets\/[a-z0-9._-]+\.(png|jpg|jpeg|gif|webp|pdf)$/i,
+  /^profiles\/[a-z0-9][\w.-]*\/assets\/[a-z0-9._-]+\.(png|jpg|jpeg|gif|webp|pdf)$/i,
 ];
 
 const BRANCH_PREFIX: Record<SubmitType, string> = {
@@ -20,14 +30,86 @@ const BRANCH_PREFIX: Record<SubmitType, string> = {
   profile: 'data/create-profile',
 };
 
-/** Base64-encode a UTF-8 string (works in both Node.js and Cloudflare Workers). */
-function toBase64(str: string): string {
-  const bytes = new TextEncoder().encode(str);
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
+interface FileEntry {
+  path: string;
+  content?: string;       // text content (YAML, MDX)
+  base64Content?: string; // binary content (images, PDFs)
+}
+
+async function commitMultipleFiles(
+  octokit: any,
+  params: {
+    owner: string;
+    repo: string;
+    branchName: string;
+    files: FileEntry[];
+    commitMessage: string;
+  },
+) {
+  const { owner, repo, branchName, files, commitMessage } = params;
+
+  // Get the current commit SHA of the branch
+  const { data: refData } = await octokit.git.getRef({
+    owner,
+    repo,
+    ref: `heads/${branchName}`,
+  });
+  const baseSha = refData.object.sha;
+
+  // Build tree entries
+  const treeEntries = await Promise.all(
+    files.map(async (file) => {
+      if (file.base64Content) {
+        // Binary file — create blob first
+        const { data: blob } = await octokit.git.createBlob({
+          owner,
+          repo,
+          content: file.base64Content,
+          encoding: 'base64',
+        });
+        return {
+          path: file.path,
+          mode: '100644' as const,
+          type: 'blob' as const,
+          sha: blob.sha,
+        };
+      }
+      // Text file — inline content
+      return {
+        path: file.path,
+        mode: '100644' as const,
+        type: 'blob' as const,
+        content: file.content!,
+      };
+    }),
+  );
+
+  // Create tree
+  const { data: tree } = await octokit.git.createTree({
+    owner,
+    repo,
+    base_tree: baseSha,
+    tree: treeEntries,
+  });
+
+  // Create commit
+  const { data: commit } = await octokit.git.createCommit({
+    owner,
+    repo,
+    message: commitMessage,
+    tree: tree.sha,
+    parents: [baseSha],
+  });
+
+  // Update branch ref
+  await octokit.git.updateRef({
+    owner,
+    repo,
+    ref: `heads/${branchName}`,
+    sha: commit.sha,
+  });
+
+  return commit;
 }
 
 export async function POST(request: NextRequest) {
@@ -39,26 +121,63 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Parse + validate
-    let body: { type: string; filename: string; content: string; slug: string };
+    let body: {
+      type: string;
+      slug: string;
+      // Old format
+      filename?: string;
+      content?: string;
+      // New format
+      files?: FileEntry[];
+    };
     try {
       body = await request.json();
     } catch {
       return NextResponse.json({ error: 'invalid JSON' }, { status: 400 });
     }
 
-    const { type, filename, content, slug } = body;
+    const { type, slug } = body;
 
     if (!VALID_TYPES.includes(type as SubmitType)) {
       return NextResponse.json({ error: 'invalid type' }, { status: 400 });
     }
-    if (!filename || !FILENAME_PATTERNS.some(p => p.test(filename))) {
-      return NextResponse.json({ error: 'invalid filename' }, { status: 400 });
-    }
-    if (!content?.trim()) {
-      return NextResponse.json({ error: 'empty content' }, { status: 400 });
-    }
     if (!slug?.trim()) {
       return NextResponse.json({ error: 'missing slug' }, { status: 400 });
+    }
+
+    // Normalize to files array (support both old and new format)
+    let files: FileEntry[];
+    if (body.files && Array.isArray(body.files)) {
+      // New format
+      files = body.files;
+    } else if (body.filename && body.content !== undefined) {
+      // Old format — convert to single-element files array
+      files = [{ path: body.filename, content: body.content }];
+    } else {
+      return NextResponse.json(
+        { error: 'must provide either "files" array or "filename"+"content"' },
+        { status: 400 },
+      );
+    }
+
+    if (files.length === 0) {
+      return NextResponse.json({ error: 'files array is empty' }, { status: 400 });
+    }
+
+    // Validate each file path
+    for (const file of files) {
+      if (!file.path || !FILENAME_PATTERNS.some((p) => p.test(file.path))) {
+        return NextResponse.json(
+          { error: `invalid filename: ${file.path}` },
+          { status: 400 },
+        );
+      }
+      if (!file.content?.trim() && !file.base64Content?.trim()) {
+        return NextResponse.json(
+          { error: `empty content for file: ${file.path}` },
+          { status: 400 },
+        );
+      }
     }
 
     // 3. Check required env vars
@@ -95,7 +214,8 @@ export async function POST(request: NextRequest) {
     let branchName = `${BRANCH_PREFIX[submitType]}-${slug}`;
     try {
       await octokit.git.createRef({
-        owner: OWNER, repo: REPO,
+        owner: OWNER,
+        repo: REPO,
         ref: `refs/heads/${branchName}`,
         sha: mainSha,
       });
@@ -104,7 +224,8 @@ export async function POST(request: NextRequest) {
       if (status === 422) {
         branchName = `${branchName}-${Math.floor(Date.now() / 1000)}`;
         await octokit.git.createRef({
-          owner: OWNER, repo: REPO,
+          owner: OWNER,
+          repo: REPO,
           ref: `refs/heads/${branchName}`,
           sha: mainSha,
         });
@@ -113,28 +234,37 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 5c. Commit file
+    // 5c. Commit files via Git Tree API
     const commitMessage =
-      submitType === 'hackathon' ? `feat(hackathons): create ${slug}` :
-      submitType === 'proposal' ? `feat(submissions): submit ${slug}` :
-      `feat(profiles): create profile for ${session.login}`;
+      submitType === 'hackathon'
+        ? `feat(hackathons): create ${slug}`
+        : submitType === 'proposal'
+          ? `feat(submissions): submit ${slug}`
+          : `feat(profiles): create profile for ${session.login}`;
 
-    await octokit.repos.createOrUpdateFileContents({
-      owner: OWNER, repo: REPO,
-      path: filename,
-      message: commitMessage,
-      content: toBase64(content),
-      branch: branchName,
+    await commitMultipleFiles(octokit, {
+      owner: OWNER,
+      repo: REPO,
+      branchName,
+      files,
+      commitMessage,
     });
 
     // 5d. Create PR
+    const filePaths = files.map((f) => f.path);
+    const filesSummary =
+      filePaths.length === 1
+        ? `**File:** \`${filePaths[0]}\``
+        : `**Files:**\n${filePaths.map((p) => `- \`${p}\``).join('\n')}`;
+
     const { data: pr } = await octokit.pulls.create({
-      owner: OWNER, repo: REPO,
+      owner: OWNER,
+      repo: REPO,
       title: commitMessage,
       body: [
         `Submitted by @${session.login}`,
         '',
-        `**File:** \`${filename}\``,
+        filesSummary,
         '',
         '---',
         '> Auto-created via [Synnovator Platform](https://home.synnovator.space)',
