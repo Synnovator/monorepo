@@ -49,7 +49,7 @@ export default async function ProjectDetailPage({
 
   // Look up team by team_ref
   const allTeams = listTeams();
-  const teamData = allTeams.find(t => t._slug === (project as any).team_ref);
+  const teamData = allTeams.find(t => t._slug === project.team_ref);
   const teamMembers = teamData
     ? [{ github: teamData.leader, role: 'leader' }, ...teamData.members]
     : [];
