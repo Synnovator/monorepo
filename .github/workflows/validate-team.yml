@@ -1,92 +1,155 @@
-name: Validate Team Formation
-
+name: Validate Team
 on:
-  issues:
-    types: [opened, edited, labeled]
+  pull_request:
+    paths:
+      - 'teams/**'
 
 jobs:
-  validate:
-    if: |
-      contains(github.event.issue.labels.*.name, 'team-formation') &&
-      (github.event.action != 'labeled' || github.event.label.name == 'team-formation')
+  validate-team:
     runs-on: ubuntu-latest
     permissions:
-      issues: write
       contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
+      - name: Find changed team files
+        id: changed
+        run: |
+          files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} -- 'teams/*/team.yml')
+          echo "files=$files" >> "$GITHUB_OUTPUT"
+          if [ -z "$files" ]; then
+            echo "No team.yml changes found"
+            exit 0
+          fi
+
       - uses: actions/setup-node@v4
+        if: steps.changed.outputs.files != ''
         with:
-          node-version: 22
+          node-version: '22'
 
-      - run: npm install js-yaml
+      - name: Install dependencies
+        if: steps.changed.outputs.files != ''
+        run: npm install js-yaml
 
-      - name: Parse and validate team formation
+      - name: Validate team YAML
+        if: steps.changed.outputs.files != ''
         uses: actions/github-script@v7
         with:
           script: |
+            const yaml = require('js-yaml');
             const fs = require('fs');
-            const yaml = require('./node_modules/js-yaml');
-            const issue = context.payload.issue;
-            const title = issue.title;
-            const body = issue.body || '';
-            const author = issue.user.login;
+            const path = require('path');
+
+            const files = `${{ steps.changed.outputs.files }}`.trim().split('\n').filter(Boolean);
             const errors = [];
+            const prAuthor = context.payload.pull_request.user.login;
 
-            // 1. Parse title: [Team] {team-name} — {hackathon-slug}
-            const titleMatch = title.match(/\[Team\]\s*(.*?)\s*—\s*(.*)/);
-            if (!titleMatch) {
-              errors.push('Issue title must match: `[Team] {team-name} — {hackathon-slug}`');
-            }
-            const [, teamName, slug] = titleMatch || [null, '', ''];
-            const trimmedSlug = slug.trim();
-            const trimmedTeam = teamName.trim();
+            for (const file of files) {
+              try {
+                const content = fs.readFileSync(file, 'utf-8');
+                const team = yaml.load(content);
 
-            if (trimmedSlug) {
-              // 2. Verify hackathon exists
-              const hackathonPath = `hackathons/${trimmedSlug}/hackathon.yml`;
-              if (!fs.existsSync(hackathonPath)) {
-                errors.push(`Hackathon not found: \`${trimmedSlug}\``);
-              } else {
-                const data = yaml.load(fs.readFileSync(hackathonPath, 'utf8'));
-                const h = data.hackathon;
+                // Schema version check
+                if (!team.synnovator_team) {
+                  errors.push(`${file}: missing synnovator_team version`);
+                  continue;
+                }
 
-                // 3. Validate track if specified in body
-                const trackField = body.match(/### Track Slug\s*\n\s*(.+)/);
-                const bodyTrack = trackField ? trackField[1].trim() : '';
-
-                if (bodyTrack) {
-                  const tracks = (h.tracks || []).map(t => t.slug);
-                  if (!tracks.includes(bodyTrack)) {
-                    errors.push(`Track not found: \`${bodyTrack}\`. Available tracks: ${tracks.join(', ')}`);
+                // Required fields
+                for (const field of ['name', 'status', 'leader', 'members', 'created_at']) {
+                  if (team[field] === undefined) {
+                    errors.push(`${file}: missing required field '${field}'`);
                   }
                 }
+
+                // Status enum
+                if (!['recruiting', 'formed', 'disbanded'].includes(team.status)) {
+                  errors.push(`${file}: invalid status '${team.status}'`);
+                }
+
+                // Member role enum
+                const validRoles = ['developer', 'product', 'designer', 'marketing', 'researcher'];
+                for (const member of (team.members || [])) {
+                  if (!member.github || !member.role || !member.joined_at) {
+                    errors.push(`${file}: member missing required fields`);
+                  }
+                  if (member.role && !validRoles.includes(member.role)) {
+                    errors.push(`${file}: invalid member role '${member.role}'`);
+                  }
+                }
+
+                // Leader profile exists
+                const leaderProfile = findProfile(team.leader);
+                if (!leaderProfile) {
+                  errors.push(`${file}: leader '${team.leader}' has no profile`);
+                }
+
+                // For member additions: check one-person-one-team
+                for (const member of (team.members || [])) {
+                  const memberProfile = findProfile(member.github);
+                  if (memberProfile) {
+                    const profileContent = fs.readFileSync(memberProfile, 'utf-8');
+                    const profile = yaml.load(profileContent);
+                    if (profile?.hacker?.team && profile.hacker.team !== path.basename(path.dirname(file))) {
+                      errors.push(`${file}: member '${member.github}' already in team '${profile.hacker.team}'`);
+                    }
+                  }
+                }
+
+                // For hackathon registrations: check hackathon exists and team size
+                for (const reg of (team.hackathons || [])) {
+                  const hackathonFile = `hackathons/${reg.hackathon}/hackathon.yml`;
+                  if (!fs.existsSync(hackathonFile)) {
+                    errors.push(`${file}: hackathon '${reg.hackathon}' not found`);
+                    continue;
+                  }
+                  const hackathon = yaml.load(fs.readFileSync(hackathonFile, 'utf-8'));
+                  const teamSize = hackathon?.hackathon?.eligibility?.team_size;
+                  if (teamSize) {
+                    const totalMembers = 1 + (team.members || []).length; // leader + members
+                    if (teamSize.max && totalMembers > teamSize.max) {
+                      errors.push(`${file}: team size ${totalMembers} exceeds max ${teamSize.max} for hackathon '${reg.hackathon}'`);
+                    }
+                    if (teamSize.min && totalMembers < teamSize.min) {
+                      errors.push(`${file}: team size ${totalMembers} below min ${teamSize.min} for hackathon '${reg.hackathon}'`);
+                    }
+                  }
+                }
+
+              } catch (e) {
+                errors.push(`${file}: YAML parse error — ${e.message}`);
               }
             }
 
-            // Report results
-            if (errors.length > 0) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: `❌ **Team formation validation failed:**\n\n${errors.map(e => `- ${e}`).join('\n')}\n\nPlease fix and re-edit this issue.`,
-              });
-            } else {
-              // 4. Add routing label
-              await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                labels: [`hackathon:${trimmedSlug}`],
-              });
+            function findProfile(github) {
+              const profilesDir = 'profiles';
+              try {
+                const files = fs.readdirSync(profilesDir);
+                for (const f of files) {
+                  if (!f.endsWith('.yml') || f.startsWith('_')) continue;
+                  try {
+                    const content = fs.readFileSync(path.join(profilesDir, f), 'utf-8');
+                    const profile = yaml.load(content);
+                    if (profile?.hacker?.github === github) return path.join(profilesDir, f);
+                  } catch {}
+                }
+              } catch {}
+              return null;
+            }
 
-              // 5. Post welcome comment
+            if (errors.length > 0) {
+              const body = `## ❌ Team Validation Failed\n\n${errors.map(e => `- ${e}`).join('\n')}`;
               await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: `✅ **Team formation post validated.** Looking to join? Comment below.\n\nTeam: \`${trimmedTeam}\`\nHackathon: \`${trimmedSlug}\``,
+                ...context.repo,
+                issue_number: context.payload.pull_request.number,
+                body,
+              });
+              core.setFailed(`Validation failed with ${errors.length} error(s)`);
+            } else {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: context.payload.pull_request.number,
+                body: '## ✅ Team Validation Passed',
               });
             }
