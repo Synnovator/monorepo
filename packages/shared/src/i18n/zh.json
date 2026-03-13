@@ -567,5 +567,30 @@
     "submit_title": "提交项目",
     "submit_desc": "组队参赛，提交作品，赢得认可",
     "cta": "开始探索"
+  },
+  "editor": {
+    "save": "提交更改",
+    "preview": "预览",
+    "insertComponent": "插入组件",
+    "uploadImage": "上传图片",
+    "uploadPdf": "上传 PDF",
+    "switchLang": "切换语言",
+    "unsavedChanges": "有未保存的更改，确定离开？",
+    "imageExceedsLimit": "图片大小不能超过 5MB",
+    "pdfExceedsLimit": "PDF 大小不能超过 20MB",
+    "submitPr": "提交 PR",
+    "prCreated": "PR 已创建",
+    "editContent": "编辑内容",
+    "autoSaved": "已自动保存",
+    "draftDetected": "检测到未提交的草稿，是否恢复？",
+    "restore": "恢复",
+    "discard": "放弃",
+    "compileError": "MDX 编译错误",
+    "noPermission": "你没有编辑此内容的权限",
+    "uploading": "上传中...",
+    "submitSuccess": "PR 已创建，等待审核",
+    "description": "活动描述",
+    "trackDescription": "赛道描述",
+    "stageDescription": "阶段描述"
   }
 }
