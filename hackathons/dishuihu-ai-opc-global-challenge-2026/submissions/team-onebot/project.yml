@@ -13,7 +13,7 @@ project:
     repo: "https://github.com/team-onebot/onebot-studio"
     document:
       local_path: ""
-      r2_url: ""
+      url: ""
     video: ""
 
   tech_stack: ["TypeScript", "React", "Cloudflare Workers", "D1", "Claude API", "Stripe"]

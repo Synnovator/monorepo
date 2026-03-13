@@ -14,7 +14,7 @@ project:
     repo: "https://github.com/team-refuse-zero/fintech-risk-model"
     document:
       local_path: ""
-      r2_url: ""
+      url: ""
     video: "https://example.com/demo-video"
 
   tech_stack: ["Python", "XGBoost", "LightGBM", "scikit-learn", "pandas"]

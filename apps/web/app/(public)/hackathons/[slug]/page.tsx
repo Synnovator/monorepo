@@ -236,7 +236,7 @@ export default async function HackathonDetailPage({
                 <Separator />
                 <section className="mt-12 mb-8">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.datasets')}</h2>
-                  <DatasetSection datasets={h.datasets as any} hackathonSlug={h.slug} lang={lang} />
+                  <DatasetSection datasets={h.datasets as any} lang={lang} />
                 </section>
                 </>
               )}
@@ -288,7 +288,6 @@ export default async function HackathonDetailPage({
                     {t(lang, 'hackathon.nda_sign')}
                   </h2>
                   <NDASignForm
-                    hackathonSlug={h.slug}
                     ndaDocumentUrl={h.legal.nda.document_url}
                     ndaSummary={h.legal.nda.summary}
                     lang={lang}

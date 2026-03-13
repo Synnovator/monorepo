@@ -14,7 +14,7 @@ export const submissionDeliverablesSchema = z.object({
   video: z.string().optional(),
   document: z.object({
     local_path: z.string().optional(),
-    r2_url: z.string().optional(),
+    url: z.string().optional(),
   }).optional(),
 });
 
