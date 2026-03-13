@@ -56,7 +56,7 @@ Layer 4 (Finalization) ── depends on Layer 3
 ```
 # DataProvider & types
 packages/shared/src/data/provider.ts              # DataProvider interface + SerializedMDX type
-packages/shared/src/data/static-provider.ts        # StaticDataProvider implementation
+apps/web/lib/static-provider.ts                    # StaticDataProvider (imports from _generated/)
 packages/shared/src/data/fs-provider.ts            # FsDataProvider implementation
 
 # MDX custom components (packages/ui)
@@ -108,6 +108,7 @@ config/templates/profile/bio.zh.mdx
 .github/workflows/validate-mdx.yml
 .github/workflows/r2-cleanup.yml
 scripts/validate-mdx.mjs
+scripts/r2-cleanup.mjs
 
 # Data provider entry point
 apps/web/lib/data.ts
@@ -116,7 +117,7 @@ apps/web/lib/data.ts
 ### Existing files to modify
 
 ```
-packages/ui/package.json                           # add @mdx-js/mdx, codemirror deps
+packages/ui/package.json                           # add @mdx-js/mdx, codemirror, recma deps
 packages/shared/package.json                       # add @mdx-js/mdx
 packages/shared/src/i18n/zh.json                   # add editor.* keys
 packages/shared/src/i18n/en.json                   # add editor.* keys
@@ -144,12 +145,13 @@ apps/web/components/forms/ProfileCreateForm.tsx     # add template files to PR
 **Files:**
 - Modify: `packages/ui/package.json`
 - Modify: `packages/shared/package.json`
-- Modify: `apps/web/package.json`
+
+> `apps/web` gets `@mdx-js/mdx` transitively from `packages/ui`; no direct install needed.
 
 - [ ] **Step 1: Add dependencies to packages/ui**
 
 ```bash
-cd packages/ui && pnpm add @mdx-js/mdx remark-gfm rehype-highlight @uiw/react-codemirror @codemirror/lang-markdown @codemirror/lang-javascript
+cd packages/ui && pnpm add @mdx-js/mdx remark-gfm rehype-highlight recma-no-import-export @uiw/react-codemirror @codemirror/lang-markdown @codemirror/lang-javascript
 ```
 
 - [ ] **Step 2: Add dependencies to packages/shared**
@@ -191,6 +193,7 @@ Create `packages/shared/src/data/provider.ts`:
 ```typescript
 import type { Hackathon } from '../schemas/hackathon';
 import type { Profile } from '../schemas/profile';
+import type { SubmissionWithMeta } from './readers/submissions';
 import type { Lang } from '../i18n';
 
 /**
@@ -200,28 +203,12 @@ import type { Lang } from '../i18n';
  */
 export type SerializedMDX = string;
 
-export interface SubmissionWithMeta {
-  _hackathonSlug: string;
-  _teamSlug: string;
-  synnovator_submission: string;
-  project: {
-    name: string;
-    name_zh?: string;
-    tagline?: string;
-    tagline_zh?: string;
-    track: string;
-    team: Array<{ github: string; role?: string }>;
-    deliverables?: Record<string, unknown>;
-    tech_stack?: string[];
-    description?: string;
-    description_zh?: string;
-    likes?: number;
-  };
-}
+// Re-export for convenience (canonical definition is in ./readers/submissions)
+export type { SubmissionWithMeta };
 
 /**
  * Unified data access interface.
- * Two implementations: StaticDataProvider (Cloudflare Workers) and FsDataProvider (Node.js).
+ * Two implementations: StaticDataProvider (apps/web) and FsDataProvider (Node.js).
  */
 export interface DataProvider {
   // YAML data
@@ -242,18 +229,22 @@ export interface DataProvider {
 }
 ```
 
+> **Note:** `SubmissionWithMeta` is already defined in `./readers/submissions.ts` — do NOT duplicate it.
+> Import and re-export instead.
+
 - [ ] **Step 2: Export from data index**
 
 Add to `packages/shared/src/data/index.ts`:
 
 ```typescript
-export type { DataProvider, SerializedMDX, SubmissionWithMeta } from './provider';
+export type { DataProvider, SerializedMDX } from './provider';
+// SubmissionWithMeta is already exported from ./readers
 ```
 
-- [ ] **Step 3: Verify build**
+- [ ] **Step 3: Verify TypeScript**
 
-Run: `pnpm --filter @synnovator/shared build`
-Expected: Build succeeds
+Run: `pnpm --filter @synnovator/shared test`
+Expected: All tests pass (shared has no build script — Vitest validates TS compilation)
 
 - [ ] **Step 4: Commit**
 
@@ -369,7 +360,7 @@ git commit -m "feat(i18n): add editor translation keys (zh + en)"
 Create `config/templates/hackathon/description.mdx`:
 
 ```mdx
-# About {hackathon-name}
+# About __HACKATHON_NAME__
 
 {/* Describe the hackathon's background, goals, and highlights */}
 
@@ -400,7 +391,7 @@ Create `config/templates/hackathon/description.mdx`:
 Create `config/templates/hackathon/description.zh.mdx`:
 
 ```mdx
-# 关于 {hackathon-name}
+# 关于 __HACKATHON_NAME__
 
 {/* 请在此介绍活动的背景、目标和亮点 */}
 
@@ -431,7 +422,7 @@ Create `config/templates/hackathon/description.zh.mdx`:
 Create `config/templates/hackathon/track.mdx`:
 
 ```mdx
-# {track-name}
+# __TRACK_NAME__
 
 {/* Describe this track's theme, goals, and evaluation criteria */}
 
@@ -447,7 +438,7 @@ Create `config/templates/hackathon/track.mdx`:
 Create `config/templates/hackathon/track.zh.mdx`:
 
 ```mdx
-# {track-name}
+# __TRACK_NAME__
 
 {/* 描述此赛道的主题、目标和评审标准 */}
 
@@ -465,7 +456,7 @@ Create `config/templates/hackathon/track.zh.mdx`:
 Create `config/templates/hackathon/stage.mdx`:
 
 ```mdx
-# {stage-name}
+# __STAGE_NAME__
 
 {/* Describe what happens during this stage */}
 
@@ -473,8 +464,8 @@ Create `config/templates/hackathon/stage.mdx`:
 
 <Timeline
   items={[
-    { date: "{start-date}", label: "Start", status: "upcoming" },
-    { date: "{end-date}", label: "End", status: "upcoming" },
+    { date: "__START_DATE__", label: "Start", status: "upcoming" },
+    { date: "__END_DATE__", label: "End", status: "upcoming" },
   ]}
 />
 
@@ -486,7 +477,7 @@ Create `config/templates/hackathon/stage.mdx`:
 Create `config/templates/hackathon/stage.zh.mdx`:
 
 ```mdx
-# {stage-name}
+# __STAGE_NAME__
 
 {/* 描述此阶段的活动内容 */}
 
@@ -494,8 +485,8 @@ Create `config/templates/hackathon/stage.zh.mdx`:
 
 <Timeline
   items={[
-    { date: "{start-date}", label: "开始", status: "upcoming" },
-    { date: "{end-date}", label: "结束", status: "upcoming" },
+    { date: "__START_DATE__", label: "开始", status: "upcoming" },
+    { date: "__END_DATE__", label: "结束", status: "upcoming" },
   ]}
 />
 
@@ -509,7 +500,7 @@ Create `config/templates/hackathon/stage.zh.mdx`:
 Create `config/templates/proposal/README.mdx`:
 
 ```mdx
-# {project-name}
+# __PROJECT_NAME__
 
 {/* Describe your project: what problem it solves, how it works */}
 
@@ -525,7 +516,7 @@ Create `config/templates/proposal/README.mdx`:
 
 <TeamRoles
   members={[
-    { github: "{leader-github}", role: "leader", contribution: "" },
+    { github: "__LEADER_GITHUB__", role: "leader", contribution: "" },
   ]}
 />
 
@@ -540,7 +531,7 @@ Create `config/templates/proposal/README.mdx`:
 Create `config/templates/proposal/README.zh.mdx`:
 
 ```mdx
-# {project-name}
+# __PROJECT_NAME__
 
 {/* 描述你的项目：解决什么问题、如何工作 */}
 
@@ -556,7 +547,7 @@ Create `config/templates/proposal/README.zh.mdx`:
 
 <TeamRoles
   members={[
-    { github: "{leader-github}", role: "leader", contribution: "" },
+    { github: "__LEADER_GITHUB__", role: "leader", contribution: "" },
   ]}
 />
 
@@ -647,25 +638,13 @@ Create `packages/ui/src/components/mdx-components/common/Callout.tsx`:
 ```tsx
 import * as React from 'react'
 import { Alert, AlertTitle, AlertDescription } from '../../alert'
+import { InfoIcon, AlertTriangleIcon, LightbulbIcon } from 'lucide-react'
 import { cn } from '../../../lib/utils'
 
-// Lucide icons inlined to avoid dependency on lucide-react in this package
 const icons = {
-  info: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
-    </svg>
-  ),
-  warning: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4" /><path d="M12 17h.01" />
-    </svg>
-  ),
-  tip: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" /><path d="M9 18h6" /><path d="M10 22h4" />
-    </svg>
-  ),
+  info: <InfoIcon className="h-4 w-4" />,
+  warning: <AlertTriangleIcon className="h-4 w-4" />,
+  tip: <LightbulbIcon className="h-4 w-4" />,
 }
 
 const variantMap = {
@@ -821,6 +800,7 @@ Create `packages/ui/src/components/mdx-components/hackathon/Timeline.tsx`:
 ```tsx
 import * as React from 'react'
 import { Badge } from '../../badge'
+import { Separator } from '../../separator'
 import { cn } from '../../../lib/utils'
 
 interface TimelineItem {
@@ -844,8 +824,8 @@ export function Timeline({ items }: TimelineProps) {
 
   return (
     <div className="relative space-y-6 pl-8">
-      {/* Vertical line */}
-      <div className="absolute left-3 top-2 bottom-2 w-px bg-border" />
+      {/* Vertical connector line */}
+      <Separator orientation="vertical" className="absolute left-3 top-2 bottom-2 h-auto" />
 
       {items.map((item, i) => (
         <div key={i} className="relative flex items-start gap-4">
@@ -894,7 +874,7 @@ export function PrizeTable({ prizes }: PrizeTableProps) {
   if (!prizes?.length) return null
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border">
+    <Card className="overflow-hidden">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border bg-muted/50">
@@ -915,7 +895,7 @@ export function PrizeTable({ prizes }: PrizeTableProps) {
           ))}
         </tbody>
       </table>
-    </div>
+    </Card>
   )
 }
 ```
@@ -928,6 +908,7 @@ Create `packages/ui/src/components/mdx-components/hackathon/SponsorGrid.tsx`:
 import * as React from 'react'
 import { Card } from '../../card'
 import { Badge } from '../../badge'
+import { Avatar, AvatarImage, AvatarFallback } from '../../avatar'
 import { cn } from '../../../lib/utils'
 
 interface Sponsor {
@@ -959,13 +940,10 @@ export function SponsorGrid({ sponsors }: SponsorGridProps) {
       {sorted.map((s, i) => {
         const content = (
           <Card key={i} className={cn('flex flex-col items-center gap-3 p-4 transition-all duration-200', s.url && 'hover:border-primary/40')}>
-            {s.logo ? (
-              <img src={s.logo} alt={s.name} className="h-12 w-auto object-contain" loading="lazy" />
-            ) : (
-              <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-lg font-medium text-muted-foreground">
-                {s.name.charAt(0)}
-              </div>
-            )}
+            <Avatar className="h-12 w-12">
+              <AvatarImage src={s.logo} alt={s.name} />
+              <AvatarFallback>{s.name.charAt(0)}</AvatarFallback>
+            </Avatar>
             <span className="text-sm font-medium text-foreground text-center">{s.name}</span>
             <Badge variant={tierVariant[s.tier]}>{s.tier}</Badge>
           </Card>
@@ -1032,6 +1010,7 @@ Create `packages/ui/src/components/mdx-components/proposal/DemoEmbed.tsx`:
 ```tsx
 import * as React from 'react'
 import { Card, CardContent } from '../../card'
+import { Button } from '../../button'
 
 interface DemoEmbedProps {
   url: string
@@ -1057,9 +1036,9 @@ export function DemoEmbed({ url, height = 400, title }: DemoEmbedProps) {
       {title && (
         <div className="flex items-center justify-between px-4 py-2">
           <span className="text-sm text-muted-foreground">{title}</span>
-          <a href={url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:text-primary/80 transition-colors">
-            Open in new tab
-          </a>
+          <Button variant="ghost" size="sm" asChild>
+            <a href={url} target="_blank" rel="noopener noreferrer">Open in new tab</a>
+          </Button>
         </div>
       )}
     </Card>
@@ -1072,10 +1051,12 @@ export function DemoEmbed({ url, height = 400, title }: DemoEmbedProps) {
 Create `packages/ui/src/components/mdx-components/proposal/TeamRoles.tsx`:
 
 ```tsx
+'use client'
+
 import * as React from 'react'
 import { Card } from '../../card'
 import { Badge } from '../../badge'
-import { cn } from '../../../lib/utils'
+import { Avatar, AvatarImage, AvatarFallback } from '../../avatar'
 
 interface TeamMember {
   github: string
@@ -1087,13 +1068,13 @@ interface TeamRolesProps {
   members: TeamMember[]
 }
 
-const roleVariant = {
+const roleVariant: Record<string, 'brand' | 'highlight' | 'info' | 'outline'> = {
   leader: 'brand',
   developer: 'highlight',
   designer: 'info',
   researcher: 'info',
   mentor: 'outline',
-} as const
+}
 
 export function TeamRoles({ members }: TeamRolesProps) {
   if (!members?.length) return null
@@ -1102,18 +1083,16 @@ export function TeamRoles({ members }: TeamRolesProps) {
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {members.map((m) => (
         <Card key={m.github} className="flex items-start gap-3 p-4">
-          <img
-            src={`https://github.com/${m.github}.png?size=80`}
-            alt={m.github}
-            className="h-10 w-10 rounded-full"
-            loading="lazy"
-          />
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={`https://github.com/${m.github}.png?size=80`} alt={m.github} />
+            <AvatarFallback>{m.github.charAt(0).toUpperCase()}</AvatarFallback>
+          </Avatar>
           <div className="flex flex-col gap-1 min-w-0">
             <div className="flex items-center gap-2">
               <a href={`https://github.com/${m.github}`} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-foreground hover:text-primary transition-colors truncate">
                 @{m.github}
               </a>
-              <Badge variant={(roleVariant as Record<string, string>)[m.role] as any || 'outline'}>{m.role}</Badge>
+              <Badge variant={roleVariant[m.role] ?? 'outline'}>{m.role}</Badge>
             </div>
             {m.contribution && <p className="text-xs text-muted-foreground">{m.contribution}</p>}
           </div>
@@ -1237,26 +1216,7 @@ export function SkillBadges({ skills }: SkillBadgesProps) {
 Create `packages/ui/src/components/mdx-components/index.ts`:
 
 ```typescript
-// Common components (available in all scenes)
-export { Callout } from './common/Callout'
-export { ImageGallery } from './common/ImageGallery'
-export { Video } from './common/Video'
-
-// Hackathon components
-export { Timeline } from './hackathon/Timeline'
-export { PrizeTable } from './hackathon/PrizeTable'
-export { SponsorGrid } from './hackathon/SponsorGrid'
-
-// Proposal components
-export { TechStack } from './proposal/TechStack'
-export { DemoEmbed } from './proposal/DemoEmbed'
-export { TeamRoles } from './proposal/TeamRoles'
-
-// Profile components
-export { ProjectShowcase } from './profile/ProjectShowcase'
-export { SkillBadges } from './profile/SkillBadges'
-
-// Scene-grouped component maps for MDX rendering
+// Import all components once
 import { Callout } from './common/Callout'
 import { ImageGallery } from './common/ImageGallery'
 import { Video } from './common/Video'
@@ -1269,6 +1229,10 @@ import { TeamRoles } from './proposal/TeamRoles'
 import { ProjectShowcase } from './profile/ProjectShowcase'
 import { SkillBadges } from './profile/SkillBadges'
 
+// Named re-exports
+export { Callout, ImageGallery, Video, Timeline, PrizeTable, SponsorGrid, TechStack, DemoEmbed, TeamRoles, ProjectShowcase, SkillBadges }
+
+// Scene-grouped component maps for MDX rendering
 export const commonComponents = { Callout, ImageGallery, Video }
 export const hackathonComponents = { ...commonComponents, Timeline, PrizeTable, SponsorGrid }
 export const proposalComponents = { ...commonComponents, TechStack, DemoEmbed, TeamRoles }
@@ -1405,22 +1369,20 @@ Read `apps/web/app/api/presign/route.ts` and create `apps/web/app/api/r2/downloa
 
 - [ ] **Step 2: Add redirect at old path**
 
-Replace `apps/web/app/api/presign/route.ts` with a redirect:
+Replace `apps/web/app/api/presign/route.ts` with a backward-compatible re-export:
 
 ```typescript
-import { NextRequest, NextResponse } from 'next/server';
-
 /** @deprecated Use /api/r2/download instead */
-export async function GET(request: NextRequest) {
-  const url = new URL(request.url);
-  url.pathname = '/api/r2/download';
-  return NextResponse.redirect(url, 308);
-}
+export { POST } from '../r2/download/route';
 ```
 
-- [ ] **Step 3: Update any imports referencing /api/presign**
+> **Why re-export, not redirect:** The existing caller (`DatasetSection.tsx`) uses `fetch('/api/presign', { method: 'POST', body: JSON.stringify({ key }) })`. A `NextResponse.redirect()` with POST body is fragile — re-exporting the handler preserves full backward compatibility.
 
-Search codebase for `/api/presign` references and update to `/api/r2/download`.
+- [ ] **Step 3: Update runtime reference in DatasetSection.tsx**
+
+Update the `fetch('/api/presign', ...)` call in `apps/web/components/DatasetSection.tsx` to `/api/r2/download`.
+
+> **Do NOT update** references in `docs/plans/`, `docs/specs/`, or `docs/acceptance/` — those are historical records.
 
 - [ ] **Step 4: Commit**
 
@@ -1467,11 +1429,28 @@ const FILENAME_PATTERNS: RegExp[] = [
 
 - [ ] **Step 2: Add multi-file commit function**
 
-Add `commitMultipleFiles()` helper using Git Tree API. See spec Section 6 for the full implementation.
+Add `commitMultipleFiles(octokit, { owner, repo, branchName, files, commitMessage })` helper using Git Tree API. The flow integrates with the existing branch-creation logic:
+
+1. The existing code creates the branch via `createRef` → this gives us `branchSha` (which equals `mainSha`)
+2. `commitMultipleFiles` receives the `branchName` created in step 1
+3. Uses `getRef({ ref: 'heads/${branchName}' })` to get the base SHA
+4. For text content (YAML, MDX): pass directly as `content` in tree entries (no base64)
+5. For binary assets (images, PDFs): create blobs via `createBlob({ encoding: 'base64' })`
+6. `createTree({ base_tree: baseSha, tree: entries })` → `createCommit` → `updateRef`
+
+> **Note:** The existing `toBase64()` helper is no longer needed for text files in the Git Tree API flow and can be removed.
+
+See spec Section 6 for the full implementation.
 
 - [ ] **Step 3: Update POST handler for backward compatibility**
 
 Parse request body to support both old format (`{ filename, content }`) and new format (`{ files[] }`). Convert old format to single-element files array internally. Validate each file path against `FILENAME_PATTERNS`.
+
+Update PR body generation for multi-file case:
+```typescript
+// Single file: **File:** `path`
+// Multi file: **Files:**\n- `path1`\n- `path2`\n...
+```
 
 - [ ] **Step 4: Test backward compatibility**
 
@@ -1565,7 +1544,7 @@ Create `packages/ui/src/components/editor/EditorPane.tsx`. Key points:
 
 Create `packages/ui/src/components/editor/PreviewPane.tsx`. Key points:
 - Accept MDX source string + component map
-- Use `@mdx-js/mdx` `evaluate()` with `remarkGfm` and `recma` plugin to strip imports
+- Use `@mdx-js/mdx` `evaluate()` with `remarkGfm` and `recma-no-import-export` plugin (package: `recma-no-import-export`) to strip `import`/`export` statements for browser security
 - Debounce compilation (300ms)
 - Show compilation errors in `Alert` component
 - Apply custom prose styles (font-heading for h1-h3, font-sans for body, etc.)
@@ -1624,7 +1603,7 @@ git commit -m "feat(ui): add MdxEditor SDK (CodeMirror + split-pane preview)"
 
 **Files:**
 - Modify: `apps/web/scripts/generate-static-data.mjs`
-- Create: `packages/shared/src/data/static-provider.ts`
+- Create: `apps/web/lib/static-provider.ts` (NOT in packages/shared — it imports from `_generated/`)
 - Create: `packages/shared/src/data/fs-provider.ts`
 - Create: `apps/web/lib/data.ts`
 - Modify: `apps/web/app/_generated/data.ts` (mark deprecated)
@@ -1643,6 +1622,7 @@ Extend `generate-static-data.mjs` with a new `collectMdx()` function:
 ```javascript
 import { compile } from '@mdx-js/mdx';
 import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
 
 async function tryCompileMdx(filePath) {
   try {
@@ -1651,6 +1631,7 @@ async function tryCompileMdx(filePath) {
       outputFormat: 'function-body',
       development: false,
       remarkPlugins: [remarkGfm],
+      rehypePlugins: [rehypeHighlight],
     });
     return String(compiled);
   } catch {
@@ -1672,7 +1653,9 @@ Output separate `apps/web/app/_generated/static-mdx/` directory with per-hackath
 
 - [ ] **Step 2: Create StaticDataProvider**
 
-Create `packages/shared/src/data/static-provider.ts` implementing `DataProvider` interface. Reads from the generated JSON files.
+Create `apps/web/lib/static-provider.ts` implementing `DataProvider` interface. Reads from the generated JSON files.
+
+> **Why in apps/web, not packages/shared:** `StaticDataProvider` imports from `apps/web/app/_generated/` — a package in `packages/shared/` cannot import from `apps/web/`. The `DataProvider` interface stays in `packages/shared/`, but implementations are app-specific.
 
 - [ ] **Step 3: Create FsDataProvider**
 
@@ -1684,10 +1667,12 @@ Create `apps/web/lib/data.ts`:
 
 ```typescript
 import { StaticDataProvider } from './static-provider';
-import type { DataProvider } from '@synnovator/shared/data';
+import type { DataProvider } from '@synnovator/shared';
 
 export const data: DataProvider = new StaticDataProvider();
 ```
+
+> Both `StaticDataProvider` and `FsDataProvider` **must** implement `getProfileByFilestem()` — it's needed for file-system-based profile MDX lookup.
 
 - [ ] **Step 5: Mark _generated/data.ts as deprecated**
 
@@ -1701,7 +1686,7 @@ Expected: Build succeeds, `static-mdx/` directory created (may be empty if no .m
 - [ ] **Step 7: Commit**
 
 ```bash
-git add apps/web/scripts/generate-static-data.mjs packages/shared/src/data/ apps/web/lib/data.ts apps/web/app/_generated/
+git add apps/web/scripts/generate-static-data.mjs packages/shared/src/data/ apps/web/lib/data.ts apps/web/lib/static-provider.ts apps/web/app/_generated/
 git commit -m "feat: add MDX build pipeline and DataProvider abstraction"
 ```
 
@@ -1724,19 +1709,27 @@ git commit -m "feat: add MDX build pipeline and DataProvider abstraction"
 
 - [ ] **Step 1: Create (auth)/edit/layout.tsx**
 
+> **Important:** The existing `(auth)/layout.tsx` wraps children in `<div className="min-h-dvh flex">`. The editor layout is nested inside it. Use the established `cookies()` + `decrypt()` pattern (same as `(admin)/admin/layout.tsx`), NOT the fake-Request pattern.
+
 ```tsx
 import { redirect } from 'next/navigation';
-import { getSession } from '@synnovator/shared/auth';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+import { decrypt } from '@synnovator/shared/auth';
 
 export default async function EditLayout({ children }: { children: React.ReactNode }) {
-  const headersList = await headers();
-  const request = new Request('https://placeholder', { headers: headersList });
-  const session = await getSession(request, process.env.AUTH_SECRET!);
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('session')?.value;
 
+  if (!sessionCookie) {
+    // Redirect to login with return path
+    const headersList = await headers();
+    const pathname = headersList.get('x-pathname') || '/';
+    redirect(`/login?returnTo=${encodeURIComponent(pathname)}`);
+  }
+
+  const session = await decrypt(sessionCookie, process.env.AUTH_SECRET!);
   if (!session) {
-    // Redirect to login — the callback will return to the edit page
-    redirect('/api/auth/login');
+    redirect('/login');
   }
 
   return <>{children}</>;
@@ -1746,7 +1739,7 @@ export default async function EditLayout({ children }: { children: React.ReactNo
 - [ ] **Step 2: Create hackathon editor page**
 
 Create `apps/web/app/(auth)/edit/hackathon/[slug]/page.tsx`. Key points:
-- Server Component: load hackathon data, verify user is in `organizers[]`
+- Server Component: load hackathon data, verify user is in `organizers[]` with null-safe access: `organizers.some(o => o.github && o.github === session.login)`
 - Pass data to Client Component `HackathonEditorClient`
 - Client Component: render `Tabs` (description + tracks + stages) with `MdxEditor` in each tab
 - On save: collect all modified MDX files + assets → POST to `/api/submit-pr` with multi-file format
@@ -1861,7 +1854,9 @@ git commit -m "feat(web): add edit buttons to hackathon, proposal, and profile d
 
 - [ ] **Step 1: Update CreateHackathonForm to include template files**
 
-When submitting the PR, read templates from `config/templates/hackathon/`, perform variable replacement (`{hackathon-name}`, `{track-name}`, etc.), and include MDX files in the multi-file submit-pr request alongside `hackathon.yml`.
+> **Client-side access:** Forms are Client Components and cannot use `node:fs`. Import templates at build time using raw loader: `import template from '../../../config/templates/hackathon/description.mdx?raw'` (Webpack/Turbopack raw loader).
+
+Load templates (via raw import), perform variable replacement (`__HACKATHON_NAME__`, `__TRACK_NAME__`, etc.), and include MDX files in the multi-file submit-pr request alongside `hackathon.yml`.
 
 Files to include per hackathon:
 - `description.mdx` + `description.zh.mdx`
@@ -1910,6 +1905,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed for git diff against base branch
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -1923,7 +1920,40 @@ jobs:
 
 Script that finds all `.mdx` files changed in the PR (via `git diff`), attempts to compile each with `@mdx-js/mdx`, and reports errors.
 
-- [ ] **Step 4: Create r2-cleanup.yml**
+- [ ] **Step 4: Create r2-cleanup.yml and scripts/r2-cleanup.mjs**
+
+> **Use Node.js, not Python** — the entire project is JavaScript/TypeScript. `@aws-sdk/client-s3` is already a project dependency.
+
+Create `scripts/r2-cleanup.mjs`:
+
+```javascript
+import { S3Client, ListObjectsV2Command, DeleteObjectCommand } from '@aws-sdk/client-s3';
+
+const s3 = new S3Client({
+  region: 'auto',
+  endpoint: process.env.R2_ENDPOINT,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+  },
+});
+
+const BUCKET = 'synnovator-temp';
+const CUTOFF_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+const cutoff = new Date(Date.now() - CUTOFF_MS);
+const { Contents = [] } = await s3.send(new ListObjectsV2Command({ Bucket: BUCKET }));
+
+for (const obj of Contents) {
+  if (obj.LastModified < cutoff) {
+    await s3.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: obj.Key }));
+    console.log(`Deleted: ${obj.Key}`);
+  }
+}
+console.log(`Cleanup complete. Checked ${Contents.length} objects.`);
+```
+
+Create `.github/workflows/r2-cleanup.yml`:
 
 ```yaml
 name: R2 Temp Cleanup
@@ -1935,27 +1965,19 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - name: Clean R2 temp bucket
         env:
           R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        run: |
-          # List and delete objects older than 24 hours from synnovator-temp bucket
-          pip install boto3
-          python3 -c "
-          import boto3, datetime, os
-          s3 = boto3.client('s3',
-            endpoint_url=os.environ['R2_ENDPOINT'],
-            aws_access_key_id=os.environ['R2_ACCESS_KEY_ID'],
-            aws_secret_access_key=os.environ['R2_SECRET_ACCESS_KEY'])
-          cutoff = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=24)
-          resp = s3.list_objects_v2(Bucket='synnovator-temp')
-          for obj in resp.get('Contents', []):
-            if obj['LastModified'] < cutoff:
-              s3.delete_object(Bucket='synnovator-temp', Key=obj['Key'])
-              print(f'Deleted: {obj[\"Key\"]}')
-          "
+        run: node scripts/r2-cleanup.mjs
 ```
 
 - [ ] **Step 5: Commit**
