@@ -3,7 +3,8 @@
 import { useAuth } from '@/hooks/useAuth';
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import { ExternalLinkIcon } from '@/components/icons';
+import Link from 'next/link';
+import { PencilIcon } from '@/components/icons';
 
 interface EditProjectButtonProps {
   hackathonSlug: string;
@@ -19,17 +20,13 @@ export function EditProjectButton({ hackathonSlug, teamSlug, teamMembers, lang }
     return null;
   }
 
-  const editUrl = `https://github.com/Synnovator/monorepo/edit/main/hackathons/${hackathonSlug}/submissions/${teamSlug}/project.yml`;
-
   return (
-    <a
-      href={editUrl}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      href={`/edit/proposal/${hackathonSlug}/${teamSlug}`}
       className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
     >
       {t(lang, 'project.edit')}
-      <ExternalLinkIcon size={12} aria-hidden="true" />
-    </a>
+      <PencilIcon size={12} aria-hidden="true" />
+    </Link>
   );
 }
