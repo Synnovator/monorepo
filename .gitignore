@@ -35,6 +35,7 @@ dist/
 apps/web/app/_generated/static-data.json
 packages/ui/src/styles/generated-themes.css
 packages/ui/src/styles/generated-theme-meta.json
+apps/web/app/_generated/static-mdx/
 
 # Logs
 *.log

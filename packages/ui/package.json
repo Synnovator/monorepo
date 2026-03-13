@@ -9,6 +9,7 @@
     "./theme-meta": "./src/styles/generated-theme-meta.json",
     "./lib/utils": "./src/lib/utils.ts",
     "./components/*": "./src/components/*.tsx",
+    "./components/editor/types": "./src/components/editor/types.ts",
     "./icons": "./src/icons/index.tsx"
   },
   "dependencies": {
