@@ -4,7 +4,9 @@ on:
   pull_request:
     types: [opened, synchronize]
     paths:
+      - 'hackathons/**/assets/**'
       - 'hackathons/**/submissions/**'
+      - 'profiles/**/assets/**'
 
 jobs:
   upload:
@@ -28,11 +30,15 @@ jobs:
           unzip -q awscliv2.zip
           sudo ./aws/install --update
 
-      - name: Find asset files in submissions
+      - name: Find asset files
         id: find
         run: |
-          # Get changed files in submissions directories (non-YAML only)
-          FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} HEAD -- 'hackathons/**/submissions/**' | grep -vE '\.(yml|yaml)$' || true)
+          # Get changed asset files across all three contexts (non-YAML only)
+          FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} HEAD -- \
+            'hackathons/**/assets/**' \
+            'hackathons/**/submissions/**' \
+            'profiles/**/assets/**' \
+            | grep -vE '\.(yml|yaml|mdx?)$' || true)
           echo "files<<EOF" >> "$GITHUB_OUTPUT"
           echo "$FILES" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
@@ -56,10 +62,10 @@ jobs:
             echo "Uploading $file..."
             aws s3 cp "$file" "s3://${R2_BUCKET}/${file}" \
               --endpoint-url "${R2_ENDPOINT}"
-            echo "  → s3://${R2_BUCKET}/${file}"
+            echo "  -> s3://${R2_BUCKET}/${file}"
           done <<< "${{ steps.find.outputs.files }}"
 
-      - name: Update project.yml r2_url fields
+      - name: Update YAML metadata with R2 URLs
         if: steps.find.outputs.has_files == 'true'
         env:
           R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
@@ -71,18 +77,32 @@ jobs:
 
             BASENAME=$(basename "$file")
             DIR=$(dirname "$file")
-            PROJECT_YML="${DIR}/project.yml"
+            R2_URL="${R2_ENDPOINT}/${R2_BUCKET}/${file}"
 
-            # Walk up directories to find project.yml
-            while [ ! -f "$PROJECT_YML" ] && [ "$DIR" != "." ]; do
-              DIR=$(dirname "$DIR")
-              PROJECT_YML="${DIR}/project.yml"
-            done
+            # Determine context and find the appropriate YAML metadata file
+            METADATA_YML=""
+            if echo "$file" | grep -qE '^profiles/.+/assets/'; then
+              # Profile-level asset: look for profile.yml in parent
+              CANDIDATE="${DIR}/../profile.yml"
+              [ -f "$CANDIDATE" ] && METADATA_YML="$CANDIDATE"
+            elif echo "$file" | grep -qE '^hackathons/.+/submissions/.+/'; then
+              # Submission-level asset: walk up to find project.yml
+              SEARCH_DIR="$DIR"
+              while [ ! -f "${SEARCH_DIR}/project.yml" ] && [ "$SEARCH_DIR" != "." ]; do
+                SEARCH_DIR=$(dirname "$SEARCH_DIR")
+              done
+              [ -f "${SEARCH_DIR}/project.yml" ] && METADATA_YML="${SEARCH_DIR}/project.yml"
+            elif echo "$file" | grep -qE '^hackathons/.+/assets/'; then
+              # Hackathon-level asset: look for hackathon.yml in parent
+              CANDIDATE="${DIR}/../hackathon.yml"
+              [ -f "$CANDIDATE" ] && METADATA_YML="$CANDIDATE"
+            fi
 
-            if [ -f "$PROJECT_YML" ]; then
-              R2_URL="${R2_ENDPOINT}/${R2_BUCKET}/${file}"
-              sed -i "s|local_path: \"./${BASENAME}\"|local_path: \"./${BASENAME}\"\n        r2_url: \"${R2_URL}\"|" "$PROJECT_YML" 2>/dev/null || true
-              echo "Updated $PROJECT_YML with R2 URL for $BASENAME"
+            if [ -n "$METADATA_YML" ] && [ -f "$METADATA_YML" ]; then
+              sed -i "s|local_path: \"./${BASENAME}\"|local_path: \"./${BASENAME}\"\n        r2_url: \"${R2_URL}\"|" "$METADATA_YML" 2>/dev/null || true
+              echo "Updated $METADATA_YML with R2 URL for $BASENAME"
+            else
+              echo "No metadata YAML found for $file (upload-only)"
             fi
           done <<< "${{ steps.find.outputs.files }}"
 
