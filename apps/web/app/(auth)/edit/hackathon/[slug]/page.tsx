@@ -38,8 +38,9 @@ export default async function HackathonEditorPage({
 
   const h = entry.hackathon;
 
-  // Authorization: check if user is an organizer
-  const isOrganizer = h.organizers?.some(
+  // Authorization: dev-token users can edit everything; otherwise check organizer list
+  const isDevUser = session.access_token === 'dev-token';
+  const isOrganizer = isDevUser || h.organizers?.some(
     (o) => o.github && o.github === session.login,
   );
 

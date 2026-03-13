@@ -12,7 +12,8 @@ interface EditHackathonButtonProps {
 export function EditHackathonButton({ slug, organizers }: EditHackathonButtonProps) {
   const { user, loading } = useAuth();
 
-  if (loading || !user || !organizers.includes(user.login)) {
+  // Dev users (non-GitHub) can edit all pages; GitHub users must be organizers
+  if (loading || !user || (user.isGitHub && !organizers.includes(user.login))) {
     return null;
   }
 
