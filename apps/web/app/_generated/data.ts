@@ -37,36 +37,44 @@ const themeData = (staticData as any).themes as {
   variants: Record<string, Record<string, unknown>>;
 } | undefined;
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function listHackathons(): Hackathon[] {
   return hackathons;
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function getHackathon(slug: string): Hackathon | null {
   return hackathons.find(h => h.hackathon.slug === slug) ?? null;
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function listProfiles(): Profile[] {
   return profiles;
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function getProfile(github: string): Profile | null {
   return profiles.find(p => p.hacker.github === github) ?? null;
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function listSubmissions(): SubmissionWithMeta[] {
   return submissions;
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function getResults(hackathonSlug: string): any[] {
   return results[hackathonSlug] ?? [];
 }
 
 // --- Theme data ---
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function getActiveThemeName(): string {
   return themeData?.activeTheme ?? '';
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function listThemes(): { id: string; name: string; name_zh?: string; active: boolean }[] {
   if (!themeData) return [];
   const active = themeData.activeTheme;
@@ -78,11 +86,13 @@ export function listThemes(): { id: string; name: string; name_zh?: string; acti
   }));
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function getTheme(id: string): ThemeEntry | null {
   if (!themeData) return null;
   return themeData.themes.find(t => t._id === id) ?? null;
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function getThemeVariant(hackathonSlug: string, themeName: string): Record<string, unknown> | null {
   if (!themeData) return null;
   return (themeData.variants[`${hackathonSlug}/${themeName}`] as Record<string, unknown>) ?? null;

@@ -10,10 +10,14 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
+import { compile } from '@mdx-js/mdx';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_ROOT = path.resolve(__dirname, '../../..');
 const OUT_FILE = path.resolve(__dirname, '../app/_generated/static-data.json');
+const MDX_OUT_DIR = path.resolve(__dirname, '../app/_generated/static-mdx');
 
 async function readYaml(filePath) {
   const content = await fs.readFile(filePath, 'utf-8');
@@ -179,6 +183,144 @@ async function collectResults() {
   return resultsByHackathon;
 }
 
+async function tryCompileMdx(filePath) {
+  try {
+    const source = await fs.readFile(filePath, 'utf-8');
+    const compiled = await compile(source, {
+      outputFormat: 'function-body',
+      development: false,
+      remarkPlugins: [remarkGfm],
+      rehypePlugins: [rehypeHighlight],
+    });
+    return String(compiled);
+  } catch {
+    return null;
+  }
+}
+
+async function collectMdx(dataRoot) {
+  await fs.mkdir(MDX_OUT_DIR, { recursive: true });
+  let count = 0;
+
+  // --- Hackathon MDX ---
+  const hackathonsDir = path.join(dataRoot, 'hackathons');
+  try {
+    const hackathonEntries = await fs.readdir(hackathonsDir, { withFileTypes: true });
+    const hackathonDirs = hackathonEntries.filter(e => e.isDirectory());
+
+    for (const dir of hackathonDirs) {
+      const slug = dir.name;
+      const hackathonPath = path.join(hackathonsDir, slug);
+      const mdxData = {};
+
+      // description.mdx / description.zh.mdx
+      for (const variant of ['description.mdx', 'description.zh.mdx']) {
+        const compiled = await tryCompileMdx(path.join(hackathonPath, variant));
+        if (compiled) {
+          const key = variant.replace('.mdx', '');
+          mdxData[key] = compiled;
+        }
+      }
+
+      // tracks/*.mdx
+      const tracksDir = path.join(hackathonPath, 'tracks');
+      try {
+        const trackFiles = await fs.readdir(tracksDir);
+        for (const tf of trackFiles.filter(f => f.endsWith('.mdx'))) {
+          const compiled = await tryCompileMdx(path.join(tracksDir, tf));
+          if (compiled) {
+            const key = `tracks/${tf.replace('.mdx', '')}`;
+            mdxData[key] = compiled;
+          }
+        }
+      } catch {
+        // No tracks directory
+      }
+
+      // stages/*.mdx
+      const stagesDir = path.join(hackathonPath, 'stages');
+      try {
+        const stageFiles = await fs.readdir(stagesDir);
+        for (const sf of stageFiles.filter(f => f.endsWith('.mdx'))) {
+          const compiled = await tryCompileMdx(path.join(stagesDir, sf));
+          if (compiled) {
+            const key = `stages/${sf.replace('.mdx', '')}`;
+            mdxData[key] = compiled;
+          }
+        }
+      } catch {
+        // No stages directory
+      }
+
+      if (Object.keys(mdxData).length > 0) {
+        const outFile = path.join(MDX_OUT_DIR, `hackathon-${slug}.json`);
+        await fs.writeFile(outFile, JSON.stringify(mdxData, null, 2));
+        count++;
+      }
+
+      // --- Submission MDX within this hackathon ---
+      const submissionsDir = path.join(hackathonPath, 'submissions');
+      try {
+        const teamEntries = await fs.readdir(submissionsDir, { withFileTypes: true });
+        const teamDirs = teamEntries.filter(e => e.isDirectory());
+
+        for (const teamDir of teamDirs) {
+          const teamSlug = teamDir.name;
+          const subMdxData = {};
+
+          for (const variant of ['README.mdx', 'README.zh.mdx']) {
+            const compiled = await tryCompileMdx(path.join(submissionsDir, teamSlug, variant));
+            if (compiled) {
+              const key = variant.replace('.mdx', '');
+              subMdxData[key] = compiled;
+            }
+          }
+
+          if (Object.keys(subMdxData).length > 0) {
+            const outFile = path.join(MDX_OUT_DIR, `submission-${slug}-${teamSlug}.json`);
+            await fs.writeFile(outFile, JSON.stringify(subMdxData, null, 2));
+            count++;
+          }
+        }
+      } catch {
+        // No submissions directory
+      }
+    }
+  } catch {
+    // No hackathons directory
+  }
+
+  // --- Profile MDX ---
+  const profilesDir = path.join(dataRoot, 'profiles');
+  try {
+    const profileEntries = await fs.readdir(profilesDir, { withFileTypes: true });
+    const profileDirs = profileEntries.filter(e => e.isDirectory());
+
+    for (const dir of profileDirs) {
+      const filestem = dir.name;
+      const profMdxData = {};
+
+      for (const variant of ['bio.mdx', 'bio.zh.mdx']) {
+        const compiled = await tryCompileMdx(path.join(profilesDir, filestem, variant));
+        if (compiled) {
+          const key = variant.replace('.mdx', '');
+          profMdxData[key] = compiled;
+        }
+      }
+
+      if (Object.keys(profMdxData).length > 0) {
+        const outFile = path.join(MDX_OUT_DIR, `profile-${filestem}.json`);
+        await fs.writeFile(outFile, JSON.stringify(profMdxData, null, 2));
+        count++;
+      }
+    }
+  } catch {
+    // No profiles directory or no profile subdirectories
+  }
+
+  return count;
+}
+
 function normaliseWeights(data) {
   const hackathon = data?.hackathon;
   if (!hackathon?.tracks) return;
@@ -200,12 +342,13 @@ function normaliseWeights(data) {
 async function main() {
   console.log('[generate-static-data] Reading YAML data...');
 
-  const [hackathons, profiles, submissions, results, themeData] = await Promise.all([
+  const [hackathons, profiles, submissions, results, themeData, mdxCount] = await Promise.all([
     collectHackathons(),
     collectProfiles(),
     collectSubmissions(),
     collectResults(),
     collectThemes(),
+    collectMdx(DATA_ROOT),
   ]);
 
   const data = { hackathons, profiles, submissions, results, themes: themeData };
@@ -219,6 +362,7 @@ async function main() {
   console.log(`  submissions: ${submissions.length}`);
   console.log(`  results: ${Object.keys(results).length} hackathons with results`);
   console.log(`  themes: ${themeData.themes.length} (active: ${themeData.activeTheme || 'none'}, variants: ${Object.keys(themeData.variants).length})`);
+  console.log(`  mdx files: ${mdxCount}`);
 }
 
 main().catch(err => {
