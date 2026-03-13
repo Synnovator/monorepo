@@ -1,29 +1,27 @@
 'use client';
 
 import { useAuth } from '@/hooks/useAuth';
-import { t } from '@synnovator/shared/i18n';
-import type { Lang } from '@synnovator/shared/i18n';
 import Link from 'next/link';
 import { PencilIcon } from '@/components/icons';
 
-interface EditProfileButtonProps {
-  profileUsername: string;
-  lang: Lang;
+interface EditHackathonButtonProps {
+  slug: string;
+  organizers: string[];
 }
 
-export function EditProfileButton({ profileUsername, lang }: EditProfileButtonProps) {
+export function EditHackathonButton({ slug, organizers }: EditHackathonButtonProps) {
   const { user, loading } = useAuth();
 
-  if (loading || !user || user.login !== profileUsername) {
+  if (loading || !user || !organizers.includes(user.login)) {
     return null;
   }
 
   return (
     <Link
-      href={`/edit/profile/${profileUsername}`}
+      href={`/edit/hackathon/${slug}`}
       className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
     >
-      {t(lang, 'profile.edit')}
+      Edit
       <PencilIcon size={12} aria-hidden="true" />
     </Link>
   );
