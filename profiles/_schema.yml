@@ -10,6 +10,10 @@ hacker:
   name_zh: ""                        # Display name (Chinese, optional)
   avatar: ""                         # Avatar URL (defaults to github.com/{username}.png)
 
+  team: "team-slug"                  # Optional. Team slug reference (global one-person-one-team).
+                                     # Set by sync-team-data.yml when joining a team.
+                                     # Cleared when leaving or team disbands.
+
   bio: ""                            # Short bio (English)
   bio_zh: ""                         # Short bio (Chinese, optional)
 

@@ -6,11 +6,7 @@ project:
   tagline: "Cross-functional compliance + tech solution with highest regulatory format score"
   track: "explainability"
 
-  team:
-    - github: "liu-compliance"
-      role: "Compliance Manager"
-    - github: "wang-algo"
-      role: "Algorithm Engineer"
+  team_ref: "team-compliance-express"
 
   mentors: []
 

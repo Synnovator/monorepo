@@ -18,7 +18,7 @@ interface SubmissionItem {
     tagline?: string;
     tagline_zh?: string;
     track: string;
-    team: Array<{ github: string; role?: string }>;
+    team_ref: string;
     tech_stack?: string[];
     likes?: number;
   };

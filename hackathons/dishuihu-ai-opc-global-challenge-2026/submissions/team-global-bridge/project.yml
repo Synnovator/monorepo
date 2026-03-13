@@ -7,15 +7,7 @@ project:
   tagline_zh: "AI驱动的跨境合规与本地化平台"
   track: "ai-application"
 
-  team:
-    - github: "frank-law"
-      role: "Lead Developer"
-    - github: "grace-nlp"
-      role: "NLP Engineer"
-    - github: "henry-backend"
-      role: "Backend Engineer"
-    - github: "iris-frontend"
-      role: "Frontend Developer"
+  team_ref: "team-global-bridge"
 
   deliverables:
     repo: "https://github.com/team-global-bridge/global-bridge"

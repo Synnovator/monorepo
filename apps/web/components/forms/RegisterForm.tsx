@@ -17,23 +17,21 @@ interface RegisterFormProps {
 }
 
 const ROLES = [
-  { value: 'participant', label: 'Participant (Solo)', zh: '个人参赛', en: 'Participant (Solo)' },
-  { value: 'team-lead', label: 'Team Lead', zh: '队长', en: 'Team Lead' },
-  { value: 'team-member', label: 'Team Member', zh: '队员', en: 'Team Member' },
+  { value: 'participant', label: 'Participant', zh: '参赛者', en: 'Participant' },
+  { value: 'mentor', label: 'Mentor', zh: '导师', en: 'Mentor' },
+  { value: 'observer', label: 'Observer', zh: '观察者', en: 'Observer' },
 ];
 
 export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired, lang }: RegisterFormProps) {
   const { user, loading, isLoggedIn } = useAuth();
   const [track, setTrack] = useState('');
   const [role, setRole] = useState('');
-  const [teamName, setTeamName] = useState('');
   const [termsAgreed, setTermsAgreed] = useState(false);
   const [profileConfirmed, setProfileConfirmed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const isSolo = role === 'participant';
-  const canSubmit = isLoggedIn && track && role && termsAgreed && profileConfirmed && (isSolo || teamName);
+  const canSubmit = isLoggedIn && track && role && termsAgreed && profileConfirmed;
 
   async function handleSubmit() {
     if (!user || !canSubmit || submitting) return;
@@ -63,7 +61,6 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
           github: user.login,
           track,
           role: roleLabel,
-          team: isSolo ? '' : teamName,
         },
       });
       openGitHubUrl(url);
@@ -144,16 +141,6 @@ export function RegisterForm({ hackathonSlug, hackathonName, tracks, ndaRequired
             ))}
           </select>
         </div>
-
-        {role && !isSolo && (
-          <div>
-            <label htmlFor="reg-team-name" className="block text-sm text-muted-foreground mb-2">{t(lang, 'form.register.team_name')}</label>
-            <input id="reg-team-name" type="text" value={teamName} onChange={e => setTeamName(e.target.value)}
-              placeholder="team-alpha"
-              aria-required="true"
-              className="w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none" />
-          </div>
-        )}
 
         <div className="space-y-3 pt-2">
           <label className="flex items-start gap-3 cursor-pointer">

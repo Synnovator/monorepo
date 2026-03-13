@@ -26,8 +26,8 @@ function getSteps(lang: Lang) {
     {
       title: lang === 'zh' ? '组建团队' : 'Form a Team',
       content: lang === 'zh'
-        ? '通过 Issue 发起组队请求，或在活动社区中寻找队友。团队规模需符合活动要求（通常 1-5 人）。'
-        : 'Create a team formation issue, or find teammates in the event community. Team size must meet the event requirements (typically 1-5 members).',
+        ? '在"队伍"页面创建队伍或加入已有队伍。创建队伍会生成一个 PR，合并后即可在队伍详情页管理成员。'
+        : 'Create a team or join an existing one on the Teams page. Creating a team generates a PR — once merged, you can manage members on the team detail page.',
     },
     {
       title: lang === 'zh' ? '提交项目' : 'Submit Your Project',

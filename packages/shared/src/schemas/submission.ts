@@ -2,9 +2,10 @@ import { z } from 'zod';
 
 // === Submission sub-schemas ===
 
-export const submissionTeamMemberSchema = z.object({
+export const submissionMentorSchema = z.object({
   github: z.string(),
-  role: z.string().optional(),
+  name: z.string().optional(),
+  affiliation: z.string().optional(),
 });
 
 export const submissionDeliverablesSchema = z.object({
@@ -25,7 +26,8 @@ export const SubmissionSchema = z.object({
     tagline: z.string().optional(),
     tagline_zh: z.string().optional(),
     track: z.string(),
-    team: z.array(submissionTeamMemberSchema),
+    team_ref: z.string(),
+    mentors: z.array(submissionMentorSchema).optional(),
     deliverables: submissionDeliverablesSchema.optional(),
     tech_stack: z.array(z.string()).optional(),
     description: z.string().optional(),

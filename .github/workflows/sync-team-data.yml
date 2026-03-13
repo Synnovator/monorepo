@@ -1,0 +1,174 @@
+name: Sync Team Data
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'teams/**'
+
+jobs:
+  sync-profiles:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - run: npm install js-yaml
+
+      - name: Sync team data to profiles
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const yaml = require('js-yaml');
+            const fs = require('fs');
+            const path = require('path');
+            const { execSync } = require('child_process');
+
+            // Find changed team files
+            const diff = execSync('git diff HEAD~1 --name-only -- teams/*/team.yml').toString().trim();
+            if (!diff) {
+              console.log('No team.yml changes');
+              return;
+            }
+
+            const changedFiles = diff.split('\n').filter(Boolean);
+            const profileUpdates = new Map();
+
+            for (const file of changedFiles) {
+              const teamSlug = path.basename(path.dirname(file));
+              let currentTeam, previousTeam;
+
+              try {
+                currentTeam = yaml.load(fs.readFileSync(file, 'utf-8'));
+              } catch {
+                continue;
+              }
+
+              try {
+                const prev = execSync(`git show HEAD~1:${file}`).toString();
+                previousTeam = yaml.load(prev);
+              } catch {
+                previousTeam = null;
+              }
+
+              const currentMembers = new Set([
+                currentTeam.leader,
+                ...(currentTeam.members || []).map(m => m.github),
+              ]);
+              const previousMembers = new Set(previousTeam ? [
+                previousTeam.leader,
+                ...(previousTeam.members || []).map(m => m.github),
+              ] : []);
+
+              for (const github of currentMembers) {
+                if (!previousMembers.has(github)) {
+                  if (!profileUpdates.has(github)) profileUpdates.set(github, {});
+                  profileUpdates.get(github).team = teamSlug;
+                }
+              }
+
+              for (const github of previousMembers) {
+                if (!currentMembers.has(github)) {
+                  if (!profileUpdates.has(github)) profileUpdates.set(github, {});
+                  profileUpdates.get(github).team = null;
+                }
+              }
+
+              if (currentTeam.status === 'disbanded' && previousTeam?.status !== 'disbanded') {
+                for (const github of currentMembers) {
+                  if (!profileUpdates.has(github)) profileUpdates.set(github, {});
+                  profileUpdates.get(github).team = null;
+                }
+              }
+
+              const currentHackathons = new Set((currentTeam.hackathons || []).map(h => `${h.hackathon}|${h.track}`));
+              const previousHackathons = new Set((previousTeam?.hackathons || []).map(h => `${h.hackathon}|${h.track}`));
+              const addedHackathons = [...currentHackathons].filter(h => !previousHackathons.has(h));
+
+              for (const key of addedHackathons) {
+                const [hackathon, track] = key.split('|');
+                for (const github of currentMembers) {
+                  if (!profileUpdates.has(github)) profileUpdates.set(github, {});
+                  const u = profileUpdates.get(github);
+                  if (!u.addRegistrations) u.addRegistrations = [];
+                  u.addRegistrations.push({ hackathon, track, registered_at: new Date().toISOString().split('T')[0] });
+                }
+              }
+            }
+
+            if (profileUpdates.size === 0) {
+              console.log('No profile updates needed');
+              return;
+            }
+
+            const profilesDir = 'profiles';
+            let modified = false;
+
+            for (const [github, updates] of profileUpdates) {
+              const files = fs.readdirSync(profilesDir).filter(f => f.endsWith('.yml') && !f.startsWith('_'));
+              let profileFile = null;
+              let profileData = null;
+
+              for (const f of files) {
+                try {
+                  const content = fs.readFileSync(path.join(profilesDir, f), 'utf-8');
+                  const data = yaml.load(content);
+                  if (data?.hacker?.github === github) {
+                    profileFile = path.join(profilesDir, f);
+                    profileData = data;
+                    break;
+                  }
+                } catch {}
+              }
+
+              if (!profileFile || !profileData) {
+                console.log(`Profile not found for ${github}, skipping`);
+                continue;
+              }
+
+              if ('team' in updates) {
+                if (updates.team === null) {
+                  delete profileData.hacker.team;
+                } else {
+                  profileData.hacker.team = updates.team;
+                }
+                modified = true;
+              }
+
+              if (updates.addRegistrations) {
+                if (!profileData.hacker.registrations) profileData.hacker.registrations = [];
+                for (const reg of updates.addRegistrations) {
+                  const exists = profileData.hacker.registrations.some(
+                    r => r.hackathon === reg.hackathon && r.track === reg.track
+                  );
+                  if (!exists) {
+                    profileData.hacker.registrations.push({
+                      hackathon: reg.hackathon,
+                      track: reg.track,
+                      role: 'participant',
+                      registered_at: reg.registered_at,
+                    });
+                    modified = true;
+                  }
+                }
+              }
+
+              if (modified) {
+                fs.writeFileSync(profileFile, yaml.dump(profileData, { lineWidth: -1, quotingType: '"' }));
+                console.log(`Updated profile: ${profileFile}`);
+              }
+            }
+
+            if (modified) {
+              execSync('git config user.name "github-actions[bot]"');
+              execSync('git config user.email "github-actions[bot]@users.noreply.github.com"');
+              execSync('git add profiles/');
+              execSync('git commit -m "chore: sync team data to member profiles"');
+              execSync('git push');
+            }

@@ -7,11 +7,7 @@ project:
   tagline_zh: "一人公司创始人的AI一站式工作空间：从创意到全球发布"
   track: "ai-application"
 
-  team:
-    - github: "dave-fullstack"
-      role: "Lead Developer"
-    - github: "eve-ai"
-      role: "AI Engineer"
+  team_ref: "team-onebot"
 
   deliverables:
     repo: "https://github.com/team-onebot/onebot-studio"

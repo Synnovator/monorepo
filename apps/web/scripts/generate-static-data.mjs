@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Pre-build script: reads all YAML data (hackathons, profiles, submissions, results)
+ * Pre-build script: reads all YAML data (hackathons, profiles, submissions, teams, results)
  * and writes a JSON cache file that can be imported without `fs` at runtime.
  *
  * This is necessary because Cloudflare Workers don't support Node.js `fs` module.
@@ -82,6 +82,28 @@ async function collectSubmissions() {
       }
     } catch {
       // No submissions directory
+    }
+  }
+  return results;
+}
+
+async function collectTeams() {
+  const teamsDir = path.join(DATA_ROOT, 'teams');
+  let entries;
+  try {
+    entries = await fs.readdir(teamsDir, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+
+  const dirs = entries.filter(e => e.isDirectory() && !e.name.startsWith('_'));
+  const results = [];
+  for (const dir of dirs) {
+    try {
+      const data = await readYaml(path.join(teamsDir, dir.name, 'team.yml'));
+      results.push({ ...data, _slug: dir.name });
+    } catch {
+      // Skip invalid team files
     }
   }
   return results;
@@ -200,15 +222,16 @@ function normaliseWeights(data) {
 async function main() {
   console.log('[generate-static-data] Reading YAML data...');
 
-  const [hackathons, profiles, submissions, results, themeData] = await Promise.all([
+  const [hackathons, profiles, submissions, teams, results, themeData] = await Promise.all([
     collectHackathons(),
     collectProfiles(),
     collectSubmissions(),
+    collectTeams(),
     collectResults(),
     collectThemes(),
   ]);
 
-  const data = { hackathons, profiles, submissions, results, themes: themeData };
+  const data = { hackathons, profiles, submissions, teams, results, themes: themeData };
 
   await fs.mkdir(path.dirname(OUT_FILE), { recursive: true });
   await fs.writeFile(OUT_FILE, JSON.stringify(data, null, 2));
@@ -217,6 +240,7 @@ async function main() {
   console.log(`  hackathons: ${hackathons.length}`);
   console.log(`  profiles: ${profiles.length}`);
   console.log(`  submissions: ${submissions.length}`);
+  console.log(`  teams: ${teams.length}`);
   console.log(`  results: ${Object.keys(results).length} hackathons with results`);
   console.log(`  themes: ${themeData.themes.length} (active: ${themeData.activeTheme || 'none'}, variants: ${Object.keys(themeData.variants).length})`);
 }

@@ -26,18 +26,13 @@ interface CreateProposalFormProps {
   lang: Lang;
 }
 
-interface TeamMember {
-  github: string;
-  role: string;
-}
-
 function toSlug(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
-const STEP_LABELS_ZH = ['选择活动', '项目信息', '团队', '提交物', '预览'];
-const STEP_LABELS_EN = ['Hackathon', 'Project', 'Team', 'Deliverables', 'Preview'];
-const TOTAL_STEPS = 5;
+const STEP_LABELS_ZH = ['选择活动', '项目信息', '提交物', '预览'];
+const STEP_LABELS_EN = ['Hackathon', 'Project', 'Deliverables', 'Preview'];
+const TOTAL_STEPS = 4;
 
 export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps) {
   const { loading, isLoggedIn } = useAuth();
@@ -55,10 +50,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
   const [techStack, setTechStack] = useState<string[]>([]);
   const [techInput, setTechInput] = useState('');
 
-  // Step 2: Team
-  const [members, setMembers] = useState<TeamMember[]>([{ github: '', role: 'Lead Developer' }]);
-
-  // Step 3: Deliverables
+  // Step 2: Deliverables
   const [repo, setRepo] = useState('');
   const [video, setVideo] = useState('');
   const [demo, setDemo] = useState('');
@@ -84,43 +76,22 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
     setTechStack(prev => prev.filter((_, i) => i !== idx));
   }
 
-  function addMember() {
-    setMembers(prev => [...prev, { github: '', role: '' }]);
-  }
-  function removeMember(idx: number) {
-    setMembers(prev => prev.filter((_, i) => i !== idx));
-  }
-  function updateMember(idx: number, field: keyof TeamMember, value: string) {
-    setMembers(prev => {
-      const n = [...prev];
-      n[idx] = { ...n[idx], [field]: value };
-      return n;
-    });
-  }
-
   function isStepValid(s: number): boolean {
     switch (s) {
       case 0: return selectedHackathon !== '';
       case 1: return name.trim() !== '' && tagline.trim() !== '' && track !== '' && techStack.length > 0;
-      case 2: return members.some(m => m.github.trim() !== '');
-      case 3: return repo.trim() !== '';
-      case 4: return true; // preview
+      case 2: return repo.trim() !== '';
+      case 3: return true;
       default: return true;
     }
   }
 
   const teamSlug = useMemo(() => {
-    const firstGithub = members[0]?.github?.trim() || 'team';
     const projectSlug = toSlug(name) || 'project';
-    return `team-${firstGithub}-${projectSlug}`;
-  }, [members, name]);
+    return `team-${projectSlug}`;
+  }, [name]);
 
   const yamlContent = useMemo(() => {
-    const teamArr = members.filter(m => m.github).map(m => ({
-      github: m.github.trim(),
-      role: m.role.trim() || 'Developer',
-    }));
-
     const deliverables: Record<string, unknown> = {
       repo: repo || undefined,
     };
@@ -135,7 +106,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
         tagline: tagline || undefined,
         tagline_zh: taglineZh || undefined,
         track: track || undefined,
-        team: teamArr.length > 0 ? teamArr : undefined,
+        team_ref: teamSlug || undefined,
         deliverables: Object.keys(deliverables).some(k => deliverables[k]) ? deliverables : undefined,
         tech_stack: techStack.length > 0 ? techStack : undefined,
         description: description || undefined,
@@ -143,7 +114,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
       },
     };
     return formatYaml(data);
-  }, [name, nameZh, tagline, taglineZh, track, members, repo, video, demo, techStack, description, descriptionZh]);
+  }, [name, nameZh, tagline, taglineZh, track, teamSlug, repo, video, demo, techStack, description, descriptionZh]);
 
   async function handleSubmit() {
     setSubmitting(true);
@@ -178,9 +149,6 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
   const inputClass = 'w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none';
   const labelClass = 'block text-sm text-muted-foreground mb-2';
   const selectClass = 'w-full bg-background border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-ring focus:outline-none';
-  const btnRemove = 'px-2 text-muted-foreground hover:text-destructive transition-colors';
-  const btnAdd = 'text-sm text-primary hover:text-primary/80 transition-colors';
-
   return (
     <Card className="p-6">
       {/* Step indicators */}
@@ -311,33 +279,8 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
           </>
         )}
 
-        {/* Step 2: Team */}
+        {/* Step 2: Deliverables */}
         {step === 2 && (
-          <>
-            <p className="text-sm text-muted-foreground">{t(lang, 'form.create_proposal.team_hint')}</p>
-            <div className="space-y-4">
-              {members.map((m, idx) => (
-                <div key={idx} className="flex gap-2 items-start">
-                  <div className="flex-1 space-y-2">
-                    <input type="text" value={m.github} onChange={e => updateMember(idx, 'github', e.target.value)}
-                      placeholder={t(lang, 'form.create_proposal.github_username')} className={inputClass} />
-                    <input type="text" value={m.role} onChange={e => updateMember(idx, 'role', e.target.value)}
-                      placeholder={t(lang, 'form.create_proposal.role_placeholder')} className={inputClass} />
-                  </div>
-                  {members.length > 1 && (
-                    <button type="button" onClick={() => removeMember(idx)} className={btnRemove}>{'\u2715'}</button>
-                  )}
-                </div>
-              ))}
-            </div>
-            <button type="button" onClick={addMember} className={btnAdd}>
-              + {t(lang, 'form.create_proposal.add_member')}
-            </button>
-          </>
-        )}
-
-        {/* Step 3: Deliverables */}
-        {step === 3 && (
           <>
             <div>
               <label htmlFor="prop-repo" className={labelClass}>{t(lang, 'form.create_proposal.repo_url')}</label>
@@ -369,8 +312,8 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
           </>
         )}
 
-        {/* Step 4: Preview & Submit */}
-        {step === 4 && (
+        {/* Step 3: Preview & Submit */}
+        {step === 3 && (
           <>
             <div>
               <label className={labelClass}>{t(lang, 'form.create_proposal.preview_yaml')}</label>
@@ -414,7 +357,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
           ) : (
             <div className="flex flex-col items-end gap-3">
               <button type="button" onClick={handleSubmit}
-                disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(3) || submitting}
+                disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || submitting}
                 aria-describedby={submitError ? 'proposal-submit-error' : undefined}
                 className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {submitting ? t(lang, 'form.common.submitting') : t(lang, 'form.create_proposal.submit_pr')} {'\u2192'}

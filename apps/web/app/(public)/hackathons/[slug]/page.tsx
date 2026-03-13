@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getHackathon, listHackathons, listSubmissions, listProfiles } from '@/app/_generated/data';
+import { getHackathon, listHackathons, listSubmissions, listProfiles, getTeamsByHackathon } from '@/app/_generated/data';
 import { t, localize, getCurrentStage, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Timeline } from '@/components/Timeline';
@@ -16,7 +16,6 @@ import { ClipboardListIcon, ShieldCheckIcon } from '@/components/icons';
 import { RegisterForm } from '@/components/forms/RegisterForm';
 import { NDASignForm } from '@/components/forms/NDASignForm';
 import { AppealForm } from '@/components/forms/AppealForm';
-import { TeamFormationForm } from '@/components/forms/TeamFormationForm';
 import { TeamsTab } from '@/components/TeamsTab';
 import { SketchUnderline, SketchDoodle } from '@/components/sketch';
 import { Separator, Badge } from '@synnovator/ui';
@@ -303,20 +302,6 @@ export default async function HackathonDetailPage({
                 </section>
               )}
 
-              {/* Team Formation (during registration/development stages) */}
-              {(['registration', 'development'].includes(stage)) && (
-                <section id="team-formation-section" className="mt-12">
-                  <h2 className="text-xl font-heading font-bold text-foreground mb-4">
-                    {t(lang, 'hackathon.team_formation')}
-                  </h2>
-                  <TeamFormationForm
-                    hackathonSlug={h.slug}
-                    tracks={formTracks}
-                    lang={lang}
-                  />
-                </section>
-              )}
-
               {/* Appeal Form (during announcement stage) */}
               {stage === 'announcement' && (
                 <section id="appeal-section" className="mt-12">
@@ -387,7 +372,7 @@ export default async function HackathonDetailPage({
           {/* Tab 4: Teams */}
           <div data-tab-panel="teams" role="tabpanel" id="panel-teams" aria-labelledby="tab-teams" className="hidden">
             <div className="space-y-8 pt-6">
-              <TeamsTab hackathonSlug={h.slug} stage={stage} lang={lang} />
+              <TeamsTab hackathonSlug={h.slug} lang={lang} teams={getTeamsByHackathon(h.slug)} />
             </div>
           </div>
         </div>

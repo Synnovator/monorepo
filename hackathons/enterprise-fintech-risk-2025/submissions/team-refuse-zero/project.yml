@@ -6,13 +6,7 @@ project:
   tagline: "Dual-stage model: XGBoost screening + LightGBM refinement, FRR 7.1%"
   track: "model-optimization"
 
-  team:
-    - github: "zhou-haoran"
-      role: "Lead Developer"
-    - github: "chen-wei"
-      role: "ML Engineer"
-    - github: "li-ming"
-      role: "Data Analyst"
+  team_ref: "team-refuse-zero"
 
   mentors: []
 

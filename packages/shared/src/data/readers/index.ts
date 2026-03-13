@@ -4,3 +4,5 @@ export { listSubmissions, getSubmissionsByHackathon } from './submissions';
 export type { SubmissionWithMeta } from './submissions';
 export { getResults } from './results';
 export type { ResultWithMeta } from './results';
+export { listTeams, getTeamBySlug, getTeamsByHackathon, getTeamByMember } from './teams';
+export type { TeamWithMeta } from './teams';

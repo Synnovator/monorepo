@@ -6,6 +6,7 @@ export const ProfileSchema = z.object({
   synnovator_profile: z.string(),
   hacker: z.object({
     github: z.string(),
+    team: z.string().optional(),
     name: z.string(),
     name_zh: z.string().optional(),
     avatar: z.string().optional(),
@@ -61,7 +62,6 @@ export const ProfileSchema = z.object({
       hackathon: z.string(),
       track: z.string(),
       role: z.string(),
-      team: z.string().optional(),
       registered_at: z.string(),
     })).optional(),
   }),

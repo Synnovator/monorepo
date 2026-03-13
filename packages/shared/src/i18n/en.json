@@ -17,7 +17,8 @@
     "search_hint": "⌘K",
     "search_no_results": "No results found",
     "search_group_events": "Events",
-    "search_group_pages": "Pages"
+    "search_group_pages": "Pages",
+    "create_team": "Create Team"
   },
   "footer": {
     "platform": "Platform",
@@ -74,11 +75,8 @@
     "results": "Results",
     "results_pending": "Results not yet published",
     "appeal_window": "Appeal Window",
-    "team_formation": "Team Formation",
-    "teams_browse": "Browse open team formation posts or create your own.",
-    "teams_browse_link": "Browse Team Posts",
-    "teams_post": "Post Team",
-    "teams_not_available": "Team formation is only available during registration and development stages.",
+    "teams_browse": "Browse teams registered for this hackathon, or create your own.",
+    "teams_not_available": "No teams yet.",
     "team_size_label": "Team size",
     "solo_allowed": "(solo allowed)",
     "license_label": "License",
@@ -99,6 +97,33 @@
     "submissions": "Submissions",
     "leaderboard": "Leaderboard",
     "teams": "Teams"
+  },
+  "team": {
+    "list_title": "Teams",
+    "create": "Create Team",
+    "create_title": "Create a Team",
+    "create_submit": "Create Team on GitHub",
+    "name": "Team Name",
+    "name_zh": "Team Name (Chinese)",
+    "leader": "Leader",
+    "members_count": "members",
+    "looking_for_roles": "Looking for",
+    "looking_for_description": "Description",
+    "no_teams_yet": "No teams yet. Be the first to create one!",
+    "status_recruiting": "Recruiting",
+    "status_formed": "Formed",
+    "status_disbanded": "Disbanded",
+    "join": "Apply to Join",
+    "leave": "Leave Team",
+    "manage": "Manage Team",
+    "hackathons": "Hackathon Participation",
+    "created_at": "Created",
+    "not_in_team": "You haven't joined a team yet.",
+    "browse_teams": "Browse teams",
+    "my_team": "My Team",
+    "description": "About",
+    "github_repo": "GitHub Repository",
+    "edit": "Edit Team"
   },
   "profile": {
     "skills": "Skills",
@@ -469,22 +494,8 @@
       "repo_required": "Repository URL is required"
     },
     "team": {
-      "title": "Team Formation",
-      "sign_in_first": "Please sign in first",
-      "team_name": "Team Name",
-      "track": "Track",
-      "select_track": "Select a track",
-      "purpose": "Purpose",
-      "select_purpose": "Select purpose",
-      "members": "Members",
-      "role": "Role",
-      "add_member": "Add member",
-      "looking_for": "Looking for (skills/roles)",
-      "looking_for_placeholder": "e.g. Frontend developer, ML engineer...",
-      "project_idea": "Project Idea",
-      "optional": "optional",
-      "project_idea_placeholder": "Briefly describe your project idea...",
-      "submit_github": "Submit on GitHub"
+      "sign_in_first": "Please sign in to create a team",
+      "optional": "optional"
     },
     "appeal": {
       "title": "Submit Appeal",
@@ -548,7 +559,8 @@
     "admin_hackathons": "Hackathons",
     "admin_profiles": "Profiles",
     "admin_submissions": "Submissions",
-    "admin_theme": "Theme Editor"
+    "admin_theme": "Theme Editor",
+    "teams": "Teams"
   },
   "proposals": {
     "title": "Proposals",
