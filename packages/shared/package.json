@@ -14,6 +14,7 @@
     "./types": "./src/types/index.ts"
   },
   "dependencies": {
+    "@mdx-js/mdx": "^3.1.1",
     "js-yaml": "^4.1.1",
     "octokit": "^4",
     "zod": "^3"
