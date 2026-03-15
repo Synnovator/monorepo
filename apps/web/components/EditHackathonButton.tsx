@@ -22,7 +22,7 @@ export function EditHackathonButton({ slug, organizers, lang }: EditHackathonBut
 
   return (
     <Link
-      href={`/edit/hackathon/${slug}`}
+      href={`/edit/hackathon/${slug}?lang=${lang}`}
       className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
     >
       {t(lang, 'hackathon.edit')}

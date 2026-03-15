@@ -23,7 +23,7 @@ export function EditProjectButton({ hackathonSlug, teamSlug, teamMembers, lang }
 
   return (
     <Link
-      href={`/edit/proposal/${hackathonSlug}/${teamSlug}`}
+      href={`/edit/proposal/${hackathonSlug}/${teamSlug}?lang=${lang}`}
       className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
     >
       {t(lang, 'project.edit')}
