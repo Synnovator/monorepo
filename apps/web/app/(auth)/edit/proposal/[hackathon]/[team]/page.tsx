@@ -1,13 +1,17 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { decrypt, type Session } from '@synnovator/shared/auth';
+import type { Lang } from '@synnovator/shared/i18n';
 import { listSubmissions, getTeam } from '@/app/_generated/data';
+import { getProposalEditorData } from '@/lib/editor-content';
 import { ProposalEditorClient } from './ProposalEditorClient';
 
 export default async function ProposalEditorPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ hackathon: string; team: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { hackathon, team } = await params;
 
@@ -19,7 +23,7 @@ export default async function ProposalEditorPage({
   const session = await decrypt(sessionCookie, process.env.AUTH_SECRET!) as Session | null;
   if (!session) redirect(`/login?returnTo=/edit/proposal/${hackathon}/${team}`);
 
-  // Load submission data
+  // Authorization: check team membership using raw submission data
   const allSubmissions = listSubmissions();
   const entry = allSubmissions.find(
     (s) => s._hackathonSlug === hackathon && s._teamSlug === team,
@@ -40,7 +44,6 @@ export default async function ProposalEditorPage({
     );
   }
 
-  // Authorization: dev-token users can edit everything; otherwise check team membership via team_ref
   const isDevUser = session.access_token === 'dev-token';
   const teamData = entry.project.team_ref ? getTeam(entry.project.team_ref) : null;
   const isTeamMember = isDevUser || (
@@ -67,14 +70,23 @@ export default async function ProposalEditorPage({
     );
   }
 
+  // Load editor data (MDX content + metadata)
+  const editorData = getProposalEditorData(hackathon, team);
+
+  // Read lang from searchParams
+  const sp = await searchParams;
+  const langRaw = Array.isArray(sp.lang) ? sp.lang[0] : sp.lang;
+  const lang: Lang = langRaw === 'en' ? 'en' : 'zh';
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <ProposalEditorClient
-        hackathonSlug={hackathon}
-        teamSlug={team}
-        projectName={entry.project.name}
-        projectNameZh={entry.project.name_zh}
+        hackathonSlug={editorData.hackathonSlug}
+        teamSlug={editorData.teamSlug}
+        projectName={editorData.projectName}
+        description={editorData.description}
         login={session.login}
+        lang={lang}
       />
     </div>
   );

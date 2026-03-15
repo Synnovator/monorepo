@@ -4,6 +4,9 @@ import { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { MdxEditor } from '@synnovator/ui/components/editor/MdxEditor';
 import type { ComponentDefinition, Asset } from '@synnovator/ui/components/editor/types';
+import type { Lang } from '@synnovator/shared/i18n';
+import type { BilingualContent } from '@/lib/bilingual';
+import { resolveBilingual } from '@/lib/bilingual';
 import {
   AlertCircle,
   Image,
@@ -69,23 +72,28 @@ const proposalComponentDefs: ComponentDefinition[] = [
 interface ProposalEditorClientProps {
   hackathonSlug: string;
   teamSlug: string;
-  projectName: string;
-  projectNameZh?: string;
+  projectName: BilingualContent;
+  description: BilingualContent;
   login: string;
+  lang: Lang;
 }
 
 export function ProposalEditorClient({
   hackathonSlug,
   teamSlug,
   projectName,
-  projectNameZh,
+  description,
   login,
+  lang,
 }: ProposalEditorClientProps) {
   const [submitResult, setSubmitResult] = useState<{
     type: 'success' | 'error';
     message: string;
     prUrl?: string;
   } | null>(null);
+
+  // Resolve bilingual content
+  const { primary: descPrimary, alt: descAlt } = resolveBilingual(description, lang);
 
   const handleSave = useCallback(
     async (contentEn: string, contentZh: string, assets: Asset[]) => {
@@ -151,9 +159,9 @@ export function ProposalEditorClient({
     [hackathonSlug, teamSlug],
   );
 
-  const displayName = projectNameZh
-    ? `${projectName} / ${projectNameZh}`
-    : projectName;
+  const displayName = projectName.zh && projectName.zh !== projectName.en
+    ? `${projectName.en} / ${projectName.zh}`
+    : projectName.en;
 
   return (
     <div className="flex h-[calc(100dvh-6rem)] flex-col">
@@ -217,11 +225,11 @@ export function ProposalEditorClient({
       {/* Editor */}
       <div className="min-h-0 flex-1">
         <MdxEditor
-          initialContent=""
-          initialContentAlt=""
+          initialContent={descPrimary}
+          initialContentAlt={descAlt}
           availableComponents={proposalComponentDefs}
           onSave={handleSave}
-          lang="en"
+          lang={lang}
           draftKey={`proposal-draft-${hackathonSlug}-${teamSlug}`}
         />
       </div>
