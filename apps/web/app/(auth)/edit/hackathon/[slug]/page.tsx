@@ -1,13 +1,17 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { decrypt, type Session } from '@synnovator/shared/auth';
+import type { Lang } from '@synnovator/shared/i18n';
 import { getHackathon } from '@/app/_generated/data';
+import { getHackathonEditorData } from '@/lib/editor-content';
 import { HackathonEditorClient } from './HackathonEditorClient';
 
 export default async function HackathonEditorPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
 
@@ -19,7 +23,7 @@ export default async function HackathonEditorPage({
   const session = await decrypt(sessionCookie, process.env.AUTH_SECRET!) as Session | null;
   if (!session) redirect('/login');
 
-  // Load hackathon data
+  // Authorization: check organizer access using raw hackathon data
   const entry = getHackathon(slug);
   if (!entry) {
     return (
@@ -37,8 +41,6 @@ export default async function HackathonEditorPage({
   }
 
   const h = entry.hackathon;
-
-  // Authorization: dev-token users can edit everything; otherwise check organizer list
   const isDevUser = session.access_token === 'dev-token';
   const isOrganizer = isDevUser || h.organizers?.some(
     (o) => o.github && o.github === session.login,
@@ -62,23 +64,23 @@ export default async function HackathonEditorPage({
     );
   }
 
-  // Extract track names for tabs
-  const tracks = (h.tracks ?? []).map((tr) => ({
-    slug: tr.slug,
-    name: tr.name,
-    nameZh: tr.name_zh,
-  }));
+  // Load editor data (MDX content + metadata)
+  const editorData = getHackathonEditorData(slug);
+
+  // Read lang from searchParams
+  const sp = await searchParams;
+  const langRaw = Array.isArray(sp.lang) ? sp.lang[0] : sp.lang;
+  const lang: Lang = langRaw === 'en' ? 'en' : 'zh';
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <HackathonEditorClient
-        slug={slug}
-        hackathonName={h.name}
-        hackathonNameZh={h.name_zh}
-        description={h.description ?? ''}
-        descriptionZh={h.description_zh ?? ''}
-        tracks={tracks}
+        slug={editorData.slug}
+        name={editorData.name}
+        description={editorData.description}
+        tracks={editorData.tracks}
         login={session.login}
+        lang={lang}
       />
     </div>
   );

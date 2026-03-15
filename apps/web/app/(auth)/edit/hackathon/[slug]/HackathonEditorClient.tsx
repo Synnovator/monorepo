@@ -12,6 +12,9 @@ import {
   Trophy,
   Users,
 } from 'lucide-react';
+import type { Lang } from '@synnovator/shared/i18n';
+import type { BilingualContent } from '@/lib/bilingual';
+import { resolveBilingual } from '@/lib/bilingual';
 
 // ---------------------------------------------------------------------------
 // Component definitions available for hackathon MDX editing
@@ -79,18 +82,17 @@ const hackathonComponentDefs: ComponentDefinition[] = [
 
 interface TrackInfo {
   slug: string;
-  name: string;
-  nameZh?: string;
+  name: BilingualContent;
+  description: BilingualContent;
 }
 
 interface HackathonEditorClientProps {
   slug: string;
-  hackathonName: string;
-  hackathonNameZh?: string;
-  description: string;
-  descriptionZh: string;
+  name: BilingualContent;
+  description: BilingualContent;
   tracks: TrackInfo[];
   login: string;
+  lang: Lang;
 }
 
 // ---------------------------------------------------------------------------
@@ -113,18 +115,20 @@ async function assetToBase64(asset: Asset): Promise<string> {
 
 export function HackathonEditorClient({
   slug,
-  hackathonName,
-  hackathonNameZh,
+  name,
   description,
-  descriptionZh,
   tracks,
   login,
+  lang,
 }: HackathonEditorClientProps) {
   const [saveStatus, setSaveStatus] = React.useState<
     'idle' | 'saving' | 'success' | 'error'
   >('idle');
   const [prUrl, setPrUrl] = React.useState<string | null>(null);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
+  // Resolve bilingual content for description tab
+  const { primary: descPrimary, alt: descAlt } = resolveBilingual(description, lang);
 
   // -----------------------------------------------------------------------
   // Save handler — collect MDX content and submit PR
@@ -195,10 +199,10 @@ export function HackathonEditorClient({
       {/* Header */}
       <div>
         <h1 className="text-2xl font-heading font-bold text-foreground">
-          Edit: {hackathonName}
+          Edit: {name.en}
         </h1>
-        {hackathonNameZh && (
-          <p className="text-muted-foreground">{hackathonNameZh}</p>
+        {name.zh && name.zh !== name.en && (
+          <p className="text-muted-foreground">{name.zh}</p>
         )}
         <p className="mt-1 text-sm text-muted-foreground">
           Editing as <span className="font-medium text-foreground">{login}</span>
@@ -235,7 +239,7 @@ export function HackathonEditorClient({
           <TabsTrigger value="description">Description</TabsTrigger>
           {tracks.map((track) => (
             <TabsTrigger key={track.slug} value={`track-${track.slug}`}>
-              {track.name}
+              {lang === 'zh' ? track.name.zh : track.name.en}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -244,88 +248,91 @@ export function HackathonEditorClient({
         <TabsContent value="description" className="mt-4">
           <div className="h-[70vh]">
             <MdxEditor
-              initialContent={description}
-              initialContentAlt={descriptionZh}
+              initialContent={descPrimary}
+              initialContentAlt={descAlt}
               availableComponents={hackathonComponentDefs}
               onSave={handleDescriptionSave}
-              lang="en"
+              lang={lang}
               draftKey={`editor-hackathon-${slug}-description`}
             />
           </div>
         </TabsContent>
 
         {/* Track tabs */}
-        {tracks.map((track) => (
-          <TabsContent
-            key={track.slug}
-            value={`track-${track.slug}`}
-            className="mt-4"
-          >
-            <div className="h-[70vh]">
-              <MdxEditor
-                initialContent=""
-                initialContentAlt=""
-                availableComponents={hackathonComponentDefs}
-                onSave={async (contentEn, contentZh, assets) => {
-                  setSaveStatus('saving');
-                  setErrorMessage(null);
-                  setPrUrl(null);
+        {tracks.map((track) => {
+          const { primary: trackPrimary, alt: trackAlt } = resolveBilingual(track.description, lang);
+          return (
+            <TabsContent
+              key={track.slug}
+              value={`track-${track.slug}`}
+              className="mt-4"
+            >
+              <div className="h-[70vh]">
+                <MdxEditor
+                  initialContent={trackPrimary}
+                  initialContentAlt={trackAlt}
+                  availableComponents={hackathonComponentDefs}
+                  onSave={async (contentEn, contentZh, assets) => {
+                    setSaveStatus('saving');
+                    setErrorMessage(null);
+                    setPrUrl(null);
 
-                  try {
-                    const files: Array<{
-                      path: string;
-                      content?: string;
-                      base64Content?: string;
-                    }> = [
-                      {
-                        path: `hackathons/${slug}/tracks/${track.slug}.mdx`,
-                        content: contentEn,
-                      },
-                      {
-                        path: `hackathons/${slug}/tracks/${track.slug}.zh.mdx`,
-                        content: contentZh,
-                      },
-                    ];
+                    try {
+                      const files: Array<{
+                        path: string;
+                        content?: string;
+                        base64Content?: string;
+                      }> = [
+                        {
+                          path: `hackathons/${slug}/tracks/${track.slug}.mdx`,
+                          content: contentEn,
+                        },
+                        {
+                          path: `hackathons/${slug}/tracks/${track.slug}.zh.mdx`,
+                          content: contentZh,
+                        },
+                      ];
 
-                    for (const asset of assets) {
-                      const base64 = await assetToBase64(asset);
-                      files.push({
-                        path: `hackathons/${slug}/assets/${asset.filename}`,
-                        base64Content: base64,
+                      for (const asset of assets) {
+                        const base64 = await assetToBase64(asset);
+                        files.push({
+                          path: `hackathons/${slug}/assets/${asset.filename}`,
+                          base64Content: base64,
+                        });
+                      }
+
+                      const res = await fetch('/api/submit-pr', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          type: 'hackathon',
+                          slug,
+                          files,
+                        }),
                       });
+
+                      const data = await res.json();
+                      if (!res.ok) {
+                        throw new Error(data.error ?? 'Failed to create PR');
+                      }
+
+                      setPrUrl(data.pr_url);
+                      setSaveStatus('success');
+                    } catch (err) {
+                      const message =
+                        err instanceof Error ? err.message : 'Failed to save';
+                      setErrorMessage(message);
+                      setSaveStatus('error');
+                      throw err;
                     }
-
-                    const res = await fetch('/api/submit-pr', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        type: 'hackathon',
-                        slug,
-                        files,
-                      }),
-                    });
-
-                    const data = await res.json();
-                    if (!res.ok) {
-                      throw new Error(data.error ?? 'Failed to create PR');
-                    }
-
-                    setPrUrl(data.pr_url);
-                    setSaveStatus('success');
-                  } catch (err) {
-                    const message =
-                      err instanceof Error ? err.message : 'Failed to save';
-                    setErrorMessage(message);
-                    setSaveStatus('error');
-                    throw err;
-                  }
-                }}
-                lang="en"
-                draftKey={`editor-hackathon-${slug}-track-${track.slug}`}
-              />
-            </div>
-          </TabsContent>
-        ))}
+                  }}
+                  lang={lang}
+                  draftKey={`editor-hackathon-${slug}-track-${track.slug}`}
+                />
+              </div>
+            </TabsContent>
+          );
+        })}
       </Tabs>
     </div>
   );
