@@ -3,7 +3,8 @@
 import { useAuth } from '@/hooks/useAuth';
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import { ExternalLinkIcon } from '@/components/icons';
+import Link from 'next/link';
+import { PencilIcon } from '@/components/icons';
 
 interface EditProfileButtonProps {
   profileUsername: string;
@@ -13,19 +14,18 @@ interface EditProfileButtonProps {
 export function EditProfileButton({ profileUsername, lang }: EditProfileButtonProps) {
   const { user, loading } = useAuth();
 
-  if (loading || !user || user.login !== profileUsername) {
+  // Dev users (non-GitHub) can edit all pages; GitHub users must be the owner
+  if (loading || !user || (user.isGitHub && user.login !== profileUsername)) {
     return null;
   }
 
   return (
-    <a
-      href={`https://github.com/Synnovator/monorepo/edit/main/profiles/${profileUsername}.yml`}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      href={`/edit/profile/${profileUsername}`}
       className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
     >
       {t(lang, 'profile.edit')}
-      <ExternalLinkIcon size={12} aria-hidden="true" />
-    </a>
+      <PencilIcon size={12} aria-hidden="true" />
+    </Link>
   );
 }

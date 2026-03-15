@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @source "../../../packages/ui/src";
 @import "@synnovator/ui/styles";
 @import "../components/sketch/sketch-anim.css";

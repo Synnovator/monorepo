@@ -13,7 +13,7 @@ project:
     repo: "https://github.com/team-global-bridge/global-bridge"
     document:
       local_path: ""
-      r2_url: ""
+      url: ""
     video: "https://example.com/global-bridge-demo"
 
   tech_stack: ["Python", "FastAPI", "Vue.js", "PostgreSQL", "GPT-4", "AWS Lambda"]

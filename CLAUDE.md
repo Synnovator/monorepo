@@ -91,7 +91,7 @@ data/xxx ──→ main → [自动部署]  (平台数据变更)
 | `sync-issue-data.yml` | Issue labeled | 将 Issue 数据同步到 YAML PR |
 | `status-update.yml` | schedule | 自动更新活动状态 |
 
-其余 workflow: `validate-register`, `validate-score`, `validate-nda`, `validate-appeal`, `validate-team`, `aggregate-scores`, `upload-assets`
+其余 workflow: `validate-register`, `validate-score`, `validate-nda`, `validate-appeal`, `validate-team`, `aggregate-scores`
 
 ## Claude Code 配置
 

@@ -13,7 +13,7 @@ project:
     repo: "https://github.com/team-smart-cs/smart-cs-agent"
     document:
       local_path: ""
-      r2_url: ""
+      url: ""
     video: ""
 
   tech_stack: ["Python", "PyTorch", "Transformers", "BERT", "FastAPI", "Redis"]
