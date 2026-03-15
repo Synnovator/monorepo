@@ -2,7 +2,7 @@
 
 ## 问题
 
-当前 MDX 编辑器有两个 bug 和一个系统性设计缺陷：
+当前 MDX 编辑器有三个 bug 和一个系统性设计缺陷：
 
 ### Bug 1：活动编辑器默认打开英文
 
@@ -21,6 +21,14 @@
 1. `ProposalEditorPage` (page.tsx) 调用 `listSubmissions()` 取到 `entry.project.description`
 2. 但**没有传给** `ProposalEditorClient` — 接口中缺少 `description` 字段
 3. `ProposalEditorClient` 硬编码 `initialContent=""`、`initialContentAlt=""`
+
+### Bug 3：赛道编辑器打开无内容
+
+活动编辑器的赛道 tab 始终显示空白，即使 `hackathon.yml` 的 `tracks[]` 中已有 `description` 和 `description_zh`。
+
+**断裂链路**：
+1. `HackathonEditorPage` (page.tsx:66-70) 只提取 `slug`、`name`、`nameZh`，**没有提取 `description`**
+2. `HackathonEditorClient` 赛道 tab 硬编码 `initialContent=""`、`initialContentAlt=""`（第 266-267 行）
 
 ### 系统性问题：无统一数据契约
 
@@ -80,6 +88,7 @@ export interface HackathonEditorData {
   tracks: Array<{
     slug: string;
     name: BilingualContent;
+    description: BilingualContent;
   }>;
 }
 
@@ -94,6 +103,7 @@ export function getHackathonEditorData(slug: string): HackathonEditorData | null
     tracks: (h.tracks ?? []).map((tr) => ({
       slug: tr.slug,
       name: { en: tr.name, zh: tr.name_zh ?? tr.name },
+      description: { en: tr.description ?? '', zh: tr.description_zh ?? '' },
     })),
   };
 }
@@ -165,7 +175,7 @@ interface HackathonEditorClientProps {
   slug: string;
   name: BilingualContent;
   description: BilingualContent;
-  tracks: Array<{ slug: string; name: BilingualContent }>;
+  tracks: Array<{ slug: string; name: BilingualContent; description: BilingualContent }>;
   login: string;
   lang: Lang;  // 新增
 }
@@ -177,11 +187,12 @@ interface HackathonEditorClientProps {
 const { primary, alt } = resolveBilingual(description, lang);
 <MdxEditor initialContent={primary} initialContentAlt={alt} lang={lang} ... />
 
-// 赛道 tab（当前也是 lang="en" 硬编码，同样需要修复）
-<MdxEditor initialContent="" initialContentAlt="" lang={lang} ... />
+// 赛道 tab — 加载赛道 YAML 描述作为初始内容
+const { primary: trackPrimary, alt: trackAlt } = resolveBilingual(track.description, lang);
+<MdxEditor initialContent={trackPrimary} initialContentAlt={trackAlt} lang={lang} ... />
 ```
 
-> **注意**：赛道 tab 的 `initialContent` 暂时仍为空字符串，因为赛道 MDX 内容不在 YAML 中（存储在独立 `.mdx` 文件），当前数据层不加载。此问题超出本次修复范围，但 `lang` 必须修复。
+> **已知局限**：编辑器保存时会创建 `tracks/{slug}.mdx` 文件（通过 PR），但编辑器始终从 YAML 的 `description` 字段加载初始内容。首次编辑保存后再次打开编辑器，会显示 YAML 中的短描述而非上次保存的 MDX 富文本内容。这个问题同样影响活动描述编辑器（YAML `description` vs `description.mdx`），需要数据层基础设施变更（让 `StaticDataProvider` 能读取原始 MDX 源码），作为后续独立任务处理。
 
 #### ProposalEditorClient
 
