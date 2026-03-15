@@ -10,6 +10,7 @@
     "./lib/utils": "./src/lib/utils.ts",
     "./components/*": "./src/components/*.tsx",
     "./components/editor/types": "./src/components/editor/types.ts",
+    "./components/mdx-components": "./src/components/mdx-components/index.ts",
     "./icons": "./src/icons/index.tsx"
   },
   "dependencies": {

@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { MdxEditor } from '@synnovator/ui/components/editor/MdxEditor';
 import type { ComponentDefinition, Asset } from '@synnovator/ui/components/editor/types';
+import { hackathonComponents } from '@synnovator/ui/components/mdx-components';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@synnovator/ui';
 import {
   AlertCircle,
@@ -251,6 +252,7 @@ export function HackathonEditorClient({
               initialContent={descPrimary}
               initialContentAlt={descAlt}
               availableComponents={hackathonComponentDefs}
+              components={hackathonComponents}
               onSave={handleDescriptionSave}
               lang={lang}
               draftKey={`editor-hackathon-${slug}-description`}
@@ -272,6 +274,7 @@ export function HackathonEditorClient({
                   initialContent={trackPrimary}
                   initialContentAlt={trackAlt}
                   availableComponents={hackathonComponentDefs}
+                  components={hackathonComponents}
                   onSave={async (contentEn, contentZh, assets) => {
                     setSaveStatus('saving');
                     setErrorMessage(null);

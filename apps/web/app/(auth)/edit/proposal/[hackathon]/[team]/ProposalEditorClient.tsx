@@ -7,6 +7,7 @@ import type { ComponentDefinition, Asset } from '@synnovator/ui/components/edito
 import type { Lang } from '@synnovator/shared/i18n';
 import type { BilingualContent } from '@/lib/bilingual';
 import { resolveBilingual } from '@/lib/bilingual';
+import { proposalComponents } from '@synnovator/ui/components/mdx-components';
 import {
   AlertCircle,
   Image,
@@ -228,6 +229,7 @@ export function ProposalEditorClient({
           initialContent={descPrimary}
           initialContentAlt={descAlt}
           availableComponents={proposalComponentDefs}
+          components={proposalComponents}
           onSave={handleSave}
           lang={lang}
           draftKey={`proposal-draft-${hackathonSlug}-${teamSlug}`}

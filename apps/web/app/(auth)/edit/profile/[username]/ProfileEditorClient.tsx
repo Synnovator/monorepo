@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react';
 import { MdxEditor } from '@synnovator/ui/components/editor/MdxEditor';
 import type { ComponentDefinition, Asset } from '@synnovator/ui/components/editor/types';
+import { profileComponents } from '@synnovator/ui/components/mdx-components';
 import {
   AlertCircle,
   Image,
@@ -233,6 +234,7 @@ export function ProfileEditorClient({
           initialContent=""
           initialContentAlt=""
           availableComponents={profileComponentDefs}
+          components={profileComponents}
           onSave={handleSave}
           lang="en"
           templateContent={PROFILE_BIO_TEMPLATE}

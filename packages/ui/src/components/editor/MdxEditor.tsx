@@ -33,6 +33,7 @@ function MdxEditor({
   initialContent,
   initialContentAlt = '',
   availableComponents,
+  components,
   onSave,
   lang: initialLang,
   templateContent,
@@ -258,7 +259,7 @@ function MdxEditor({
 
         {/* Preview pane */}
         <div className="hidden min-h-0 overflow-hidden md:block">
-          <PreviewPane source={currentContent} />
+          <PreviewPane source={currentContent} components={components} />
         </div>
       </div>
 

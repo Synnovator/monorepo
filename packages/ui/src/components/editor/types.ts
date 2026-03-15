@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react'
 import type { LucideIcon } from 'lucide-react'
 
 export interface MdxEditorProps {
@@ -7,6 +8,9 @@ export interface MdxEditorProps {
   initialContentAlt?: string
   /** Available custom components for this scene */
   availableComponents: ComponentDefinition[]
+  /** Actual React component implementations for MDX preview rendering */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  components?: Record<string, ComponentType<any>>
   /** Called when user submits (both languages + assets). MDX content has blob URLs already rewritten to ./assets/ paths. */
   onSave: (content: string, contentAlt: string, assets: Asset[]) => Promise<void>
   /** Current language */
