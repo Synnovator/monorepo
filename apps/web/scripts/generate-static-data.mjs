@@ -343,6 +343,66 @@ async function collectMdx(dataRoot) {
   return count;
 }
 
+async function collectEditorMdx(dataRoot) {
+  const result = {};
+  const hackathonsDir = path.join(dataRoot, 'hackathons');
+
+  let hackathonEntries;
+  try {
+    hackathonEntries = await fs.readdir(hackathonsDir, { withFileTypes: true });
+  } catch {
+    return result;
+  }
+
+  const hackathonDirs = hackathonEntries.filter(e => e.isDirectory());
+
+  for (const dir of hackathonDirs) {
+    const slug = dir.name;
+    const hackathonPath = path.join(hackathonsDir, slug);
+
+    // Hackathon description MDX (raw source)
+    for (const suffix of ['', '.zh']) {
+      const file = path.join(hackathonPath, `description${suffix}.mdx`);
+      try {
+        result[`hackathon:${slug}:description${suffix}`] =
+          await fs.readFile(file, 'utf-8');
+      } catch { /* file does not exist */ }
+    }
+
+    // Track MDX (raw source)
+    const tracksDir = path.join(hackathonPath, 'tracks');
+    try {
+      const trackFiles = await fs.readdir(tracksDir);
+      for (const tf of trackFiles.filter(f => f.endsWith('.mdx'))) {
+        const key = tf.replace('.mdx', '');
+        result[`track:${slug}:${key}`] =
+          await fs.readFile(path.join(tracksDir, tf), 'utf-8');
+      }
+    } catch { /* no tracks directory */ }
+
+    // Submission MDX (raw source)
+    const submissionsDir = path.join(hackathonPath, 'submissions');
+    try {
+      const teamEntries = await fs.readdir(submissionsDir, { withFileTypes: true });
+      const teamDirs = teamEntries.filter(e => e.isDirectory());
+
+      for (const teamDir of teamDirs) {
+        const teamSlug = teamDir.name;
+        for (const variant of ['README.mdx', 'README.zh.mdx']) {
+          const file = path.join(submissionsDir, teamSlug, variant);
+          const suffix = variant === 'README.zh.mdx' ? '.zh' : '';
+          try {
+            result[`submission:${slug}:${teamSlug}${suffix}`] =
+              await fs.readFile(file, 'utf-8');
+          } catch { /* file does not exist */ }
+        }
+      }
+    } catch { /* no submissions directory */ }
+  }
+
+  return result;
+}
+
 function normaliseWeights(data) {
   const hackathon = data?.hackathon;
   if (!hackathon?.tracks) return;
@@ -364,7 +424,7 @@ function normaliseWeights(data) {
 async function main() {
   console.log('[generate-static-data] Reading YAML data...');
 
-  const [hackathons, profiles, submissions, teams, results, themeData, mdxCount] = await Promise.all([
+  const [hackathons, profiles, submissions, teams, results, themeData, mdxCount, editorMdx] = await Promise.all([
     collectHackathons(),
     collectProfiles(),
     collectSubmissions(),
@@ -372,12 +432,17 @@ async function main() {
     collectResults(),
     collectThemes(),
     collectMdx(DATA_ROOT),
+    collectEditorMdx(DATA_ROOT),
   ]);
 
   const data = { hackathons, profiles, submissions, teams, results, themes: themeData };
 
   await fs.mkdir(path.dirname(OUT_FILE), { recursive: true });
   await fs.writeFile(OUT_FILE, JSON.stringify(data, null, 2));
+
+  // Write raw MDX source for editor consumption
+  const editorMdxFile = path.resolve(__dirname, '../app/_generated/editor-mdx.json');
+  await fs.writeFile(editorMdxFile, JSON.stringify(editorMdx));
 
   console.log(`[generate-static-data] Written to ${path.relative(process.cwd(), OUT_FILE)}`);
   console.log(`  hackathons: ${hackathons.length}`);
@@ -387,6 +452,7 @@ async function main() {
   console.log(`  results: ${Object.keys(results).length} hackathons with results`);
   console.log(`  themes: ${themeData.themes.length} (active: ${themeData.activeTheme || 'none'}, variants: ${Object.keys(themeData.variants).length})`);
   console.log(`  mdx files: ${mdxCount}`);
+  console.log(`  editor mdx entries: ${Object.keys(editorMdx).length}`);
 }
 
 main().catch(err => {
