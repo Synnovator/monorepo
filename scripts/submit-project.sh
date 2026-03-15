@@ -24,6 +24,41 @@ fi
 
 mkdir -p "$DIR"
 
+# Create MDX template files
+cat > "${DIR}/README.mdx" << 'MDX'
+# Project Name
+
+## Overview
+
+Describe your project here.
+
+## Features
+
+- Feature 1
+- Feature 2
+
+## Architecture
+
+Describe your technical architecture.
+MDX
+
+cat > "${DIR}/README.zh.mdx" << 'MDX'
+# 项目名称
+
+## 概述
+
+在此描述您的项目。
+
+## 功能特点
+
+- 功能 1
+- 功能 2
+
+## 技术架构
+
+描述您的技术架构。
+MDX
+
 cat > "$FILE" << YAML
 synnovator_submission: "2.0"
 
@@ -50,5 +85,5 @@ project:
     Project description...
 YAML
 
-echo "Created submission: $FILE"
-echo "Next: edit $FILE and add deliverables, then commit and create PR"
+echo "Created submission: $FILE (with MDX templates)"
+echo "Next: edit $FILE and README.mdx, then commit and create PR"

@@ -24,6 +24,34 @@ fi
 
 mkdir -p "${DIR}/assets" "${DIR}/submissions"
 
+# Create MDX template files
+mkdir -p "${DIR}/tracks"
+
+cat > "${DIR}/description.mdx" << MDX
+# ${NAME}
+
+Add your hackathon description here.
+MDX
+
+cat > "${DIR}/description.zh.mdx" << MDX
+# ${NAME}
+
+在此添加活动描述。
+MDX
+
+# Default track MDX
+cat > "${DIR}/tracks/default.mdx" << MDX
+# Default Track
+
+Describe this track's focus, requirements, and evaluation criteria.
+MDX
+
+cat > "${DIR}/tracks/default.zh.mdx" << 'MDX'
+# 默认赛道
+
+描述此赛道的方向、要求和评审标准。
+MDX
+
 cat > "$FILE" << YAML
 synnovator_version: "2.0"
 
@@ -61,5 +89,5 @@ hackathon:
     language: ["zh", "en"]
 YAML
 
-echo "Created hackathon: $FILE"
-echo "Next: edit $FILE to fill in details, then commit and create PR"
+echo "Created hackathon: $FILE (with MDX templates)"
+echo "Next: edit $FILE and MDX files, then commit and create PR"
