@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getHackathon, listHackathons, listSubmissions, listProfiles } from '@/app/_generated/data';
+import { getHackathon, listHackathons, listSubmissions, listProfiles, getTeamsByHackathon } from '@/app/_generated/data';
 import { t, localize, getCurrentStage, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Timeline } from '@/components/Timeline';
@@ -16,9 +16,9 @@ import { ClipboardListIcon, ShieldCheckIcon } from '@/components/icons';
 import { RegisterForm } from '@/components/forms/RegisterForm';
 import { NDASignForm } from '@/components/forms/NDASignForm';
 import { AppealForm } from '@/components/forms/AppealForm';
-import { TeamFormationForm } from '@/components/forms/TeamFormationForm';
 import { TeamsTab } from '@/components/TeamsTab';
 import { SketchUnderline, SketchDoodle } from '@/components/sketch';
+import { EditHackathonButton } from '@/components/EditHackathonButton';
 import { Separator, Badge } from '@synnovator/ui';
 
 export const dynamic = 'force-static';
@@ -111,9 +111,16 @@ export default async function HackathonDetailPage({
           </Badge>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
-          {localize(lang, h.name, h.name_zh)}
-        </h1>
+        <div className="flex items-center gap-3 mb-3">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-foreground">
+            {localize(lang, h.name, h.name_zh)}
+          </h1>
+          <EditHackathonButton
+            slug={h.slug}
+            organizers={(h.organizers ?? []).map((o: any) => o.github).filter(Boolean)}
+            lang={lang}
+          />
+        </div>
 
         <p className="text-lg text-muted-foreground max-w-3xl mb-6">
           {localize(lang, h.tagline, h.tagline_zh)}
@@ -229,7 +236,7 @@ export default async function HackathonDetailPage({
                 <Separator />
                 <section className="mt-12 mb-8">
                   <h2 className="text-xl font-heading font-bold text-foreground mb-4">{t(lang, 'hackathon.datasets')}</h2>
-                  <DatasetSection datasets={h.datasets as any} hackathonSlug={h.slug} lang={lang} />
+                  <DatasetSection datasets={h.datasets as any} lang={lang} />
                 </section>
                 </>
               )}
@@ -281,7 +288,6 @@ export default async function HackathonDetailPage({
                     {t(lang, 'hackathon.nda_sign')}
                   </h2>
                   <NDASignForm
-                    hackathonSlug={h.slug}
                     ndaDocumentUrl={h.legal.nda.document_url}
                     ndaSummary={h.legal.nda.summary}
                     lang={lang}
@@ -298,20 +304,6 @@ export default async function HackathonDetailPage({
                     hackathonName={localize(lang, h.name, h.name_zh)}
                     tracks={formTracks}
                     ndaRequired={!!h.legal?.nda?.required}
-                    lang={lang}
-                  />
-                </section>
-              )}
-
-              {/* Team Formation (during registration/development stages) */}
-              {(['registration', 'development'].includes(stage)) && (
-                <section id="team-formation-section" className="mt-12">
-                  <h2 className="text-xl font-heading font-bold text-foreground mb-4">
-                    {t(lang, 'hackathon.team_formation')}
-                  </h2>
-                  <TeamFormationForm
-                    hackathonSlug={h.slug}
-                    tracks={formTracks}
                     lang={lang}
                   />
                 </section>
@@ -387,7 +379,7 @@ export default async function HackathonDetailPage({
           {/* Tab 4: Teams */}
           <div data-tab-panel="teams" role="tabpanel" id="panel-teams" aria-labelledby="tab-teams" className="hidden">
             <div className="space-y-8 pt-6">
-              <TeamsTab hackathonSlug={h.slug} stage={stage} lang={lang} />
+              <TeamsTab hackathonSlug={h.slug} lang={lang} teams={getTeamsByHackathon(h.slug)} />
             </div>
           </div>
         </div>

@@ -6,11 +6,7 @@ project:
   tagline: "Cross-functional compliance + tech solution with highest regulatory format score"
   track: "explainability"
 
-  team:
-    - github: "liu-compliance"
-      role: "Compliance Manager"
-    - github: "wang-algo"
-      role: "Algorithm Engineer"
+  team_ref: "team-compliance-express"
 
   mentors: []
 
@@ -18,7 +14,7 @@ project:
     repo: "https://github.com/team-compliance-express/explainability"
     document:
       local_path: ""
-      r2_url: ""
+      url: ""
     video: "https://example.com/compliance-demo"
 
   tech_stack: ["Python", "SHAP", "scikit-learn", "Jinja2"]

@@ -62,10 +62,7 @@ const MOCK_PROJECT = {
   tagline: 'AI-powered collaborative drawing tool',
   tagline_zh: 'AI 驱动的协作绘图工具',
   track: 'AI Applications',
-  team: [
-    { github: 'alice', role: 'lead' },
-    { github: 'bob', role: 'developer' },
-  ],
+  team_ref: 'mock-team',
   tech_stack: ['Python', 'TensorFlow', 'React', 'WebSocket'],
   likes: 42,
 };

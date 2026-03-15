@@ -17,7 +17,8 @@
     "search_hint": "⌘K",
     "search_no_results": "没有找到结果",
     "search_group_events": "活动",
-    "search_group_pages": "页面"
+    "search_group_pages": "页面",
+    "create_team": "创建队伍"
   },
   "footer": {
     "platform": "平台",
@@ -72,15 +73,13 @@
     "results": "评审结果",
     "results_pending": "结果尚未公布",
     "appeal_window": "申诉窗口",
-    "team_formation": "组队 / 寻找队友",
-    "teams_browse": "浏览正在组队的帖子，或发布你自己的组队信息。",
-    "teams_browse_link": "浏览组队帖子",
-    "teams_post": "发布组队",
-    "teams_not_available": "组队功能仅在报名和开发阶段开放。",
+    "teams_browse": "浏览参加此活动的队伍，或创建你自己的队伍。",
+    "teams_not_available": "暂无队伍信息。",
     "team_size_label": "团队规模",
     "solo_allowed": "（允许个人参赛）",
     "license_label": "许可证",
-    "ip_label": "知识产权"
+    "ip_label": "知识产权",
+    "edit": "编辑活动"
   },
   "stage": {
     "draft": "筹备中",
@@ -96,7 +95,34 @@
     "details": "详情",
     "submissions": "提案",
     "leaderboard": "排行榜",
-    "teams": "组队"
+    "teams": "队伍"
+  },
+  "team": {
+    "list_title": "队伍",
+    "create": "创建队伍",
+    "create_title": "创建队伍",
+    "create_submit": "在 GitHub 上创建队伍",
+    "name": "队伍名称",
+    "name_zh": "队伍中文名",
+    "leader": "队长",
+    "members_count": "名成员",
+    "looking_for_roles": "招募角色",
+    "looking_for_description": "招募说明",
+    "no_teams_yet": "暂无队伍，成为第一个创建的人吧！",
+    "status_recruiting": "招募中",
+    "status_formed": "已组队",
+    "status_disbanded": "已解散",
+    "join": "申请加入",
+    "leave": "退出队伍",
+    "manage": "管理队伍",
+    "hackathons": "参赛记录",
+    "created_at": "创建于",
+    "not_in_team": "你还没有加入任何队伍",
+    "browse_teams": "浏览队伍",
+    "my_team": "我的队伍",
+    "description": "关于",
+    "github_repo": "GitHub 仓库",
+    "edit": "编辑队伍"
   },
   "profile": {
     "skills": "技能",
@@ -252,10 +278,7 @@
     "public": "公开",
     "nda_required": "需 NDA",
     "download": "下载",
-    "get_download_link": "获取下载链接",
-    "sign_nda_link": "→ 签署 NDA",
-    "nda_first": "请先签署 NDA",
-    "network_error": "网络错误，请重试"
+    "link_pending": "下载链接待提供，请等待组织方更新"
   },
   "project": {
     "submissions": "提交作品",
@@ -346,20 +369,10 @@
       "name_required": "请输入显示名称"
     },
     "nda": {
-      "operation_failed": "操作失败，请重试",
-      "terms_1": "我已阅读并同意 NDA 条款",
-      "terms_2": "我了解保密和数据处理要求",
-      "terms_3": "我知晓违反可能导致取消资格和法律后果",
       "requires_nda": "此活动要求签署保密协议 (NDA)",
       "nda_summary": "NDA 摘要",
       "download_nda": "下载 NDA 文档",
-      "sign_in_to_sign": "请先登录后再签署 NDA",
-      "signer": "签署人",
-      "processing": "处理中...",
-      "sign_and_pr": "签署 NDA 并创建 PR",
-      "create_profile": "创建 档案",
-      "create_profile_first": "请先创建 档案，然后再签署 NDA",
-      "already_signed": "您已签署过该活动的 NDA"
+      "contact_organizer": "NDA 签署由活动组织方负责，请联系组织方获取签署指引。"
     },
     "create_hackathon": {
       "sign_in_first": "请先登录 GitHub",
@@ -468,22 +481,8 @@
       "repo_required": "请填写代码仓库 URL"
     },
     "team": {
-      "title": "组队 / 寻找队友",
-      "sign_in_first": "请先登录",
-      "team_name": "队伍名称",
-      "track": "赛道",
-      "select_track": "请选择赛道",
-      "purpose": "目的",
-      "select_purpose": "请选择",
-      "members": "成员",
-      "role": "角色",
-      "add_member": "添加成员",
-      "looking_for": "期望技能/角色",
-      "looking_for_placeholder": "例如：前端开发、ML 工程师...",
-      "project_idea": "项目想法",
-      "optional": "可选",
-      "project_idea_placeholder": "简要描述你的项目想法...",
-      "submit_github": "前往 GitHub 提交"
+      "sign_in_first": "请先登录以创建队伍",
+      "optional": "可选"
     },
     "appeal": {
       "title": "提起申诉",
@@ -547,7 +546,8 @@
     "admin_hackathons": "活动管理",
     "admin_profiles": "档案管理",
     "admin_submissions": "提交管理",
-    "admin_theme": "主题编辑"
+    "admin_theme": "主题编辑",
+    "teams": "队伍"
   },
   "proposals": {
     "title": "提案",
@@ -567,5 +567,30 @@
     "submit_title": "提交项目",
     "submit_desc": "组队参赛，提交作品，赢得认可",
     "cta": "开始探索"
+  },
+  "editor": {
+    "save": "提交更改",
+    "preview": "预览",
+    "insertComponent": "插入组件",
+    "uploadImage": "上传图片",
+    "uploadPdf": "上传 PDF",
+    "switchLang": "切换语言",
+    "unsavedChanges": "有未保存的更改，确定离开？",
+    "imageExceedsLimit": "图片大小不能超过 5MB",
+    "pdfExceedsLimit": "PDF 大小不能超过 20MB",
+    "submitPr": "提交 PR",
+    "prCreated": "PR 已创建",
+    "editContent": "编辑内容",
+    "autoSaved": "已自动保存",
+    "draftDetected": "检测到未提交的草稿，是否恢复？",
+    "restore": "恢复",
+    "discard": "放弃",
+    "compileError": "MDX 编译错误",
+    "noPermission": "你没有编辑此内容的权限",
+    "uploading": "上传中...",
+    "submitSuccess": "PR 已创建，等待审核",
+    "description": "活动描述",
+    "trackDescription": "赛道描述",
+    "stageDescription": "阶段描述"
   }
 }

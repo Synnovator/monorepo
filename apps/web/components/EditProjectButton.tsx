@@ -3,7 +3,8 @@
 import { useAuth } from '@/hooks/useAuth';
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
-import { ExternalLinkIcon } from '@/components/icons';
+import Link from 'next/link';
+import { PencilIcon } from '@/components/icons';
 
 interface EditProjectButtonProps {
   hackathonSlug: string;
@@ -15,21 +16,18 @@ interface EditProjectButtonProps {
 export function EditProjectButton({ hackathonSlug, teamSlug, teamMembers, lang }: EditProjectButtonProps) {
   const { user, loading } = useAuth();
 
-  if (loading || !user || !teamMembers.includes(user.login)) {
+  // Dev users (non-GitHub) can edit all pages; GitHub users must be team members
+  if (loading || !user || (user.isGitHub && !teamMembers.includes(user.login))) {
     return null;
   }
 
-  const editUrl = `https://github.com/Synnovator/monorepo/edit/main/hackathons/${hackathonSlug}/submissions/${teamSlug}/project.yml`;
-
   return (
-    <a
-      href={editUrl}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      href={`/edit/proposal/${hackathonSlug}/${teamSlug}?lang=${lang}`}
       className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
     >
       {t(lang, 'project.edit')}
-      <ExternalLinkIcon size={12} aria-hidden="true" />
-    </a>
+      <PencilIcon size={12} aria-hidden="true" />
+    </Link>
   );
 }

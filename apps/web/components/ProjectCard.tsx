@@ -3,6 +3,7 @@ import { localize } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Card, Avatar, AvatarImage, AvatarFallback } from '@synnovator/ui';
 import { HeartIcon } from './icons';
+import { getTeam } from '@/app/_generated/data';
 
 interface ProjectCardProps {
   project: {
@@ -11,7 +12,7 @@ interface ProjectCardProps {
     tagline?: string;
     tagline_zh?: string;
     track: string;
-    team: Array<{ github: string; role?: string }>;
+    team_ref: string;
     tech_stack?: string[];
     likes?: number;
   };
@@ -22,6 +23,12 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, hackathonSlug, teamSlug, lang }: ProjectCardProps) {
   const detailUrl = `/projects/${hackathonSlug}/${teamSlug}`;
+
+  // Look up team members from team_ref
+  const teamData = getTeam(project.team_ref);
+  const members = teamData
+    ? [{ github: teamData.leader, role: 'leader' }, ...teamData.members]
+    : [];
 
   return (
     <Card className="hover:border-primary/30 transition-colors group">
@@ -49,7 +56,7 @@ export function ProjectCard({ project, hackathonSlug, teamSlug, lang }: ProjectC
       </div>
 
       <div className="flex flex-wrap gap-2 mb-3">
-        {project.team.map(member => (
+        {members.map(member => (
           <span key={member.github} className="flex items-center gap-1 text-xs text-muted-foreground">
             <Avatar className="h-4 w-4">
               <AvatarImage src={`https://github.com/${member.github}.png?size=20`} alt={member.github} />

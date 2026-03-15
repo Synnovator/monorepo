@@ -73,6 +73,14 @@ export function SlimHeader() {
                 {t(lang, 'nav.create_proposal')}
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                href={langHref('/teams/create')}
+                className="block px-4 py-2.5 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors"
+              >
+                {t(lang, 'nav.create_team')}
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 

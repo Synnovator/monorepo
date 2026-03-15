@@ -7,17 +7,13 @@ project:
   tagline_zh: "在智海基准数据集上达到94.2%准确率的意图识别系统"
   track: "zhihai-customer-service"
 
-  team:
-    - github: "jack-nlp"
-      role: "Lead Developer"
-    - github: "kate-ml"
-      role: "ML Researcher"
+  team_ref: "team-smart-cs"
 
   deliverables:
     repo: "https://github.com/team-smart-cs/smart-cs-agent"
     document:
       local_path: ""
-      r2_url: ""
+      url: ""
     video: ""
 
   tech_stack: ["Python", "PyTorch", "Transformers", "BERT", "FastAPI", "Redis"]

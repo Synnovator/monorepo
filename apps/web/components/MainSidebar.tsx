@@ -27,6 +27,7 @@ import {
 import {
   TrophyIcon,
   ClipboardListIcon,
+  UsersIcon,
   SparklesIcon,
   ShieldCheckIcon,
   ChevronDownIcon,
@@ -48,6 +49,7 @@ interface CollapsibleNavGroup {
 const topItems: NavItem[] = [
   { href: '/', labelKey: 'sidebar.events', icon: TrophyIcon },
   { href: '/proposals', labelKey: 'sidebar.proposals', icon: ClipboardListIcon },
+  { href: '/teams', labelKey: 'sidebar.teams', icon: UsersIcon },
 ];
 
 const guidesGroup: CollapsibleNavGroup = {

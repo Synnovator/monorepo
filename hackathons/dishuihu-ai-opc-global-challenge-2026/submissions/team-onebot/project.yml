@@ -7,17 +7,13 @@ project:
   tagline_zh: "一人公司创始人的AI一站式工作空间：从创意到全球发布"
   track: "ai-application"
 
-  team:
-    - github: "dave-fullstack"
-      role: "Lead Developer"
-    - github: "eve-ai"
-      role: "AI Engineer"
+  team_ref: "team-onebot"
 
   deliverables:
     repo: "https://github.com/team-onebot/onebot-studio"
     document:
       local_path: ""
-      r2_url: ""
+      url: ""
     video: ""
 
   tech_stack: ["TypeScript", "React", "Cloudflare Workers", "D1", "Claude API", "Stripe"]

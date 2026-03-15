@@ -10,6 +10,7 @@
 import type { Hackathon } from '@synnovator/shared/types';
 import type { Profile } from '@synnovator/shared/types';
 import type { SubmissionWithMeta } from '@synnovator/shared/data';
+import type { Team } from '@synnovator/shared/schemas';
 import staticData from './static-data.json';
 
 // Cast the untyped JSON to the proper schema types.
@@ -19,6 +20,7 @@ const hackathons = staticData.hackathons as unknown as Hackathon[];
 const profiles = staticData.profiles as unknown as Profile[];
 const submissions = staticData.submissions as unknown as SubmissionWithMeta[];
 const results = staticData.results as unknown as Record<string, any[]>;
+const teams = ((staticData as any).teams ?? []) as unknown as (Team & { _slug: string })[];
 
 interface ThemeEntry {
   _id: string;
@@ -37,36 +39,56 @@ const themeData = (staticData as any).themes as {
   variants: Record<string, Record<string, unknown>>;
 } | undefined;
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function listHackathons(): Hackathon[] {
   return hackathons;
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function getHackathon(slug: string): Hackathon | null {
   return hackathons.find(h => h.hackathon.slug === slug) ?? null;
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function listProfiles(): Profile[] {
   return profiles;
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function getProfile(github: string): Profile | null {
   return profiles.find(p => p.hacker.github === github) ?? null;
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function listSubmissions(): SubmissionWithMeta[] {
   return submissions;
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function getResults(hackathonSlug: string): any[] {
   return results[hackathonSlug] ?? [];
 }
 
+export function listTeams(): (Team & { _slug: string })[] {
+  return teams;
+}
+
+export function getTeam(slug: string): (Team & { _slug: string }) | null {
+  return teams.find(t => t._slug === slug) ?? null;
+}
+
+export function getTeamsByHackathon(hackathonSlug: string): (Team & { _slug: string })[] {
+  return teams.filter(t => t.hackathons?.some(h => h.hackathon === hackathonSlug));
+}
+
 // --- Theme data ---
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function getActiveThemeName(): string {
   return themeData?.activeTheme ?? '';
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function listThemes(): { id: string; name: string; name_zh?: string; active: boolean }[] {
   if (!themeData) return [];
   const active = themeData.activeTheme;
@@ -78,11 +100,13 @@ export function listThemes(): { id: string; name: string; name_zh?: string; acti
   }));
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function getTheme(id: string): ThemeEntry | null {
   if (!themeData) return null;
   return themeData.themes.find(t => t._id === id) ?? null;
 }
 
+/** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function getThemeVariant(hackathonSlug: string, themeName: string): Record<string, unknown> | null {
   if (!themeData) return null;
   return (themeData.variants[`${hackathonSlug}/${themeName}`] as Record<string, unknown>) ?? null;
