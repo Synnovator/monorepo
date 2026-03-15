@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { decrypt, type Session } from '@synnovator/shared/auth';
-import { listSubmissions } from '@/app/_generated/data';
+import { listSubmissions, getTeam } from '@/app/_generated/data';
 import { ProposalEditorClient } from './ProposalEditorClient';
 
 export default async function ProposalEditorPage({
@@ -40,10 +40,13 @@ export default async function ProposalEditorPage({
     );
   }
 
-  // Authorization: dev-token users can edit everything; otherwise check team membership
+  // Authorization: dev-token users can edit everything; otherwise check team membership via team_ref
   const isDevUser = session.access_token === 'dev-token';
-  const isTeamMember = isDevUser || entry.project.team.some(
-    (member) => member.github === session.login,
+  const teamData = entry.project.team_ref ? getTeam(entry.project.team_ref) : null;
+  const isTeamMember = isDevUser || (
+    teamData
+      ? teamData.leader === session.login || teamData.members.some(m => m.github === session.login)
+      : false
   );
 
   if (!isTeamMember) {

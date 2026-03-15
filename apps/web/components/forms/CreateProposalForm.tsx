@@ -39,7 +39,7 @@ const STEP_LABELS_EN = ['Hackathon', 'Project', 'Deliverables', 'Preview'];
 const TOTAL_STEPS = 4;
 
 export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps) {
-  const { loading, isLoggedIn } = useAuth();
+  const { user, loading, isLoggedIn } = useAuth();
   const [step, setStep] = useState(0);
 
   // Step 0: Select hackathon
@@ -126,7 +126,7 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
     try {
       // Build files array: project.yml + MDX templates
       const basePath = `hackathons/${selectedHackathon}/submissions/${teamSlug}`;
-      const leaderGithub = members[0]?.github?.trim() || '';
+      const leaderGithub = user?.login || '';
       const files = [
         { path: `${basePath}/project.yml`, content: yamlContent },
         {
