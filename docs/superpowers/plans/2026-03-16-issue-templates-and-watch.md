@@ -748,13 +748,19 @@ EOF
 ```
 ```
 
-- [ ] **Step 3: Append watch-issue section to SKILL.md**
+- [ ] **Step 3: Update SKILL.md (Quick Reference table + Watch Operations section)**
 
-Insert between the `---` separator after `audit-secrets` (line ~331 of SKILL.md) and `## Important Rules` (line ~333). This creates a new `## Watch Operations` top-level section:
+First, add a row to the Quick Reference table (after `audit-secrets` row, line ~37 of SKILL.md):
+
+```
+| `watch-issue` | Watch | Monitor new bug/feature issues, AI triage + summary |
+```
+
+Then, append the watch-issue section to SKILL.md:
+
+Insert after the existing `---` separator at line ~331 of SKILL.md (do NOT duplicate the separator). The new content goes between the existing `---` and `## Important Rules`:
 
 ```markdown
----
-
 ## Watch Operations
 
 ### watch-issue
@@ -825,10 +831,6 @@ In the `## GitHub Actions 工作流` table in `CLAUDE.md`, add these rows:
 | `validate-bug.yml` | Issue with `bug` label | 校验 Bug Report 必填字段 |
 | `validate-feature.yml` | Issue with `enhancement` label | 校验 Feature Request 必填字段 |
 | `stale.yml` | schedule (every 6h) | 自动关闭 needs-info 超时 Issue |
-
-Also update the Quick Reference table in `SKILL.md` (`.claude/skills/synnovator-admin/SKILL.md`) to include:
-
-| `watch-issue` | Watch | Monitor new bug/feature issues, AI triage + summary |
 
 - [ ] **Step 2: Commit**
 
