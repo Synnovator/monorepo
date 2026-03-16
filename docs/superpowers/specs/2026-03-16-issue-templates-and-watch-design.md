@@ -40,12 +40,14 @@ Synnovator 仓库已有 5 个面向参与者的 Issue 模板（registration、ju
 
 **自动 label**：`bug`
 
+**标题格式**：`[Bug] {简要描述}`
+
 **字段**：
 
 | ID | 类型 | 标签 | 必填 | 说明 |
 |----|------|------|------|------|
-| `role` | input | 你的身份 | 是 | 参赛选手 / 评委 / 主办方管理员 / 访客 |
-| `hackathon-url` | input | 相关活动页面 URL | 否 | 具体活动页面的完整 URL |
+| `role` | dropdown | 你的身份 | 是 | 参赛选手 / 评委 / 主办方管理员 / 访客 |
+| `hackathon-url` | input | 相关活动页面 URL | 否 | 须匹配 `https://home.synnovator.space/*` |
 | `steps` | textarea | 复现步骤 | 是 | 逐步操作描述，含正反例引导 |
 | `expected` | textarea | 期望行为 | 是 | 正确结果应该是什么 |
 | `actual` | textarea | 实际行为 | 是 | 实际发生了什么，含错误信息 |
@@ -73,6 +75,8 @@ Synnovator 仓库已有 5 个面向参与者的 Issue 模板（registration、ju
 
 **自动 label**：`enhancement`
 
+**标题格式**：`[Feature] {简要描述}`
+
 **字段**：
 
 | ID | 类型 | 标签 | 必填 | 说明 |
@@ -99,15 +103,32 @@ contact_links:
   - name: "使用帮助"
     url: https://home.synnovator.space
     about: 如果你不确定是否是 Bug，请先浏览平台
+  - name: "一般性问题"
+    url: https://github.com/Synnovator/monorepo/discussions
+    about: 提问、讨论、或寻求使用帮助
 ```
 
-强制所有 issue 必须选择模板，防止信息不完整的空白 issue。
+强制所有 issue 必须选择模板，防止信息不完整的空白 issue。非 Bug / Feature 的一般性问题引导至 Discussions。
 
 ## 4. Validate Workflows
 
 ### 4.1 `validate-bug.yml`
 
-**触发**：`issues.opened` 和 `issues.edited`，仅处理带 `bug` label 的 issue。
+**触发**：`issues: [opened, edited, labeled]`（含 `labeled` 以处理 Issue Forms label 异步添加的竞态条件），与现有 `validate-register.yml` 等 workflow 保持一致。
+
+**Guard 条件**：
+```yaml
+if: |
+  contains(github.event.issue.labels.*.name, 'bug') &&
+  (github.event.action != 'labeled' || github.event.label.name == 'bug')
+```
+
+**权限**：
+```yaml
+permissions:
+  issues: write
+  contents: read
+```
 
 **检查逻辑**：解析 issue body，验证以下必填字段非空：
 - `role`（身份）
@@ -117,20 +138,27 @@ contact_links:
 - `browser`（浏览器）
 - `device`（设备类型）
 
-**结果**：
+附加检查：如果 `hackathon-url` 非空，验证其匹配 `https://home.synnovator.space/*`。
+
+**Label 状态机**：
 - 任何必填字段为空 → 添加 `needs-info` label + 留评论列出缺少字段（引用模板中的好例子）
 - 所有字段完整 → 添加 `triaged` label + 移除 `needs-info`（如之前有）
+- 用户编辑 issue 触发 `edited` 事件 → 重新验证：通过则移除 `needs-info` 加 `triaged`，仍不通过则更新评论列出剩余缺失字段
+
+**注意**：仅 `edited` 事件（用户修改 issue body）触发重新验证。用户仅发表评论不会触发 validate workflow，因此不会绕过字段检查（见 §5.1 中 stale 配置对评论的处理）。
 
 ### 4.2 `validate-feature.yml`
 
-**触发**：同上，仅处理带 `enhancement` label 的 issue。
+**触发**：同 4.1，guard 条件替换为 `enhancement` label。
+
+**权限**：同 4.1。
 
 **检查字段**：
 - `problem`（问题/痛点）
 - `solution`（建议方案）
 - `scope`（影响范围）
 
-**结果逻辑**：同 `validate-bug.yml`。
+**Label 状态机**：同 4.1。
 
 ### 4.3 Issue Body 解析方式
 
@@ -155,13 +183,26 @@ GitHub Issue Forms 生成的 body 格式为：
 
 使用 [`actions/stale`](https://github.com/actions/stale) 官方 Action。
 
-**配置要点**：
-- **触发频率**：每小时运行 `schedule: '0 * * * *'`
-- **目标 label**：`needs-info`
-- **超时时间**：1 天（`days-before-close: 1`）
-- **关闭评论**："由于未在 24 小时内补充所需信息，此 Issue 已自动关闭。补充信息后可随时 reopen。"
-- **豁免**：如果 issue 作者在超时前发布了新评论，`actions/stale` 自动移除 stale 标记，issue 保持开启
-- **作用范围**：仅处理 `needs-info` label 的 issue，不影响其他 issue
+**完整配置**：
+```yaml
+schedule: '0 */6 * * *'  # 每 6 小时运行（24h 超时无需更频繁）
+```
+
+```yaml
+with:
+  days-before-stale: -1                  # 禁用 stale 自身的过期检测（由 validate workflow 添加 needs-info）
+  days-before-close: 1                   # needs-info 标记后 1 天无响应则关闭
+  stale-issue-label: needs-info          # 以 needs-info 作为 stale 标记
+  close-issue-label: closed-incomplete   # 关闭时添加的 label
+  only-labels: needs-info                # 仅处理带 needs-info 的 issue，不影响其他 issue
+  exempt-issue-labels: triaged,watched   # 已分诊的 issue 豁免
+  remove-stale-when-updated: false       # 仅评论不移除 needs-info（须编辑 issue body 触发 validate 重新验证）
+  close-issue-message: |
+    由于未在 24 小时内补充所需信息，此 Issue 已自动关闭。
+    补充信息后可随时编辑 Issue 内容并 reopen，validate workflow 会重新验证。
+```
+
+**关键设计决策**：`remove-stale-when-updated: false` — 用户仅发表评论不会自动移除 `needs-info`。用户必须**编辑 issue body** 补充缺失字段，触发 validate workflow 重新验证后由 workflow 移除 `needs-info`。这防止了用户通过评论保活而不实际补充信息的情况。
 
 ### 5.2 Label 体系扩展
 
@@ -185,15 +226,16 @@ GitHub Issue Forms 生成的 body 格式为：
 
 每 30 分钟自动扫描新的 Bug Report 和 Feature Request。
 
+**前置条件**：`/loop` 是 Claude Code 内置 skill，用于按指定间隔重复执行 slash command。管理员需在本地 Claude Code 会话中启动，会话关闭则停止。
+
 ### 6.2 扫描范围
 
 ```bash
 # 查找已通过字段检查（triaged）但尚未被 AI 处理（无 watched label）的 issue
-gh issue list --label "bug" --label "triaged" --state open --json number,title,author,createdAt,body
-gh issue list --label "enhancement" --label "triaged" --state open --json number,title,author,createdAt,body
+# 使用 --search "-label:watched" 在 API 层排除，避免客户端过滤
+gh issue list --label "bug" --label "triaged" --state open --search "-label:watched" --json number,title,author,createdAt,body
+gh issue list --label "enhancement" --label "triaged" --state open --search "-label:watched" --json number,title,author,createdAt,body
 ```
-
-过滤逻辑：跳过已有 `watched` label 的 issue。
 
 ### 6.3 每个 Issue 的处理流程
 
@@ -250,7 +292,7 @@ gh issue list --label "enhancement" --label "triaged" --state open --json number
     └── watch-issue-prompt.md   # 新增：AI 分诊 system prompt
 ```
 
-**实现方式**：使用 `/skill-creator` skill 创建 `watch-issue` 子命令。
+**实现方式**：使用 `/skill-creator` skill 创建。`watch-issue` 作为 `synnovator-admin` 的子命令（`synnovator-admin:watch-issue`），通过在 `SKILL.md` 中追加章节实现，不创建独立 skill 目录。`/skill-creator` 用于生成 `watch-issue-prompt.md` 参考文件和辅助 SKILL.md 章节编写。
 
 ## 7. 决策流转
 
@@ -263,13 +305,14 @@ Issue 讨论充分、有明确修改意见后：
 
 ```
 提交者创建 Issue（选择模板）
-  → Issue Form 强制填写必填字段
+  → Issue Form 强制填写必填字段，标题格式：[Bug]/[Feature] + 简要描述
   → 模板自动添加 bug / enhancement label
-  → validate-bug.yml / validate-feature.yml 触发
+  → validate-bug.yml / validate-feature.yml 触发（opened / edited / labeled）
     → 字段完整 → 添加 triaged label
     → 字段缺失 → 添加 needs-info label + 评论要求补充
-      → 24h 无回应 → stale.yml 自动关闭
-      → 作者补充 → 移除 needs-info → 重新触发 validate
+      → 24h 内作者编辑 issue body → validate 重新触发 → 通过则移除 needs-info 加 triaged
+      → 24h 无编辑 → stale.yml 自动关闭（标记 closed-incomplete）
+      → 关闭后作者可编辑 body 并 reopen
   → watch-issue（每 30 分钟）扫描 triaged 且无 watched 的 issue
     → AI 分诊 → 发布摘要评论 + 添加 watched label
     → 管理员终端收到汇总报告
