@@ -3,11 +3,12 @@ name: synnovator-admin
 description: >
   Synnovator platform admin CLI — create/update/close hackathons, manage profiles and submissions,
   export scores and registrations, audit changes and permissions, and simulate full hackathon
-  scenarios with synthetic data. Use whenever the admin needs to manage hackathon data, create
-  profiles, export reports, query audit history, simulate hackathon scenarios, or perform any
-  platform management operation. Also trigger when the user mentions hackathon management,
-  YAML data editing, score exports, NDA approvals, 模拟活动, 生成仿真数据, simulate hackathon,
-  forge challenge scenario, or 活动虚拟数据 in the Synnovator context.
+  scenarios with synthetic data, and monitor issues with AI-powered triage. Use whenever the admin
+  needs to manage hackathon data, create profiles, export reports, query audit history, simulate
+  hackathon scenarios, monitor new bug/feature issues, or perform any platform management operation.
+  Also trigger when the user mentions hackathon management, YAML data editing, score exports,
+  NDA approvals, 模拟活动, 生成仿真数据, simulate hackathon, forge challenge scenario,
+  活动虚拟数据, watch issues, or issue triage in the Synnovator context.
 ---
 
 # Synnovator Admin
@@ -35,6 +36,7 @@ and PR creation into guided interactive workflows.
 | `audit-log` | Read | Query git history for a hackathon |
 | `audit-permissions` | Read | Check RBAC config (collaborators + CODEOWNERS) |
 | `audit-secrets` | Read | Verify required GitHub Secrets are configured |
+| `watch-issue` | Watch | Monitor new bug/feature issues, AI triage + summary |
 
 When the admin invokes `/synnovator-admin` without a specific command, display this table and
 ask which operation they need.
@@ -327,6 +329,54 @@ and JSON parsing.
 2. Check against required secrets: `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`,
    `R2_BUCKET_NAME`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `AUTH_SECRET`
 3. Report which are present and which are missing (values are never shown)
+
+---
+
+## Watch Operations
+
+### watch-issue
+
+Monitor new Bug Reports and Feature Requests, perform AI-powered triage, and post summary comments.
+
+**Invocation**: `/loop 30m /synnovator-admin:watch-issue`
+
+**Prerequisite**: `/loop` is a Claude Code built-in skill that repeats a slash command at the specified interval. The loop runs in the local Claude Code session and stops when the session closes.
+
+**Execution steps**:
+
+1. **Query new issues** — read `references/github-api-patterns.md` for the exact queries:
+   ```bash
+   gh issue list --label "bug" --label "triaged" --state open --search "-label:watched" --json number,title,author,createdAt,body,labels --limit 50
+   gh issue list --label "enhancement" --label "triaged" --state open --search "-label:watched" --json number,title,author,createdAt,body,labels --limit 50
+   ```
+
+2. **For each issue**:
+   a. Parse the issue body to extract form field values
+   b. Read `references/watch-issue-prompt.md` for the AI triage prompt structure
+   c. Analyze the issue and generate a triage summary
+   d. Post the triage summary as a comment: `gh issue comment {number} --body "{summary}"`
+   e. Add the `watched` label: `gh issue edit {number} --add-label "watched"`
+
+3. **Output scan report** to the terminal:
+   ```
+   ━━━ watch-issue 扫描报告 ━━━
+     扫描时间：{timestamp}
+     新 Bug：{count} 个 | 新 Feature：{count} 个
+
+     #{number} [{priority} {type}] {title summary} — @{author}
+          → 影响：{impact} | 模块：{module}
+
+     无需处理：{count} 个（已有摘要或待补充信息）
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ```
+
+4. **If no new issues found**, output:
+   ```
+   ━━━ watch-issue 扫描报告 ━━━
+     扫描时间：{timestamp}
+     无新 Issue 需要处理
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ```
 
 ---
 
