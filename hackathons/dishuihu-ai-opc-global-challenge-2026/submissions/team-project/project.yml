@@ -1,11 +1,10 @@
 synnovator_submission: "2.0"
 project:
-  name: "我的黑历史"
-  name_zh: "测试项目"
-  tagline: "testing"
+  name: "电竞酒店"
+  tagline: "ddd"
   track: "ai-application"
   team_ref: "team-project"
   deliverables:
-    repo: "https://github.com/CS571-F23/hw12-Cynthialime"
+    repo: "jdjdaj "
   tech_stack:
-    - "python"
+    - "jdjd"
