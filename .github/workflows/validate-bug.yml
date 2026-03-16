@@ -1,0 +1,124 @@
+name: Validate Bug Report
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+
+jobs:
+  validate:
+    if: |
+      contains(github.event.issue.labels.*.name, 'bug') &&
+      (github.event.action != 'labeled' || github.event.label.name == 'bug')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - name: Validate bug report fields
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body || '';
+            const errors = [];
+
+            // Parse Issue Forms body: split by ### headers
+            // Field labels are Chinese text; escape for regex safety
+            function getField(body, label) {
+              const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              const regex = new RegExp(`### ${escaped}\\s*\\n\\s*([\\s\\S]*?)(?=\\n### |$)`);
+              const match = body.match(regex);
+              if (!match) return '';
+              const value = match[1].trim();
+              if (value === '_No response_' || value === '') return '';
+              return value;
+            }
+
+            // Required fields
+            const requiredFields = [
+              { id: 'role', label: '你的身份' },
+              { id: 'steps', label: '复现步骤' },
+              { id: 'expected', label: '期望行为' },
+              { id: 'actual', label: '实际行为' },
+              { id: 'browser', label: '浏览器' },
+              { id: 'device', label: '设备类型' },
+            ];
+
+            const missing = [];
+            for (const field of requiredFields) {
+              if (!getField(body, field.label)) {
+                missing.push(field.label);
+              }
+            }
+
+            // Optional URL validation
+            const hackathonUrl = getField(body, '相关活动页面 URL');
+            if (hackathonUrl && !hackathonUrl.startsWith('https://home.synnovator.space/')) {
+              errors.push(`活动页面 URL 应以 \`https://home.synnovator.space/\` 开头，当前值：\`${hackathonUrl}\``);
+            }
+
+            if (missing.length > 0) {
+              errors.push(`以下必填字段为空：${missing.map(f => `**${f}**`).join('、')}`);
+            }
+
+            const currentLabels = issue.labels.map(l => l.name);
+
+            if (errors.length > 0) {
+              // Add needs-info, remove triaged if present
+              if (!currentLabels.includes('needs-info')) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: ['needs-info'],
+                });
+              }
+              if (currentLabels.includes('triaged')) {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  name: 'triaged',
+                });
+              }
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: [
+                  '⚠️ **Bug Report 信息不完整**\n',
+                  ...errors.map(e => `- ${e}`),
+                  '',
+                  '请编辑 Issue 补充以上信息。示例：',
+                  '> 1. 登录账号 xxx  2. 进入活动页面  3. 点击某按钮  4. 看到错误信息 "xxx"',
+                  '',
+                  '编辑完成后，系统会自动重新验证。24 小时内未补充将自动关闭。',
+                ].join('\n'),
+              });
+            } else {
+              // All fields present — add triaged, remove needs-info
+              if (!currentLabels.includes('triaged')) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: ['triaged'],
+                });
+              }
+              if (currentLabels.includes('needs-info')) {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  name: 'needs-info',
+                });
+              }
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: '✅ **Bug Report 验证通过。** 感谢提交！团队将尽快查看。\n\n> 讨论达成一致后，请 @allenwoods 确认最终方案。',
+              });
+            }

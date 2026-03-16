@@ -91,6 +91,10 @@ data/xxx ──→ main → [自动部署]  (平台数据变更)
 | `sync-issue-data.yml` | Issue labeled | 将 Issue 数据同步到 YAML PR |
 | `status-update.yml` | schedule | 自动更新活动状态 |
 
+| `validate-bug.yml` | Issue with `bug` label | 校验 Bug Report 必填字段 |
+| `validate-feature.yml` | Issue with `enhancement` label | 校验 Feature Request 必填字段 |
+| `stale.yml` | schedule (every 6h) | 自动关闭 needs-info 超时 Issue |
+
 其余 workflow: `validate-register`, `validate-score`, `validate-nda`, `validate-appeal`, `validate-team`, `aggregate-scores`
 
 ## Claude Code 配置

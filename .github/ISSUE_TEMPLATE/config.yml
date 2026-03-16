@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "使用帮助"
+    url: https://home.synnovator.space
+    about: 如果你不确定是否是 Bug，请先浏览平台
+  - name: "一般性问题"
+    url: https://github.com/Synnovator/monorepo/discussions
+    about: 提问、讨论、或寻求使用帮助

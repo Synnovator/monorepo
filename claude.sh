@@ -69,6 +69,19 @@ if ! command -v tmux &> /dev/null; then
 fi
 
 # ============================================
+# Agent Setup plugin bootstrap
+# ============================================
+
+if ! claude plugin list 2>/dev/null | grep -q "agent-setup@agent-setup"; then
+    echo "📦 Installing agent-setup plugin..."
+    claude plugin install agent-setup@agent-setup --scope project 2>/dev/null || {
+        echo "⚠️  Could not install agent-setup plugin. Run manually:"
+        echo "  claude plugin install agent-setup@agent-setup --scope project"
+    }
+    echo ""
+fi
+
+# ============================================
 # Flags per mode
 #
 # Interactive: supports --permission-mode, --mcp-config, --worktree

@@ -6,40 +6,7 @@
     "defaultMode": "bypassPermissions"
   },
   "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/check-skill-updates.sh"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/agent-setup.sh"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/inject-superpowers.sh"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/learning-output-style.sh"
-          }
-        ]
-      }
-    ],
+    "SessionStart": [],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -60,6 +27,13 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "agent-setup@agent-setup": true,
+    "superpowers@agent-setup": true,
+    "agent-browser@agent-setup": true,
+    "learning-output-style@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true
   },
   "teammateMode": "auto"
 }

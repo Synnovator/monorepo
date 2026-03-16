@@ -1,0 +1,27 @@
+name: Close Stale Issues
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-stale: -1
+          days-before-close: 1
+          stale-issue-label: needs-info
+          close-issue-label: closed-incomplete
+          only-labels: needs-info
+          exempt-issue-labels: triaged,watched
+          remove-stale-when-updated: false
+          close-issue-message: |
+            由于未在 24 小时内补充所需信息，此 Issue 已自动关闭。
+            补充信息后可随时编辑 Issue 内容并 reopen，validate workflow 会重新验证。
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
