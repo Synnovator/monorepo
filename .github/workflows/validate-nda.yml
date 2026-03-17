@@ -2,7 +2,7 @@ name: Validate NDA
 
 on:
   issues:
-    types: [opened, edited, labeled]
+    types: [edited, labeled]
 
 jobs:
   validate:
