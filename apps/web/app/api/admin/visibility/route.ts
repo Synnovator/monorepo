@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@synnovator/shared/auth';
-import { isAdmin } from '@/lib/permissions';
+import { canEditHackathon } from '@/lib/permissions';
 import { getInstallationOctokit } from '@/lib/github-app';
+import { getHackathon } from '@/app/_generated/data';
 import yaml from 'js-yaml';
 
 const OWNER = process.env.GITHUB_OWNER || 'Synnovator';
@@ -34,12 +35,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 2. Check admin permission via roles config
-    if (!isAdmin(session.login)) {
-      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
-    }
-
-    // 3. Parse and validate body
+    // 2. Parse and validate body
     let body: { type?: string; slug?: string; visibility?: string };
     try {
       body = await request.json();
@@ -56,6 +52,14 @@ export async function POST(request: NextRequest) {
     }
     if (visibility !== 'public' && visibility !== 'private') {
       return NextResponse.json({ error: 'visibility must be public or private' }, { status: 400 });
+    }
+
+    // 3. Check permission: admin or hackathon managed_by
+    const hackathonSlugForPerm = type === 'hackathon' ? slug : slug.split('/')[0];
+    const hackathonEntry = getHackathon(hackathonSlugForPerm);
+    const managedBy = hackathonEntry?.hackathon.managed_by ?? [];
+    if (!canEditHackathon(session.login, managedBy)) {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
     // 4. Check GitHub App env vars
