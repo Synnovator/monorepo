@@ -1,10 +1,16 @@
 ---
 name: watch-issue
 description: >
-  Monitor new Bug Report and Feature Request issues with AI-powered triage. Posts summary comments
-  and adds watched labels. Designed for recurring use via /loop. Use when the admin mentions:
-  watch issues, issue triage, monitor bugs, 监控 Issue, issue 分诊, or wants to set up automated
-  issue monitoring in the Synnovator context.
+  Two-phase AI triage for GitHub Bug Reports and Feature Requests: Phase 1 posts non-technical
+  triage comments (with codebase investigation and optional screenshots) for product discussion;
+  Phase 2 posts technical implementation plans after solution is confirmed. Designed for recurring
+  use via /loop. Use this skill whenever the admin wants to: check for new issues, scan or triage
+  bugs and feature requests, monitor issue activity, review untriaged issues, set up automated
+  issue watching, assess issue priority, post triage summaries, or follow up on solution-confirmed
+  issues. Also trigger when the admin mentions: watch issues, issue 分诊, 监控 Issue, new bugs,
+  扫描 issue, 优先级评估, or asks about issue status in the Synnovator context. This skill handles
+  the full lifecycle from initial triage to development handoff — if the request involves GitHub
+  issues in any way (reading, analyzing, commenting, labeling), this skill likely applies.
 ---
 
 # Watch Issue
@@ -52,6 +58,11 @@ Triage comments are split into two phases to serve different audiences:
       - Read the key files to understand **what the current code actually does**
       - For bugs: trace the code path to identify where the failure likely occurs
       - For features: check whether the requested behavior (or a partial version) already exists
+      - **Validate candidate fix approaches**: before proposing any option, verify it is
+        technically feasible. Consider: does the API/mechanism actually exist? Do users have
+        the required permissions (most users are Read-only)? Does the target endpoint support
+        the needed parameters? Does the approach work for existing files vs new files?
+        Discard any option that fails validation — do not present it as a possibility
 
    c. **Visual verification (best-effort)** — use `agent-browser` to capture the current state.
       This step is best-effort: if the app is inaccessible, requires special auth, or the flow
