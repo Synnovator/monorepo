@@ -153,7 +153,7 @@ export default async function TeamDetailPage({
           {team.members.length > 0 && (
             <section>
               <h2 className="text-sm font-medium text-muted-foreground mb-3">
-                {t(lang, 'team.members_count')} ({team.members.length})
+                {team.members.length} {t(lang, 'team.members_count')}
               </h2>
               <div className="space-y-2">
                 {team.members.map(member => (
