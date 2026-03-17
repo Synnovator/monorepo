@@ -2,7 +2,7 @@ name: Validate Feature Request
 
 on:
   issues:
-    types: [opened, edited, labeled]
+    types: [edited, labeled]
 
 jobs:
   validate:
@@ -107,6 +107,6 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                body: '✅ **Feature Request 验证通过。** 感谢建议！团队将评估可行性。\n\n> 讨论达成一致后，请 @allenwoods 确认最终方案。',
+                body: '✅ **Feature Request 验证通过。** 感谢建议！团队将评估可行性。',
               });
             }
