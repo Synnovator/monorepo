@@ -9,17 +9,23 @@ import { PencilIcon } from '@/components/icons';
 interface EditProjectButtonProps {
   hackathonSlug: string;
   teamSlug: string;
+  managedBy: string[];
   teamMembers: string[];
   lang: Lang;
 }
 
-export function EditProjectButton({ hackathonSlug, teamSlug, teamMembers, lang }: EditProjectButtonProps) {
+export function EditProjectButton({ hackathonSlug, teamSlug, managedBy, teamMembers, lang }: EditProjectButtonProps) {
   const { user, loading } = useAuth();
 
-  // Dev users (non-GitHub) can edit all pages; GitHub users must be team members
-  if (loading || !user || (user.isGitHub && !teamMembers.includes(user.login))) {
-    return null;
-  }
+  if (loading || !user) return null;
+
+  const login = user.login.toLowerCase();
+  const canEdit =
+    user.role === 'admin' ||
+    managedBy.some(m => m.toLowerCase() === login) ||
+    teamMembers.some(member => member.toLowerCase() === login);
+
+  if (!canEdit) return null;
 
   return (
     <Link

@@ -14,10 +14,13 @@ interface EditProfileButtonProps {
 export function EditProfileButton({ profileUsername, lang }: EditProfileButtonProps) {
   const { user, loading } = useAuth();
 
-  // Dev users (non-GitHub) can edit all pages; GitHub users must be the owner
-  if (loading || !user || (user.isGitHub && user.login !== profileUsername)) {
-    return null;
-  }
+  if (loading || !user) return null;
+
+  const canEdit =
+    user.role === 'admin' ||
+    user.login.toLowerCase() === profileUsername.toLowerCase();
+
+  if (!canEdit) return null;
 
   return (
     <Link
