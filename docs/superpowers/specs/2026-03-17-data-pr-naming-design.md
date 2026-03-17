@@ -12,10 +12,11 @@ Data PRs are reviewed by operations/admin staff, not developers. They need a dif
 
 ## Design Decisions
 
-1. **Data PRs do not follow conventional commit format** — they use a `[操作类型]` prefix with human-readable names
+1. **Data PRs do not follow conventional commit format** — they use a `[操作类型]` prefix with human-readable names. This applies to both PR titles and commit messages. Dev PRs continue to use conventional commit format.
 2. **Bilingual (zh-first, en-second)** — `name_zh / name` format throughout title and body
-3. **No fallback** — `metadata` is required on the API; missing metadata returns 400
+3. **No fallback** — `metadata` is required on the API; missing metadata returns 400. All frontend forms and the API are deployed atomically — there is no rollout period where old clients call the new API.
 4. **Branch names use flat concatenation** — hyphens only, no nested `/` separators beyond the `data/` prefix
+5. **Unified branch naming across entry points** — the same data operation uses the same branch pattern regardless of whether it's initiated via Web API, Admin Skill, or GitHub Actions
 
 ## PR Title Format
 
@@ -43,6 +44,8 @@ Data PRs are reviewed by operations/admin staff, not developers. They need a dif
 | submit-project | `[提交] {projectName} → {hackathonNameZh} · {trackNameZh}赛道` | `[提交] AgentFlow → 社区黑客松 · AI Agent赛道` |
 | create-profile | `[创建档案] @{username}` | `[创建档案] @alice` |
 
+Note: `close-hackathon` is admin-only (via Skill), not available through the Web API.
+
 ## Branch Name Format
 
 ### Web API
@@ -62,15 +65,27 @@ Collision handling (branch already exists): append Unix timestamp suffix, e.g. `
 | sync-registrations | `data/sync-registrations-{hackathonSlug}-{DATE}` | `data/sync-registrations-dishuihu-ai-opc-2026-03-17` |
 | sync-nda | `data/sync-nda-{hackathonSlug}-{DATE}` | `data/sync-nda-dishuihu-ai-opc-2026-03-17` |
 
-When multiple hackathons are synced in one run, use the first hackathon slug. If registrations span multiple hackathons, use `multi` as the slug.
+When multiple hackathons are synced in one run, use the first hackathon slug. If registrations span multiple hackathons, use `multi` as the slug, and the title becomes `[同步注册] {N} 个注册 · 多个比赛 / Multiple hackathons`.
+
+#### Implementation: extracting hackathon info in sync workflows
+
+The sync scripts (`actions/github-script` steps) must be modified to:
+1. Collect unique hackathon slugs from processed issues (extracted from `hackathon:{slug}` labels)
+2. For each unique slug, read `hackathons/{slug}/hackathon.yml` to get `name` and `name_zh`
+3. Output via `core.setOutput()`: `hackathon_slugs`, `hackathon_names`, `hackathon_names_zh`, `count`, `users`
+4. The shell step uses these outputs to construct the PR title, branch name, and body
+
+If `hackathon.yml` doesn't exist for a slug, fall back to using the slug itself as the display name.
 
 ### Admin Skill
 
+Uses the same branch patterns as Web API for consistency:
+
 | Operation | Branch Format | Example |
 |-----------|--------------|---------|
-| create-hackathon | `data/hackathon-{slug}` | `data/hackathon-community-hackathon` (unchanged) |
-| submit-project | `data/submission-{hackathonSlug}-{teamSlug}` | `data/submission-dishuihu-ai-opc-team-agentflow` |
-| create-profile | `data/profile-{username}` | `data/profile-alice` (unchanged) |
+| create-hackathon | `data/create-hackathon-{slug}` | `data/create-hackathon-community-hackathon` |
+| submit-project | `data/submit-{hackathonSlug}-{teamSlug}` | `data/submit-dishuihu-ai-opc-team-agentflow` |
+| create-profile | `data/create-profile-{username}` | `data/create-profile-alice` |
 
 ## PR Body Format
 
@@ -163,9 +178,11 @@ interface SubmitMetadata {
 ```
 
 Validation rules:
-- `type === 'proposal'` requires: `hackathonSlug`, `hackathonName`, `trackName`, `projectName`
-- `type === 'hackathon'` requires: `hackathonName`
+- `type === 'proposal'` requires: `hackathonSlug`, `hackathonName`, `hackathonNameZh`, `trackName`, `projectName`
+- `type === 'hackathon'` requires: `hackathonName`, `hackathonNameZh`
 - `type === 'profile'` requires: no metadata fields (login comes from session)
+
+Note: `*Zh` fields use the English name as fallback when the Chinese name is not provided by the user. The frontend is responsible for ensuring these fields are populated.
 
 Missing required metadata fields → HTTP 400.
 
