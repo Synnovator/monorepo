@@ -52,6 +52,11 @@ Triage comments are split into two phases to serve different audiences:
       - Read the key files to understand **what the current code actually does**
       - For bugs: trace the code path to identify where the failure likely occurs
       - For features: check whether the requested behavior (or a partial version) already exists
+      - **Validate candidate fix approaches**: before proposing any option, verify it is
+        technically feasible. Consider: does the API/mechanism actually exist? Do users have
+        the required permissions (most users are Read-only)? Does the target endpoint support
+        the needed parameters? Does the approach work for existing files vs new files?
+        Discard any option that fails validation — do not present it as a possibility
 
    c. **Visual verification (best-effort)** — use `agent-browser` to capture the current state.
       This step is best-effort: if the app is inaccessible, requires special auth, or the flow

@@ -43,11 +43,24 @@ Plus:
    - Does a workaround exist that the author may not know about?
    - Is this aligned with the platform's direction?
 
-4. **Propose high-level options** (2-3 approaches described in user terms):
+4. **Validate feasibility of candidate options** — before proposing any option, verify it
+   is technically possible. Specifically:
+   - For each candidate approach, trace through the code/platform constraints to confirm
+     it can actually work (e.g., does the API exist? do users have the required permissions?
+     does the target mechanism support the needed parameters?)
+   - Consider the user's actual permission level — most users have Read-only access to the
+     repo. Any approach that requires Write access, fork creation, or manual Git/YAML
+     operations is not viable for the target audience
+   - **Discard options that fail feasibility validation.** Do not present them as "low effort"
+     alternatives. It is better to have 2 solid options than 3 with one that doesn't work
+   - If only one viable option exists, say so directly — don't invent alternatives for the
+     sake of having a table
+
+5. **Propose high-level options** (only validated, feasible approaches):
    - Each option: what changes for the user, rough effort level (小/中/大), trade-offs
    - No code, no file names — describe in terms of user experience
 
-5. **Ask for confirmation** — @mention the issue author
+6. **Ask for confirmation** — @mention the issue author
 
 ### Screenshot Integration
 
@@ -112,6 +125,9 @@ For bugs: show the error state. For features: show what exists today.}
 - [ ] "我们的理解" is NOT a paraphrase of the issue — it shows deeper understanding
 - [ ] "现状" is based on actual codebase findings, not speculation
 - [ ] "现状" includes screenshot(s) or 📸 text description of the current state
+- [ ] **Every proposed option has been validated for technical feasibility** — no option
+      relies on mechanisms that don't exist, permissions users don't have, or APIs that
+      don't support the needed parameters
 - [ ] Options are described in terms of user experience changes, not implementation
 - [ ] @mentions the issue author for confirmation
 
