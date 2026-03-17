@@ -89,17 +89,18 @@ docs/xxx ──→ main
 
 | 前缀 | 用途 | 示例 |
 |------|------|------|
-| `data/hackathon-*` | 创建/编辑活动 | `data/hackathon-ai-challenge-2026` |
-| `data/profile-*` | 创建/编辑 Profile | `data/profile-alice` |
-| `data/submission-*` | 提交项目 | `data/submission-ai-challenge-team-alpha` |
+| `data/create-hackathon-*` | 创建活动 | `data/create-hackathon-ai-challenge-2026` |
+| `data/create-profile-*` | 创建 Profile | `data/create-profile-alice` |
+| `data/submit-*` | 提交项目 | `data/submit-ai-challenge-team-alpha` |
 | `data/simulate-*` | 模拟数据 | `data/simulate-fintech-2025` |
-| `data/sync-*` | Actions 自动同步 | `data/sync-registrations-2026-03-08` |
+| `data/sync-registrations-*` | 注册同步 | `data/sync-registrations-ai-challenge-2026-03-17` |
+| `data/sync-nda-*` | NDA 同步 | `data/sync-nda-ai-challenge-2026-03-17` |
 
 ## Pull Request
 
 1. 从 `main` 创建功能/数据分支
 2. 开发完成后提交 PR 到 `main`
-3. PR 标题遵循 Commit 规范格式
+3. 代码 PR 标题遵循 Commit 规范格式；数据 PR 标题使用 `[操作类型]` 前缀（如 `[提交]`、`[创建比赛]`、`[创建档案]`）
 4. 合并后自动部署
 
 ## 数据贡献

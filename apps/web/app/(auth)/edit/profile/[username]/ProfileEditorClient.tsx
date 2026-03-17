@@ -153,6 +153,7 @@ export function ProfileEditorClient({
           type: 'profile',
           slug: username,
           files,
+          metadata: {},
         }),
       });
 

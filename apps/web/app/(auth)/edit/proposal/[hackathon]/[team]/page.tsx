@@ -85,6 +85,8 @@ export default async function ProposalEditorPage({
         hackathonSlug={editorData.hackathonSlug}
         teamSlug={editorData.teamSlug}
         projectName={editorData.projectName}
+        hackathonName={editorData.hackathonName}
+        trackName={editorData.trackName}
         description={editorData.description}
         login={session.login}
         lang={lang}

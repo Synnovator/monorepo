@@ -36,6 +36,22 @@ interface FileEntry {
   base64Content?: string; // binary content (images, PDFs)
 }
 
+interface SubmitMetadata {
+  hackathonSlug?: string;
+  hackathonName?: string;
+  hackathonNameZh?: string;
+  trackName?: string;
+  trackNameZh?: string;
+  projectName?: string;
+  projectNameZh?: string;
+}
+
+const REQUIRED_METADATA: Record<SubmitType, (keyof SubmitMetadata)[]> = {
+  proposal: ['hackathonSlug', 'hackathonName', 'hackathonNameZh', 'trackName', 'projectName'],
+  hackathon: ['hackathonName', 'hackathonNameZh'],
+  profile: [],
+};
+
 async function commitMultipleFiles(
   octokit: any,
   params: {
@@ -129,6 +145,7 @@ export async function POST(request: NextRequest) {
       content?: string;
       // New format
       files?: FileEntry[];
+      metadata?: SubmitMetadata;
     };
     try {
       body = await request.json();
@@ -143,6 +160,19 @@ export async function POST(request: NextRequest) {
     }
     if (!slug?.trim()) {
       return NextResponse.json({ error: 'missing slug' }, { status: 400 });
+    }
+
+    const submitType = type as SubmitType;
+
+    // Validate metadata
+    const metadata: SubmitMetadata = body.metadata ?? {};
+    const requiredFields = REQUIRED_METADATA[submitType];
+    const missingMeta = requiredFields.filter(f => !metadata[f]?.trim());
+    if (missingMeta.length > 0) {
+      return NextResponse.json(
+        { error: `missing metadata: ${missingMeta.join(', ')}` },
+        { status: 400 },
+      );
     }
 
     // Normalize to files array (support both old and new format)
@@ -204,14 +234,14 @@ export async function POST(request: NextRequest) {
       GITHUB_APP_INSTALLATION_ID: installationId!,
     });
 
-    const submitType = type as SubmitType;
-
     // 5a. Get main SHA
     const { data: ref } = await octokit.git.getRef({ owner: OWNER, repo: REPO, ref: 'heads/main' });
     const mainSha = ref.object.sha;
 
     // 5b. Create branch (retry with timestamp on conflict)
-    let branchName = `${BRANCH_PREFIX[submitType]}-${slug}`;
+    let branchName = submitType === 'proposal'
+      ? `data/submit-${metadata.hackathonSlug}-${slug}`
+      : `${BRANCH_PREFIX[submitType]}-${slug}`;
     try {
       await octokit.git.createRef({
         owner: OWNER,
@@ -234,41 +264,71 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 5c. Commit files via Git Tree API
-    const commitMessage =
-      submitType === 'hackathon'
-        ? `feat(hackathons): create ${slug}`
-        : submitType === 'proposal'
-          ? `feat(submissions): submit ${slug}`
-          : `feat(profiles): create profile for ${session.login}`;
+    // 5c. Build PR title and body
+    const prTitle =
+      submitType === 'proposal'
+        ? `[提交] ${metadata.projectName} → ${metadata.hackathonNameZh} · ${metadata.trackNameZh || metadata.trackName}赛道`
+        : submitType === 'hackathon'
+          ? `[创建比赛] ${metadata.hackathonNameZh} / ${metadata.hackathonName}`
+          : `[创建档案] @${session.login}`;
 
+    const filePaths = files.map((f) => f.path);
+    const filesList = filePaths.map((p) => `- \`${p}\``).join('\n');
+
+    let prBody: string;
+    if (submitType === 'proposal') {
+      prBody = [
+        `提交者 / Submitted by: @${session.login}`,
+        `比赛 / Hackathon: ${metadata.hackathonNameZh} / ${metadata.hackathonName}`,
+        `赛道 / Track: ${metadata.trackNameZh || metadata.trackName} / ${metadata.trackName}`,
+        `项目 / Project: ${metadata.projectNameZh || metadata.projectName} / ${metadata.projectName}`,
+        `队伍 / Team: ${slug}`,
+        '',
+        `文件 / Files:`,
+        filesList,
+        '',
+        '---',
+        '> Auto-created via [Synnovator Platform](https://home.synnovator.space)',
+      ].join('\n');
+    } else if (submitType === 'hackathon') {
+      prBody = [
+        `提交者 / Submitted by: @${session.login}`,
+        `比赛 / Hackathon: ${metadata.hackathonNameZh} / ${metadata.hackathonName}`,
+        `类型 / Type: ${slug}`,
+        '',
+        `文件 / Files:`,
+        filesList,
+        '',
+        '---',
+        '> Auto-created via [Synnovator Platform](https://home.synnovator.space)',
+      ].join('\n');
+    } else {
+      prBody = [
+        `提交者 / Submitted by: @${session.login}`,
+        '',
+        `文件 / Files:`,
+        filesList,
+        '',
+        '---',
+        '> Auto-created via [Synnovator Platform](https://home.synnovator.space)',
+      ].join('\n');
+    }
+
+    // 5d. Commit files via Git Tree API
     await commitMultipleFiles(octokit, {
       owner: OWNER,
       repo: REPO,
       branchName,
       files,
-      commitMessage,
+      commitMessage: prTitle,
     });
 
-    // 5d. Create PR
-    const filePaths = files.map((f) => f.path);
-    const filesSummary =
-      filePaths.length === 1
-        ? `**File:** \`${filePaths[0]}\``
-        : `**Files:**\n${filePaths.map((p) => `- \`${p}\``).join('\n')}`;
-
+    // 5e. Create PR
     const { data: pr } = await octokit.pulls.create({
       owner: OWNER,
       repo: REPO,
-      title: commitMessage,
-      body: [
-        `Submitted by @${session.login}`,
-        '',
-        filesSummary,
-        '',
-        '---',
-        '> Auto-created via [Synnovator Platform](https://home.synnovator.space)',
-      ].join('\n'),
+      title: prTitle,
+      body: prBody,
       head: branchName,
       base: 'main',
     });

@@ -74,6 +74,8 @@ interface ProposalEditorClientProps {
   hackathonSlug: string;
   teamSlug: string;
   projectName: BilingualContent;
+  hackathonName: BilingualContent;
+  trackName: BilingualContent;
   description: BilingualContent;
   login: string;
   lang: Lang;
@@ -83,6 +85,8 @@ export function ProposalEditorClient({
   hackathonSlug,
   teamSlug,
   projectName,
+  hackathonName,
+  trackName,
   description,
   login,
   lang,
@@ -142,6 +146,15 @@ export function ProposalEditorClient({
           type: 'proposal',
           slug: teamSlug,
           files,
+          metadata: {
+            hackathonSlug,
+            hackathonName: hackathonName.en,
+            hackathonNameZh: hackathonName.zh,
+            trackName: trackName.en,
+            trackNameZh: trackName.zh,
+            projectName: projectName.en,
+            projectNameZh: projectName.zh,
+          },
         }),
       });
 
