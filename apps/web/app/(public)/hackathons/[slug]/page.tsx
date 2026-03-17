@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getHackathon, listHackathons, listSubmissions, listProfiles, getTeamsByHackathon } from '@/app/_generated/data';
+import { getHackathon, listHackathons, listPublicSubmissions, listProfiles, getTeamsByHackathon } from '@/app/_generated/data';
 import { t, localize, getCurrentStage, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Timeline } from '@/components/Timeline';
@@ -67,7 +67,7 @@ export default async function HackathonDetailPage({
   const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
 
   // Load submissions
-  const allSubmissions = listSubmissions();
+  const allSubmissions = listPublicSubmissions();
   const submissions = allSubmissions.filter(s => s._hackathonSlug === slug);
 
   // Load results (embedded in hackathon data or separate)

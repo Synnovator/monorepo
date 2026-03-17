@@ -1,4 +1,4 @@
-import { listHackathons } from '@/app/_generated/data';
+import { listPublicHackathons } from '@/app/_generated/data';
 import { getLangFromSearchParams, t } from '@synnovator/shared/i18n';
 import { HackathonFilter } from '@/components/HackathonFilter';
 import { SketchArrow } from '@/components/sketch';
@@ -12,7 +12,7 @@ export default async function HomePage({
 }) {
   const params = await searchParams;
   const lang = getLangFromSearchParams(new URLSearchParams(params as Record<string, string>));
-  const hackathons = listHackathons();
+  const hackathons = listPublicHackathons();
 
   // Sort by registration start date descending
   const sorted = [...hackathons].sort((a, b) => {
