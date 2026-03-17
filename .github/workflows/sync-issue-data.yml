@@ -133,20 +133,78 @@ jobs:
 
             core.setOutput('changed', changed.toString());
 
+            // Collect hackathon info for PR title/branch
+            const hackathonSlugs = new Set();
+            const users = new Set();
+            let count = 0;
+            for (const [username, regs] of Object.entries(registrations)) {
+              if (!usernameToFile[username.toLowerCase()]) continue;
+              for (const reg of regs) {
+                hackathonSlugs.add(reg.hackathon);
+                users.add(`@${username}`);
+                count++;
+              }
+            }
+
+            // Read hackathon YAML for bilingual names
+            const slugsArr = [...hackathonSlugs];
+            let hackathonSlug, hackathonName, hackathonNameZh;
+            if (slugsArr.length === 1) {
+              hackathonSlug = slugsArr[0];
+              try {
+                const hData = yaml.load(fs.readFileSync(`hackathons/${hackathonSlug}/hackathon.yml`, 'utf8'));
+                hackathonName = hData?.hackathon?.name || hackathonSlug;
+                hackathonNameZh = hData?.hackathon?.name_zh || hackathonName;
+              } catch {
+                hackathonName = hackathonSlug;
+                hackathonNameZh = hackathonSlug;
+              }
+            } else if (slugsArr.length > 1) {
+              hackathonSlug = 'multi';
+              hackathonName = 'Multiple hackathons';
+              hackathonNameZh = '多个比赛';
+            } else {
+              hackathonSlug = 'unknown';
+              hackathonName = 'Unknown';
+              hackathonNameZh = '未知';
+            }
+
+            core.setOutput('hackathon_slug', hackathonSlug);
+            core.setOutput('hackathon_name', hackathonName);
+            core.setOutput('hackathon_name_zh', hackathonNameZh);
+            core.setOutput('count', count.toString());
+            core.setOutput('users', [...users].map(u => `- ${u}`).join('\n'));
+
       - name: Create PR if changed
         if: steps.sync.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           DATE=$(date +%Y-%m-%d)
-          BRANCH="data/sync-registrations-${DATE}"
+          SLUG="${{ steps.sync.outputs.hackathon_slug }}"
+          NAME="${{ steps.sync.outputs.hackathon_name }}"
+          NAME_ZH="${{ steps.sync.outputs.hackathon_name_zh }}"
+          COUNT="${{ steps.sync.outputs.count }}"
+          USERS="${{ steps.sync.outputs.users }}"
+          BRANCH="data/sync-registrations-${SLUG}-${DATE}"
           git checkout -b "${BRANCH}"
           git add profiles/
-          git commit -m "chore: sync registration data from Issues [automated]"
+          git commit -m "[同步注册] ${COUNT} 个注册 · ${NAME_ZH} / ${NAME}"
           git push origin "${BRANCH}"
           gh pr create \
-            --title "chore: sync registration data from validated Issues" \
-            --body "Automated sync of registration data from GitHub Issues with \`registered\` label into profile YAML files." \
+            --title "[同步注册] ${COUNT} 个注册 · ${NAME_ZH} / ${NAME}" \
+            --body "$(cat <<EOF
+          同步来源 / Source: GitHub Issues with \`registered\` label
+          比赛 / Hackathon: ${NAME_ZH} / ${NAME}
+          同步数量 / Count: ${COUNT}
+
+          涉及用户 / Users:
+          ${USERS}
+
+          ---
+          > Auto-created by GitHub Actions
+          EOF
+          )" \
             --base main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -264,20 +322,78 @@ jobs:
 
             core.setOutput('changed', changed.toString());
 
+            // Collect hackathon info for PR title/branch
+            const hackathonSlugs = new Set();
+            const users = new Set();
+            let count = 0;
+            for (const [username, records] of Object.entries(ndaRecords)) {
+              if (!usernameToFile[username.toLowerCase()]) continue;
+              for (const rec of records) {
+                hackathonSlugs.add(rec.hackathon);
+                users.add(`@${username}`);
+                count++;
+              }
+            }
+
+            // Read hackathon YAML for bilingual names
+            const slugsArr = [...hackathonSlugs];
+            let hackathonSlug, hackathonName, hackathonNameZh;
+            if (slugsArr.length === 1) {
+              hackathonSlug = slugsArr[0];
+              try {
+                const hData = yaml.load(fs.readFileSync(`hackathons/${hackathonSlug}/hackathon.yml`, 'utf8'));
+                hackathonName = hData?.hackathon?.name || hackathonSlug;
+                hackathonNameZh = hData?.hackathon?.name_zh || hackathonName;
+              } catch {
+                hackathonName = hackathonSlug;
+                hackathonNameZh = hackathonSlug;
+              }
+            } else if (slugsArr.length > 1) {
+              hackathonSlug = 'multi';
+              hackathonName = 'Multiple hackathons';
+              hackathonNameZh = '多个比赛';
+            } else {
+              hackathonSlug = 'unknown';
+              hackathonName = 'Unknown';
+              hackathonNameZh = '未知';
+            }
+
+            core.setOutput('hackathon_slug', hackathonSlug);
+            core.setOutput('hackathon_name', hackathonName);
+            core.setOutput('hackathon_name_zh', hackathonNameZh);
+            core.setOutput('count', count.toString());
+            core.setOutput('users', [...users].map(u => `- ${u}`).join('\n'));
+
       - name: Create PR if changed
         if: steps.sync.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           DATE=$(date +%Y-%m-%d)
-          BRANCH="data/sync-nda-${DATE}"
+          SLUG="${{ steps.sync.outputs.hackathon_slug }}"
+          NAME="${{ steps.sync.outputs.hackathon_name }}"
+          NAME_ZH="${{ steps.sync.outputs.hackathon_name_zh }}"
+          COUNT="${{ steps.sync.outputs.count }}"
+          USERS="${{ steps.sync.outputs.users }}"
+          BRANCH="data/sync-nda-${SLUG}-${DATE}"
           git checkout -b "${BRANCH}"
           git add profiles/
-          git commit -m "chore: sync NDA records from Issues [automated]"
+          git commit -m "[同步NDA] ${COUNT} 份签署 · ${NAME_ZH} / ${NAME}"
           git push origin "${BRANCH}"
           gh pr create \
-            --title "chore: sync NDA records from validated Issues" \
-            --body "Automated sync of NDA signing records from GitHub Issues with \`nda-approved\` label into profile YAML files." \
+            --title "[同步NDA] ${COUNT} 份签署 · ${NAME_ZH} / ${NAME}" \
+            --body "$(cat <<EOF
+          同步来源 / Source: GitHub Issues with \`nda-approved\` label
+          比赛 / Hackathon: ${NAME_ZH} / ${NAME}
+          同步数量 / Count: ${COUNT}
+
+          涉及用户 / Users:
+          ${USERS}
+
+          ---
+          > Auto-created by GitHub Actions
+          EOF
+          )" \
             --base main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
