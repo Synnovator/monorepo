@@ -4,6 +4,7 @@ export interface AuthUser {
   login: string;
   avatar_url: string;
   isGitHub: boolean;
+  role: 'admin' | 'designer' | 'user';
 }
 
 export interface AuthState {
@@ -24,7 +25,7 @@ export function useAuth(): AuthState {
         const data = await res.json();
         if (!cancelled) {
           if (data.authenticated) {
-            setUser({ login: data.login, avatar_url: data.avatar_url, isGitHub: data.isGitHub });
+            setUser({ login: data.login, avatar_url: data.avatar_url, isGitHub: data.isGitHub, role: data.role ?? 'user' });
           } else {
             setUser(null);
           }
