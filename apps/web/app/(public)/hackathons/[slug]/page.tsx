@@ -19,6 +19,7 @@ import { AppealForm } from '@/components/forms/AppealForm';
 import { TeamsTab } from '@/components/TeamsTab';
 import { SketchUnderline, SketchDoodle } from '@/components/sketch';
 import { EditHackathonButton } from '@/components/EditHackathonButton';
+import { UnlistedBanner } from '@/components/UnlistedBanner';
 import { Separator, Badge } from '@synnovator/ui';
 
 export const dynamic = 'force-static';
@@ -49,6 +50,16 @@ function stageVariant(stage: string): StageVariant {
   }
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const entry = getHackathon(slug);
+  if (!entry) return {};
+  if (entry.hackathon.visibility === 'private') {
+    return { robots: { index: false, follow: false } };
+  }
+  return {};
+}
+
 export default async function HackathonDetailPage({
   params,
   searchParams,
@@ -62,6 +73,8 @@ export default async function HackathonDetailPage({
 
   const entry = getHackathon(slug);
   if (!entry) notFound();
+
+  const isPrivate = entry.hackathon.visibility === 'private';
 
   const h = entry.hackathon;
   const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
@@ -99,6 +112,7 @@ export default async function HackathonDetailPage({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" data-hackathon={h.slug}>
+      {isPrivate && <UnlistedBanner lang={lang} />}
 
       {/* Hero */}
       <div className="mb-12">
