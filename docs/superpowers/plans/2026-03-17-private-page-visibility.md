@@ -35,6 +35,7 @@
 | Create | `apps/web/app/api/admin/visibility/route.ts` | API route: create PR to change visibility |
 | Modify | `scripts/create-hackathon.sh:58` | Add `visibility: private` to generated YAML |
 | Modify | `scripts/submit-project.sh:65` | Add `visibility: private` to generated YAML |
+| Modify | `scripts/validate-hackathon.sh:44` | Add visibility field validation rule |
 
 ---
 
@@ -1111,7 +1112,61 @@ git commit -m "feat(scripts): set visibility: private for new hackathons and sub
 
 ---
 
-### Task 13: End-to-end verification
+### Task 13: Add visibility validation to CI scripts
+
+**Files:**
+- Modify: `scripts/validate-hackathon.sh:44`
+- Modify: `.github/workflows/validate-submission.yml` (or its underlying validation script)
+
+- [ ] **Step 1: Add visibility warning to `validate-hackathon.sh`**
+
+In `scripts/validate-hackathon.sh`, after the required fields checks (after line 44), add a new rule:
+
+```bash
+# --- Rule: visibility field should be present ---
+VISIBILITY=$(yq '.hackathon.visibility' "$FILE")
+if [ "$VISIBILITY" = "null" ] || [ -z "$VISIBILITY" ]; then
+  echo "WARNING: hackathon.visibility is not set — defaulting to 'public'. New hackathons should set visibility: private" >&2
+fi
+if [ "$VISIBILITY" != "null" ] && [ -n "$VISIBILITY" ]; then
+  case "$VISIBILITY" in
+    public|private) ;;
+    *) err "hackathon.visibility must be 'public' or 'private' (got \"$VISIBILITY\")" ;;
+  esac
+fi
+```
+
+Note: This is a warning (not an error) for missing visibility, but an error for invalid values. This allows existing hackathons without the field to pass while flagging the omission.
+
+- [ ] **Step 2: Add visibility check to submission validation**
+
+If submission validation uses a similar bash script, add the equivalent check:
+
+```bash
+VISIBILITY=$(yq '.project.visibility' "$FILE")
+if [ "$VISIBILITY" = "null" ] || [ -z "$VISIBILITY" ]; then
+  echo "WARNING: project.visibility is not set — defaulting to 'public'. New submissions should set visibility: private" >&2
+fi
+if [ "$VISIBILITY" != "null" ] && [ -n "$VISIBILITY" ]; then
+  case "$VISIBILITY" in
+    public|private) ;;
+    *) err "project.visibility must be 'public' or 'private' (got \"$VISIBILITY\")" ;;
+  esac
+fi
+```
+
+If submission validation is handled by the Zod schema in the GitHub Actions workflow directly (via `validate-submission.yml`), the Zod schema change from Task 1 already covers this — the enum will reject invalid values, and the default handles missing values.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add scripts/validate-hackathon.sh
+git commit -m "feat(scripts): add visibility field validation to hackathon validator"
+```
+
+---
+
+### Task 14: End-to-end verification
 
 - [ ] **Step 1: Run shared package tests**
 
