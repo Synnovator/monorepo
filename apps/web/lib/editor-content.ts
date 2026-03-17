@@ -78,6 +78,8 @@ export interface ProposalEditorData {
   hackathonSlug: string;
   teamSlug: string;
   projectName: BilingualContent;
+  hackathonName: BilingualContent;
+  trackName: BilingualContent;
   description: BilingualContent;
 }
 
@@ -91,12 +93,26 @@ export function getProposalEditorData(
   );
   if (!entry) throw new Error(`Submission not found: ${hackathonSlug}/${teamSlug}`);
 
+  // Load hackathon name and track name for PR metadata
+  const hackathonEntry = getHackathon(hackathonSlug);
+  const h = hackathonEntry?.hackathon;
+  const trackSlug = entry.project.track;
+  const track = h?.tracks?.find((t) => t.slug === trackSlug);
+
   return {
     hackathonSlug,
     teamSlug,
     projectName: {
       en: entry.project.name,
       zh: entry.project.name_zh ?? entry.project.name,
+    },
+    hackathonName: {
+      en: h?.name ?? hackathonSlug,
+      zh: h?.name_zh ?? h?.name ?? hackathonSlug,
+    },
+    trackName: {
+      en: track?.name ?? trackSlug ?? '',
+      zh: track?.name_zh ?? track?.name ?? trackSlug ?? '',
     },
     description: loadBilingualMdx(`submission:${hackathonSlug}:${teamSlug}`),
   };

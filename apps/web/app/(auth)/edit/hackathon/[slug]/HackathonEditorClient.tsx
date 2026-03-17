@@ -173,6 +173,10 @@ export function HackathonEditorClient({
             type: 'hackathon',
             slug,
             files,
+            metadata: {
+              hackathonName: name.en || name.zh || slug,
+              hackathonNameZh: name.zh || name.en || slug,
+            },
           }),
         });
 
