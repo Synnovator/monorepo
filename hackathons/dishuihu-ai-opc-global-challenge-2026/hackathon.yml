@@ -28,6 +28,8 @@ hackathon:
     - 全程数据化：Synnovator平台提供从浏览到获奖的全流程数据支持
     - 多路径晋级：支持自动晋级、复活挑战、高门槛直通等多种方式参与决赛
 
+  managed_by:
+    - allenwoods
   organizers:
     - name: "Lingang Group"
       name_zh: "临港集团"

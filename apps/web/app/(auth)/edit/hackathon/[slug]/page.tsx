@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { decrypt, type Session } from '@synnovator/shared/auth';
+import { canEditHackathon } from '@/lib/permissions';
 import type { Lang } from '@synnovator/shared/i18n';
 import { getHackathon } from '@/app/_generated/data';
 import { getHackathonEditorData } from '@/lib/editor-content';
@@ -41,12 +42,7 @@ export default async function HackathonEditorPage({
   }
 
   const h = entry.hackathon;
-  const isDevUser = session.access_token === 'dev-token';
-  const isOrganizer = isDevUser || h.organizers?.some(
-    (o) => o.github && o.github === session.login,
-  );
-
-  if (!isOrganizer) {
+  if (!canEditHackathon(session.login, h.managed_by ?? [])) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
@@ -54,7 +50,7 @@ export default async function HackathonEditorPage({
             Access Denied
           </h1>
           <p className="text-muted-foreground">
-            You must be an organizer of &quot;{h.name}&quot; to edit this hackathon.
+            You must be a manager of &quot;{h.name}&quot; to edit this hackathon.
           </p>
           <p className="text-muted-foreground text-sm mt-1">
             Logged in as: {session.login}

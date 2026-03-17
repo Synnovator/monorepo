@@ -421,10 +421,24 @@ function normaliseWeights(data) {
   }
 }
 
+async function collectRoles() {
+  const rolesFile = path.join(DATA_ROOT, 'config', 'roles.yml');
+  try {
+    const data = await readYaml(rolesFile);
+    return {
+      admin: Array.isArray(data?.admin) ? data.admin : [],
+      designer: Array.isArray(data?.designer) ? data.designer : [],
+    };
+  } catch {
+    console.warn('[generate-static-data] config/roles.yml not found, using empty roles');
+    return { admin: [], designer: [] };
+  }
+}
+
 async function main() {
   console.log('[generate-static-data] Reading YAML data...');
 
-  const [hackathons, profiles, submissions, teams, results, themeData, mdxCount, editorMdx] = await Promise.all([
+  const [hackathons, profiles, submissions, teams, results, themeData, mdxCount, editorMdx, roles] = await Promise.all([
     collectHackathons(),
     collectProfiles(),
     collectSubmissions(),
@@ -433,9 +447,10 @@ async function main() {
     collectThemes(),
     collectMdx(DATA_ROOT),
     collectEditorMdx(DATA_ROOT),
+    collectRoles(),
   ]);
 
-  const data = { hackathons, profiles, submissions, teams, results, themes: themeData };
+  const data = { hackathons, profiles, submissions, teams, results, themes: themeData, roles };
 
   await fs.mkdir(path.dirname(OUT_FILE), { recursive: true });
   await fs.writeFile(OUT_FILE, JSON.stringify(data, null, 2));
@@ -453,6 +468,7 @@ async function main() {
   console.log(`  themes: ${themeData.themes.length} (active: ${themeData.activeTheme || 'none'}, variants: ${Object.keys(themeData.variants).length})`);
   console.log(`  mdx files: ${mdxCount}`);
   console.log(`  editor mdx entries: ${Object.keys(editorMdx).length}`);
+  console.log(`  roles: ${roles.admin.length} admin, ${roles.designer.length} designer`);
 }
 
 main().catch(err => {

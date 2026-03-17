@@ -4,6 +4,8 @@ hackathon:
   name_zh: "2026 测试黑客松"
   slug: "test-hackathon-2026"
   type: "community"
+  managed_by:
+    - allenwoods
   organizers:
     - name: "OneSyn.ai"
       name_zh: "智道元生"

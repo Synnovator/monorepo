@@ -1,8 +1,9 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { decrypt, type Session } from '@synnovator/shared/auth';
+import { canEditProposal } from '@/lib/permissions';
 import type { Lang } from '@synnovator/shared/i18n';
-import { listSubmissions, getTeam } from '@/app/_generated/data';
+import { listSubmissions, getTeam, getHackathon } from '@/app/_generated/data';
 import { getProposalEditorData } from '@/lib/editor-content';
 import { ProposalEditorClient } from './ProposalEditorClient';
 
@@ -44,15 +45,15 @@ export default async function ProposalEditorPage({
     );
   }
 
-  const isDevUser = session.access_token === 'dev-token';
+  // Collect permission data
+  const hackathonEntry = getHackathon(hackathon);
+  const managedBy = hackathonEntry?.hackathon.managed_by ?? [];
   const teamData = entry.project.team_ref ? getTeam(entry.project.team_ref) : null;
-  const isTeamMember = isDevUser || (
-    teamData
-      ? teamData.leader === session.login || teamData.members.some(m => m.github === session.login)
-      : false
-  );
+  const teamMembers = teamData
+    ? [teamData.leader, ...teamData.members.map(m => m.github)]
+    : [];
 
-  if (!isTeamMember) {
+  if (!canEditProposal(session.login, managedBy, teamMembers)) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
@@ -60,7 +61,7 @@ export default async function ProposalEditorPage({
             Access Denied
           </h1>
           <p className="text-muted-foreground">
-            You must be a team member to edit this proposal.
+            You must be a team member or hackathon manager to edit this proposal.
           </p>
           <p className="text-muted-foreground text-sm mt-1">
             Logged in as: {session.login}

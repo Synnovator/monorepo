@@ -8,17 +8,21 @@ import { PencilIcon } from '@/components/icons';
 
 interface EditHackathonButtonProps {
   slug: string;
-  organizers: string[];
+  managedBy: string[];
   lang: Lang;
 }
 
-export function EditHackathonButton({ slug, organizers, lang }: EditHackathonButtonProps) {
+export function EditHackathonButton({ slug, managedBy, lang }: EditHackathonButtonProps) {
   const { user, loading } = useAuth();
 
-  // Dev users (non-GitHub) can edit all pages; GitHub users must be organizers
-  if (loading || !user || (user.isGitHub && !organizers.includes(user.login))) {
-    return null;
-  }
+  if (loading || !user) return null;
+
+  const login = user.login.toLowerCase();
+  const canEdit =
+    user.role === 'admin' ||
+    managedBy.some(m => m.toLowerCase() === login);
+
+  if (!canEdit) return null;
 
   return (
     <Link

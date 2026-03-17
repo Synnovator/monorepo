@@ -111,3 +111,20 @@ export function getThemeVariant(hackathonSlug: string, themeName: string): Recor
   if (!themeData) return null;
   return (themeData.variants[`${hackathonSlug}/${themeName}`] as Record<string, unknown>) ?? null;
 }
+
+// --- Roles data (server-only — do NOT import in client components) ---
+
+interface Roles {
+  admin: string[];
+  designer: string[];
+}
+
+const roles: Roles = (staticData as any).roles ?? { admin: [], designer: [] };
+
+/**
+ * Returns global roles config. Server-only — never import in client components
+ * to avoid leaking admin usernames into the client bundle.
+ */
+export function getRoles(): Roles {
+  return roles;
+}

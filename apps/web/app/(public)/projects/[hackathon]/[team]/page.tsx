@@ -157,6 +157,7 @@ export default async function ProjectDetailPage({
           <EditProjectButton
             hackathonSlug={hackathon}
             teamSlug={team}
+            managedBy={hackathonEntry?.hackathon.managed_by ?? []}
             teamMembers={teamMembers.map(m => m.github)}
             lang={lang}
           />
