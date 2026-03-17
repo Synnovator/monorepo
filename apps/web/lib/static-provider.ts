@@ -7,6 +7,8 @@ import {
   getProfile,
   listSubmissions,
   getResults,
+  listPublicHackathons,
+  listPublicSubmissions,
 } from '@/app/_generated/data';
 
 /**
@@ -45,6 +47,14 @@ export class StaticDataProvider implements DataProvider {
 
   listSubmissions() {
     return listSubmissions();
+  }
+
+  listPublicHackathons() {
+    return listPublicHackathons();
+  }
+
+  listPublicSubmissions() {
+    return listPublicSubmissions();
   }
 
   getResults(hackathonSlug: string) {
