@@ -56,17 +56,19 @@ project:
 
 #### Zod Schema Changes
 
-In `packages/shared/src/schemas/hackathon.ts`:
+In `packages/shared/src/schemas/hackathon.ts`, add `visibility` inside the inner `hackathon` object (`HackathonSchema.shape.hackathon`):
 ```typescript
 visibility: z.enum(['public', 'private']).default('public')
 ```
 
-In `packages/shared/src/schemas/submission.ts`:
+In `packages/shared/src/schemas/submission.ts`, add `visibility` inside the inner `project` object (`SubmissionSchema.shape.project`):
 ```typescript
 visibility: z.enum(['public', 'private']).default('public')
 ```
 
 Zod default is `'public'` so existing YAML files without the field remain public. Creation scripts/skills explicitly set `visibility: private` for new content.
+
+**Validation:** Update `validate-hackathon.sh` and `validate-submission.yml` workflows to warn if a new YAML file is missing the `visibility` field, ensuring new content doesn't accidentally become public via the Zod default.
 
 ### 2. Build Pipeline
 
@@ -87,11 +89,13 @@ After collecting hackathons and submissions, produce two subsets in `static-data
 }
 ```
 
-Filtering logic in the script:
+Filtering logic in the script (note the nested property paths matching YAML structure):
 ```javascript
-const hackathonsPublic = hackathons.filter(h => h.visibility !== 'private')
+const hackathonsPublic = hackathons.filter(h => h.hackathon?.visibility !== 'private')
 const submissionsPublic = submissions.filter(s => s.project?.visibility !== 'private')
 ```
+
+**Note on bundle size:** The public subsets duplicate some data in `static-data.json`. At current scale (~57KB total) this is negligible. If the dataset grows significantly, consider splitting into separate JSON files.
 
 #### Data Accessors (`data.ts`)
 
@@ -109,7 +113,10 @@ export function listPublicSubmissions() { ... }
 
 #### DataProvider Interface (`provider.ts`)
 
-Add `listPublicHackathons()` and `listPublicSubmissions()` to the interface. Both `StaticDataProvider` and `FsDataProvider` implementations updated.
+Add `listPublicHackathons()` and `listPublicSubmissions()` to the interface. Both implementations updated:
+
+- **`StaticDataProvider`** (`apps/web/lib/static-provider.ts`): Read from `staticData.hackathonsPublic` / `staticData.submissionsPublic` with the same type casts as the existing accessors.
+- **`FsDataProvider`** (`packages/shared/src/data/fs-provider.ts`): Filter at the provider level: `this.hackathons.filter(h => h.hackathon?.visibility !== 'private')`, similarly for submissions.
 
 ### 3. Page Rendering
 
@@ -137,21 +144,25 @@ When `visibility === 'private'`, render a banner at the top of:
 ```tsx
 <div className="bg-warning/10 border border-warning/30 rounded-lg px-4 py-3 mb-6">
   <p className="text-sm text-warning-foreground">
-    {lang === 'zh'
-      ? '此内容正在审核中，尚未公开展示。'
-      : 'This content is under review and not yet publicly listed.'}
+    {t(lang, 'common.unlisted_banner')}
   </p>
 </div>
 ```
+
+i18n keys to add: `common.unlisted_banner` (en: "This content is under review and not yet publicly listed.", zh: "此内容正在审核中，尚未公开展示。")
+
+**SEO:** Add `<meta name="robots" content="noindex,nofollow" />` to detail pages when `visibility === 'private'` to prevent search engine indexing of unlisted content.
 
 ### 4. Admin Panel
 
 #### Content Visibility Section
 
-On admin hackathon and submission pages (`(admin)/admin/hackathons/`, `(admin)/admin/submissions/`), add a section listing all content with:
+On admin hackathon and submission pages (`(admin)/admin/hackathons/`, `(admin)/admin/submissions/`), add a **new section alongside the existing review list**. The existing review list (pending PRs from GitHub API) remains unchanged. The new section lists all content from static data (`listHackathons()` / `listSubmissions()`) with:
 - Content name/slug
 - Visibility badge (`private` / `public`)
 - Toggle button: "Publish" (private → public) or "Unpublish" (public → private)
+
+i18n keys to add: `admin.visibility`, `admin.publish`, `admin.unpublish`, `admin.visibility_private`, `admin.visibility_public`
 
 #### API Route: `POST /api/admin/visibility`
 
@@ -165,18 +176,37 @@ On admin hackathon and submission pages (`(admin)/admin/hackathons/`, `(admin)/a
 ```
 
 **Flow:**
-1. Validate admin session
-2. Determine YAML file path from type + slug
-3. Create branch `data/visibility-{type}-{slug}`
-4. Read current YAML via GitHub Contents API
-5. Update `visibility` field
-6. Commit change to branch
-7. Create PR targeting main with title: `data(visibility): publish {type} {slug}` or `data(visibility): unpublish {type} {slug}`
-8. Return PR URL to frontend
+1. Validate admin session exists
+2. Check repo permission via `getInstallationOctokit()` — verify the user has at least `write` permission; return 403 otherwise
+3. Determine YAML file path from type + slug
+4. Create branch `data/visibility-{type}-{slug}-{timestamp}` (timestamp suffix avoids collision if publish/unpublish happen before prior PR is merged)
+5. Read current YAML via GitHub Contents API
+6. Update `visibility` field
+7. Commit change to branch
+8. Create PR targeting main with title: `data(visibility): publish {type} {slug}` or `data(visibility): unpublish {type} {slug}`
+9. Return PR URL to frontend
+10. On error after branch creation, attempt to delete the orphan branch
 
-**Auth:** Reuse existing admin session validation. GitHub API calls use admin's `access_token` from session — PRs are authored by the admin.
+**Auth:** Use `getInstallationOctokit()` (GitHub App token) for branch/commit/PR operations, matching the existing `theme` admin route pattern. This avoids dependence on the user's OAuth token scope for repo writes. PRs are authored by the GitHub App bot.
 
-### 5. Creation Scripts
+### 5. Edge Cases
+
+**Private hackathon with public submissions:** A submission cannot be public if its parent hackathon is private. The `submissionsPublic` filter should also exclude submissions whose parent hackathon is private:
+
+```javascript
+const privateHackathonSlugs = new Set(
+  hackathons.filter(h => h.hackathon?.visibility === 'private').map(h => h._slug)
+)
+const submissionsPublic = submissions.filter(
+  s => s.project?.visibility !== 'private' && !privateHackathonSlugs.has(s._hackathonSlug)
+)
+```
+
+**Public hackathon with all private submissions:** The hackathon's submissions tab will show zero submissions. This is expected — the tab can display a message like "No submissions yet" (same as a hackathon with no submissions).
+
+**Admin publishes a submission whose hackathon is still private:** The API route should warn (but not block) — the submission won't appear in public listings anyway until the hackathon is also published.
+
+### 6. Creation Scripts
 
 Update creation scripts/skills to set `visibility: private` explicitly:
 - `scripts/create-hackathon.sh` — add `visibility: private` to generated YAML
