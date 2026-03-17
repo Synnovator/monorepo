@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { decrypt, type Session } from '@synnovator/shared/auth';
+import { canEditProfile } from '@/lib/permissions';
 import { getProfile } from '@/app/_generated/data';
 import { ProfileEditorClient } from './ProfileEditorClient';
 
@@ -36,9 +37,7 @@ export default async function ProfileEditorPage({
     );
   }
 
-  // Authorization: dev-token users can edit everything; otherwise only owner
-  const isDevUser = session.access_token === 'dev-token';
-  if (!isDevUser && entry.hacker.github !== session.login) {
+  if (!canEditProfile(session.login, entry.hacker.github)) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
