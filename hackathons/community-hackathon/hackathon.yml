@@ -1,0 +1,71 @@
+synnovator_version: "2.0"
+hackathon:
+  name: "community hackathon"
+  name_zh: "2026社区黑客松"
+  slug: "community-hackathon"
+  tagline: "everyone can come"
+  tagline_zh: "每个人都可以参加"
+  type: "community"
+  organizers:
+    - name: "Synnovator"
+      name_zh: "协创者号"
+      role: "organizer"
+  eligibility:
+    open_to: "all"
+    team_size:
+      min: 1
+      max: 5
+    allow_solo: true
+  legal:
+    license: "Apache-2.0"
+    ip_ownership: "participant"
+  timeline:
+    draft:
+      start: "2026-03-15T01:00Z"
+      end: "2026-03-17T23:59Z"
+      description: "本阶段用户可以提交草案"
+      description_zh: "本阶段用户可以提交草案"
+    registration:
+      start: "2026-03-18T00:00Z"
+      end: "2026-03-25T22:59Z"
+      description: "用户使用自己的草案报名"
+    development:
+      start: "2026-03-25T10:52Z"
+      end: "2026-04-25T10:59Z"
+      description: "本阶段是开发阶段"
+      description_zh: "参赛者需要开发一个完整的demo"
+    submission:
+      start: "2026-04-11T10:59Z"
+      end: "2026-03-23T11:04Z"
+      description: "提交完成的demo并且附上使用说明"
+    judging:
+      start: "2026-03-23T11:04Z"
+      end: "2026-04-18T11:04Z"
+      description: "评审阶段"
+    announcement:
+      start: "2026-04-18T11:04Z"
+      end: "2026-04-25T11:05Z"
+      description: "公布结果"
+    award:
+      start: "2026-05-01T11:05Z"
+      end: "2026-05-05T11:06Z"
+      description: "颁奖"
+  tracks:
+    - name: "education"
+      name_zh: "教育"
+      slug: "edu"
+      rewards:
+      - type: "prize"
+      rank: "1st"
+      amount: "$1,000"
+      judging:
+      mode: "weighted"
+      criteria:
+      - name: "Innovation"
+      weight: 0.3
+      score_range:
+  settings:
+    language:
+      - "zh"
+      - "en"
+    public_vote: "reactions"

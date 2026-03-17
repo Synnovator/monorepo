@@ -106,6 +106,7 @@ export const HackathonSchema = z.object({
     visibility: z.enum(['public', 'private']).default('public'),
     description: z.string().optional(),
     description_zh: z.string().optional(),
+    managed_by: z.array(z.string()).optional(),
     organizers: z.array(z.object({
       name: z.string().optional(),
       name_zh: z.string().optional(),

@@ -1,0 +1,109 @@
+name: Bug Report
+description: 报告 Synnovator 平台的 Bug
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 提交前请确认
+        - 我已在 [home.synnovator.space](https://home.synnovator.space) 上实际操作并确认问题存在
+        - 我已阅读 [PRD](https://github.com/Synnovator/monorepo/blob/main/docs/specs/synnovator-prd.md) 中相关功能的描述，确认这是 Bug 而非预期行为
+        - 我已搜索[已有 Issues](https://github.com/Synnovator/monorepo/issues?q=is%3Aissue+label%3Abug)，确认没有重复报告
+
+  - type: dropdown
+    id: role
+    attributes:
+      label: 你的身份
+      description: 你在平台中的角色
+      options:
+        - 参赛选手
+        - 评委
+        - 主办方管理员
+        - 访客
+    validations:
+      required: true
+
+  - type: input
+    id: hackathon-url
+    attributes:
+      label: 相关活动页面 URL
+      description: 如果 Bug 与某个具体活动相关，请粘贴该活动页面的完整 URL
+      placeholder: "https://home.synnovator.space/hackathons/xxx"
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: |
+        请按时间顺序，逐步描述你的操作。好的复现步骤应该能让任何人照做就能看到问题。
+        ❌ "无法创建团队"
+        ✅ "1. 登录账号 xxx  2. 进入活动 test-youth-hackathons  3. 点击'创建团队'  4. 填写团队名称、简介  5. 点击'前往 GitHub 创建团队'  6. 页面显示 'Unauthorized User'，且返回后已填信息丢失"
+      placeholder: |
+        1. 打开 https://home.synnovator.space/hackathons/xxx
+        2. 点击 ...
+        3. 填写 ...
+        4. 点击 ...
+        5. 看到 ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为
+      description: 你认为正确的结果应该是什么？
+      placeholder: "点击'创建团队'后应跳转到 GitHub Issue 创建页，且团队信息被预填"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际行为
+      description: 实际发生了什么？包括错误信息、异常状态等
+      placeholder: "页面显示 'Unauthorized User' 弹窗，关闭后返回团队编辑页，之前填写的信息全部清空"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: 浏览器
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - 其他（请在补充信息中说明）
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: 设备类型
+      options:
+        - 桌面端
+        - 移动端
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 截图或录屏
+      description: 拖拽上传截图或录屏，能极大帮助定位问题
+      placeholder: 拖拽图片到此处上传
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 补充信息
+      description: 控制台报错、网络请求失败截图、或其他你认为有帮助的信息
+    validations:
+      required: false

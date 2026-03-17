@@ -2,12 +2,11 @@
 name: synnovator-admin
 description: >
   Synnovator platform admin CLI — create/update/close hackathons, manage profiles and submissions,
-  export scores and registrations, audit changes and permissions, and simulate full hackathon
-  scenarios with synthetic data. Use whenever the admin needs to manage hackathon data, create
-  profiles, export reports, query audit history, simulate hackathon scenarios, or perform any
-  platform management operation. Also trigger when the user mentions hackathon management,
-  YAML data editing, score exports, NDA approvals, 模拟活动, 生成仿真数据, simulate hackathon,
-  forge challenge scenario, or 活动虚拟数据 in the Synnovator context.
+  export scores and registrations, audit changes and permissions. Use whenever the admin needs to
+  manage hackathon data, create profiles, export reports, query audit history, or perform any
+  platform management operation. Also trigger when the user mentions hackathon management, YAML
+  data editing, score exports, or NDA approvals in the Synnovator context. For hackathon simulation
+  use /synnovator-admin:simulate; for issue monitoring use /synnovator-admin:watch-issue.
 ---
 
 # Synnovator Admin
@@ -27,14 +26,15 @@ and PR creation into guided interactive workflows.
 | `create-profile` | Write | Generate hacker profile skeleton, guide editing, PR |
 | `submit-project` | Write | Generate submission skeleton, guide editing, PR |
 | `approve-nda` | Write | Find NDA issue, add `nda-approved` label |
-| `simulate` | Write | Generate full hackathon simulation data (hackathon.yml + profiles + submissions + archive) |
-| `list-registrations` | Read | Query registration issues for a hackathon |
-| `list-submissions` | Read | Scan submission directories and show status |
-| `export-scores` | Read | Parse score issues into CSV |
-| `export-report` | Read | Generate comprehensive activity report |
-| `audit-log` | Read | Query git history for a hackathon |
-| `audit-permissions` | Read | Check RBAC config (collaborators + CODEOWNERS) |
-| `audit-secrets` | Read | Verify required GitHub Secrets are configured |
+
+### Sub-Skills (independent invocation)
+
+| Command | Invocation | What it does |
+|---------|------------|-------------|
+| `simulate` | `/synnovator-admin:simulate` | Generate full hackathon simulation data |
+| `watch-issue` | `/synnovator-admin:watch-issue` | Monitor new bug/feature issues, AI triage + summary |
+
+> **Tip**: `watch-issue` is designed for recurring use: `/loop 30m /synnovator-admin:watch-issue`
 
 When the admin invokes `/synnovator-admin` without a specific command, display this table and
 ask which operation they need.
@@ -137,122 +137,6 @@ After commit, offer to create PR but never push without the admin's confirmation
 5. Add label: `gh issue edit {number} --add-label "nda-approved"`
 6. Add comment: `gh issue comment {number} --body "NDA approved by @{admin}"`
 
-### simulate
-
-Generate a complete hackathon simulation — schema-v2 compliant YAML data files plus a rich
-Markdown archive — using fictional but realistic data. The output is indistinguishable from
-real platform data. Useful for user research interviews, operational dry-runs, demos, and
-pitch materials.
-
-Branch naming: `data/simulate-{slug}`
-
-**Two organizer personas** shape defaults for legal, eligibility, confidentiality, and risk focus:
-
-| Dimension | Enterprise (`enterprise`) | Youth League (`youth-league`) |
-|-----------|--------------------------|-------------------------------|
-| IP | Owned by organizer; NDA required | Open-source or author-owned |
-| Confidentiality | High (NDA + data policy) | Low |
-| Rewards | Cash / pilot contract / procurement | Certificates / internships / honors |
-| Risk focus | R-01–R-05 (data leak, IP infringement) | R-03–R-08 (content violations, credential fraud) |
-
-#### Parameter collection
-
-Guide the admin through these parameters one at a time. The admin can say "use defaults" at
-any step to accept all remaining defaults.
-
-| # | Parameter | Required | Default |
-|---|-----------|----------|---------|
-| 1 | `slug` | Yes | — |
-| 2 | `organizer_type` | Yes | `enterprise` |
-| 3 | `challenge_theme` | Yes | "AI 驱动的智能运营方案探索" |
-| 4 | `participant_scale` | No | `medium` |
-| 5 | `tracks` | No | Technical + Business |
-| 6 | `timeline` | No | 12-week standard (T+7 from today) |
-| 7 | `team_policy` | No | 2–5 members |
-| 8 | `judging_model` | No | Expert only; 4 criteria |
-| 9 | `risk_event_toggles` | No | All enabled |
-| 10 | `random_seed` | No | `42` |
-
-**Scale presets** — `participant_scale` controls how much data to generate:
-
-| Scale | Profiles | Submissions | Visitors | Registrations |
-|-------|----------|-------------|----------|---------------|
-| `small` | 5–8 | 3–5 | ~1,500 | ~100 |
-| `medium` | 15–20 | 8–12 | ~5,000 | ~300 |
-| `large` | 30–40 | 15–20 | ~15,000 | ~800 |
-
-#### Execution steps
-
-1. **Confirm persona** — `organizer_type` selects default legal/eligibility/risk settings
-2. **Create branch** — `git checkout -b data/simulate-{slug}`
-3. **Generate `hackathon.yml`**
-   - Read `references/schema-v2.md` for field structure
-   - Read `references/simulate-output-template.md` for content richness guidance
-   - Fill `legal`, `eligibility`, `settings` per `organizer_type`
-   - Generate fictional organizers, judges, events, FAQ, datasets (enterprise)
-   - Enterprise: `legal.nda.required: true`, `ip_ownership: organizer`, compliance notes
-   - Youth-league: `eligibility.open_to: students`, `legal.license: Apache-2.0`, mentor rules
-4. **Generate profiles** — create `profiles/{username}-{uuid}.yml` files
-   - Count per `participant_scale` table above
-   - Fictional Chinese names, natural backgrounds, varied skills and experience levels
-   - Each file conforms to profile schema in `references/schema-v2.md`
-5. **Generate submissions** — create `hackathons/{slug}/submissions/team-{name}/project.yml`
-   - Count per `participant_scale` table above
-   - Team members drawn from generated profiles (each profile used at most once)
-   - Cover all tracks; varied deliverable types (repo, video, demo, document)
-6. **Generate `simulation-archive.md`** — the rich Markdown companion document
-   - Read `references/simulate-output-template.md` and follow chapters 0–7 exactly
-   - Read `references/simulate-risk-playbook.md` and inject ≥5 risk scenarios into chapter 5
-   - Include: funnel data, ≥12 post samples (8+ types), scoring sheets, KPI dashboard
-   - Read `references/simulate-example-a.md` or `simulate-example-b.md` if admin requests examples
-7. **Self-consistency check** — verify before committing:
-   - Funnel: visitors > registrations > teams > submissions > winners (monotonic decrease)
-   - Profile count ≥ total unique team members across all submissions
-   - Judging criteria weights sum to 1.0 (±0.01) per track
-   - Timeline stages are chronological with no overlaps
-   - Weighted scores in archive calculate correctly
-8. **Validate** — `bash scripts/validate-hackathon.sh hackathons/{slug}/hackathon.yml`
-9. **Review** — list all generated files for admin inspection
-10. **Commit** — single commit with all files:
-    ```bash
-    git add hackathons/{slug}/ profiles/
-    git commit -m "feat(hackathons): simulate hackathon {slug}"
-    ```
-11. **Offer PR**
-
-#### Data generation rules
-
-- **Natural numbers** — avoid round alignment (use 317, not 300; 4,312, not 4,000)
-- **Fictional identifiers** — Chinese names (陈梦阳, 李思远), companies (智海科技, 云擎网络),
-  placeholder URLs (`https://github.com/synnovator-demo/proj-xxx`)
-- **Persona-specific** — enterprise archives emphasize NDA/IP/data policy;
-  youth-league archives emphasize student eligibility and mentor rules
-- **Post diversity** — ≥12 sample posts covering: official announcements, technical Q&A,
-  experience sharing, complaints, team recruitment, mentor Q&A, celebrations, appeals
-- **No real PII** — no real phone numbers, ID numbers, or registered company names
-
-#### Quality checklist
-
-Before committing, verify:
-- [ ] `hackathon.yml` passes `validate-hackathon.sh`
-- [ ] Funnel numbers decrease monotonically in `simulation-archive.md`
-- [ ] Profile count matches `participant_scale`
-- [ ] Submissions ≥ 8 (for medium/large), team members all have profiles
-- [ ] Weighted scoring totals calculate correctly
-- [ ] Risk scenarios ≥ 5 types in `simulation-archive.md`
-- [ ] Enterprise: NDA + IP clauses present / Youth-league: open-source license declared
-- [ ] No real personally identifiable information anywhere
-
-#### Reference files
-
-| File | When to load |
-|------|-------------|
-| `references/schema-v2.md` | Always — YAML field structure for hackathon, profile, submission |
-| `references/simulate-output-template.md` | Always — chapters 0–7 structure for simulation-archive.md |
-| `references/simulate-risk-playbook.md` | Step 6 — risk scenarios for chapter 5 |
-| `references/simulate-example-a.md` | On request — medium-small enterprise pilot example |
-| `references/simulate-example-b.md` | On request — large-scale youth-league competition example |
-
 ---
 
 ## Read Operations
@@ -332,6 +216,9 @@ and JSON parsing.
 
 ## Important Rules
 
+- **All `references/` paths are relative to this skill's base directory** (provided by the
+  system as `Base directory for this skill:` at load time), not the project root — always
+  resolve via the skill directory when using the Read tool
 - Use `pnpm` for any JavaScript tooling — never `npm` or `npx` (enforced by hook)
 - Always show generated/modified files for review before committing
 - Never commit directly to `main` — always create a feature branch and PR

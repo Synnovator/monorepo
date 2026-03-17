@@ -154,3 +154,37 @@ gh pr create \
 EOF
 )"
 ```
+
+## Bug/Feature Issue Queries
+
+### List Triaged Bug Reports (unwatched)
+
+```bash
+gh issue list \
+  --label "bug" --label "triaged" \
+  --state open \
+  --search "-label:watched" \
+  --json number,title,author,createdAt,body,labels \
+  --limit 50
+```
+
+### List Triaged Feature Requests (unwatched)
+
+```bash
+gh issue list \
+  --label "enhancement" --label "triaged" \
+  --state open \
+  --search "-label:watched" \
+  --json number,title,author,createdAt,body,labels \
+  --limit 50
+```
+
+### Add Watch Label + Post Triage Comment
+
+```bash
+gh issue edit {number} --add-label "watched"
+gh issue comment {number} --body "$(cat <<'EOF'
+{triage comment content}
+EOF
+)"
+```
