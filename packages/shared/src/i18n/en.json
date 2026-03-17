@@ -212,12 +212,21 @@
     "theme_comp_accordion": "Accordion",
     "theme_comp_alerts": "Alerts",
     "theme_comp_dropdown": "Dropdown Menu",
-    "theme_comp_palette": "Color Palette"
+    "theme_comp_palette": "Color Palette",
+    "visibility": "Content Visibility",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "visibility_private": "Private",
+    "visibility_public": "Public",
+    "publish_success": "Publish PR created",
+    "publish_error": "Operation failed, please try again",
+    "visibility_warning_parent_private": "Note: The parent hackathon is still private. This submission won't appear in public listings until the hackathon is also published."
   },
   "common": {
     "back_home": "Back to Home",
     "not_found": "Page Not Found",
-    "not_found_desc": "Sorry, the page you are looking for does not exist"
+    "not_found_desc": "Sorry, the page you are looking for does not exist",
+    "unlisted_banner": "This content is under review and not yet publicly listed."
   },
   "auth": {
     "login": "Sign In",
