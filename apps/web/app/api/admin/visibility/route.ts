@@ -126,11 +126,11 @@ export async function POST(request: NextRequest) {
         path: filePath,
         ref: branchName,
       });
-      if (Array.isArray(existing)) {
-        return NextResponse.json({ error: 'Path is a directory' }, { status: 400 });
+      if (Array.isArray(existing) || existing.type !== 'file') {
+        return NextResponse.json({ error: 'Path is not a file' }, { status: 400 });
       }
       fileSha = existing.sha;
-      currentContent = fromBase64(existing.content);
+      currentContent = fromBase64(existing.content as string);
     } catch {
       // Cleanup branch on file not found
       try {
