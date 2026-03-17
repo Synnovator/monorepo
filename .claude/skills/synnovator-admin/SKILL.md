@@ -49,8 +49,8 @@ All write operations follow the same pattern:
 Collect params → Create branch → Execute → Validate → Commit → Offer PR
 ```
 
-Branch naming: `data/hackathon-{slug}` for hackathon ops, `data/profile-{username}` for profiles,
-`data/submission-{slug}-{team}` for submissions.
+Branch naming: `data/create-hackathon-{slug}` for hackathon ops, `data/create-profile-{username}` for profiles,
+`data/submit-{hackathonSlug}-{teamSlug}` for submissions.
 
 Commit format: `type(scope): description` — types are `feat`, `fix`, `chore`; scope is usually
 `hackathons` or `profiles`.
@@ -65,7 +65,7 @@ After commit, offer to create PR but never push without the admin's confirmation
 ### create-hackathon
 
 1. Ask for: `slug` (lowercase alphanumeric + hyphens), `type` (community / enterprise / youth-league / open-source), `name`
-2. Create branch: `git checkout -b data/hackathon-{slug}`
+2. Create branch: `git checkout -b data/create-hackathon-{slug}`
 3. Run: `bash scripts/create-hackathon.sh {slug} {type} "{name}"`
 4. Check if `docs/templates/{type}/hackathon.yml` exists — if so, read the template and use its
    structure to replace the generated skeleton. Preserve the `slug`, `name`, and `type` values
@@ -81,9 +81,9 @@ After commit, offer to create PR but never push without the admin's confirmation
 7. Stage and commit:
    ```bash
    git add hackathons/{slug}/
-   git commit -m "feat(hackathons): create hackathon {slug}"
+   git commit -m "[创建比赛] {name_zh} / {name}"
    ```
-8. Offer: `gh pr create --title "feat(hackathons): add {slug}" --body "New hackathon: {name}"`
+8. Offer: `gh pr create --title "[创建比赛] {name_zh} / {name}" --body "比赛 / Hackathon: {name_zh} / {name}\n类型 / Type: {type}"`
 
 ### update-timeline
 
@@ -107,7 +107,7 @@ After commit, offer to create PR but never push without the admin's confirmation
 1. Ask for hackathon `slug`
 2. Read the YAML — confirm the hackathon exists and is not already archived
 3. Add `status: archived` under the `hackathon:` key
-4. Branch → validate → commit with message `chore(hackathons): close hackathon {slug}` → offer PR
+4. Branch `data/create-hackathon-{slug}` → validate → commit with message `[关闭比赛] {name_zh} / {name}` → offer PR with title `[关闭比赛] {name_zh} / {name}`
 
 ### create-profile
 
@@ -115,7 +115,7 @@ After commit, offer to create PR but never push without the admin's confirmation
 2. Run: `bash scripts/create-profile.sh {username}`
 3. The script outputs the created file path — read it
 4. Guide the admin through filling: name, bio, location, skills, identity
-5. Branch → commit `feat(profiles): create profile for {username}` → offer PR
+5. Branch `data/create-profile-{username}` → commit `[创建档案] @{username}` → offer PR with title `[创建档案] @{username}`
 
 ### submit-project
 
@@ -123,7 +123,7 @@ After commit, offer to create PR but never push without the admin's confirmation
 2. Verify the hackathon exists and the track slug matches one in `hackathon.yml`
 3. Run: `bash scripts/submit-project.sh {slug} {team} {track}`
 4. Guide editing: project name, team members, deliverables, tech stack
-5. Branch → commit `feat(hackathons): add submission {team} for {slug}` → offer PR
+5. Branch `data/submit-{slug}-{team}` → commit `[提交] {project_name} → {hackathon_name_zh} · {track_name_zh}赛道` → offer PR
 
 ### approve-nda
 
