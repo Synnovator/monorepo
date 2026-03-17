@@ -513,6 +513,10 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
           type: 'hackathon',
           slug: finalSlug,
           files,
+          metadata: {
+            hackathonName: name,
+            hackathonNameZh: nameZh || name,
+          },
         }),
       });
       const text = await res.text();

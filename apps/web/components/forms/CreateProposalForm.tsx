@@ -150,6 +150,16 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
           type: 'proposal',
           slug: teamSlug,
           files,
+          metadata: {
+            hackathonSlug: selectedHackathon,
+            hackathonName: currentHackathon?.name,
+            hackathonNameZh: currentHackathon?.name_zh || currentHackathon?.name,
+            trackName: currentHackathon?.tracks.find(t => t.slug === track)?.name,
+            trackNameZh: currentHackathon?.tracks.find(t => t.slug === track)?.name_zh
+              || currentHackathon?.tracks.find(t => t.slug === track)?.name,
+            projectName: name,
+            projectNameZh: nameZh || name,
+          },
         }),
       });
       const text = await res.text();

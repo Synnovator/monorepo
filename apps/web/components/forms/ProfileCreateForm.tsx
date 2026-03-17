@@ -179,6 +179,7 @@ export function ProfileCreateForm({ lang }: ProfileCreateFormProps) {
           type: 'profile',
           slug: user.login,
           files,
+          metadata: {},
         }),
       });
       const text = await res.text();
