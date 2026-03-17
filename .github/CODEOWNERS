@@ -16,5 +16,8 @@
 # CI/CD and repo config: admins only
 /.github/                      @Synnovator/admins
 
+# Roles config: admins only
+/config/roles.yml              @Synnovator/admins
+
 # Documentation: anyone can contribute, developers review
 /docs/                         @Synnovator/developers
