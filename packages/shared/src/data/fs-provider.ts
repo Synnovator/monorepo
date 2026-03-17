@@ -78,6 +78,21 @@ export class FsDataProvider implements DataProvider {
     return this.submissions;
   }
 
+  listPublicHackathons(): Hackathon[] {
+    return this.hackathons.filter(h => h.hackathon.visibility !== 'private');
+  }
+
+  listPublicSubmissions(): SubmissionWithMeta[] {
+    const privateHackathonSlugs = new Set(
+      this.hackathons
+        .filter(h => h.hackathon.visibility === 'private')
+        .map(h => h.hackathon.slug),
+    );
+    return this.submissions.filter(
+      s => s.project.visibility !== 'private' && !privateHackathonSlugs.has(s._hackathonSlug),
+    );
+  }
+
   getResults(hackathonSlug: string): ResultWithMeta[] {
     return this.resultsByHackathon.get(hackathonSlug) ?? [];
   }
