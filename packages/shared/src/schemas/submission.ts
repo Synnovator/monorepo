@@ -33,6 +33,7 @@ export const SubmissionSchema = z.object({
     description: z.string().optional(),
     description_zh: z.string().optional(),
     likes: z.number().optional(),
+    visibility: z.enum(['public', 'private']).default('public'),
   }),
 });
 

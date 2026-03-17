@@ -103,6 +103,7 @@ export const HackathonSchema = z.object({
     tagline: z.string().optional(),
     tagline_zh: z.string().optional(),
     type: z.enum(['community', 'enterprise', 'youth-league', 'open-source']),
+    visibility: z.enum(['public', 'private']).default('public'),
     description: z.string().optional(),
     description_zh: z.string().optional(),
     organizers: z.array(z.object({
