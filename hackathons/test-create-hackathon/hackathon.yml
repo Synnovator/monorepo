@@ -3,6 +3,8 @@ hackathon:
   name: "Test-create-hackathon"
   slug: "test-create-hackathon"
   type: "community"
+  managed_by:
+    - allenwoods
   organizers:
     - name: "OneSyn"
       role: "organizer"

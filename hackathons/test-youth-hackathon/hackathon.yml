@@ -3,6 +3,8 @@ hackathon:
   name: "test-youth-hackathon"
   slug: "test-youth-hackathon"
   type: "youth-league"
+  managed_by:
+    - allenwoods
   organizers:
     - name: "H2OSLabs"
       role: "organizer"
