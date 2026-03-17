@@ -73,6 +73,8 @@ if (submitType === 'proposal') {
 }
 ```
 
+Keep the existing collision handling (try/catch with 422 → append timestamp suffix) unchanged — it already works with the new `branchName`.
+
 - [ ] **Step 4: Replace commit message and PR title construction**
 
 Replace commitMessage (lines 238-243):
@@ -115,6 +117,7 @@ if (submitType === 'proposal') {
   prBody = [
     `提交者 / Submitted by: @${session.login}`,
     `比赛 / Hackathon: ${metadata.hackathonNameZh} / ${metadata.hackathonName}`,
+    `类型 / Type: ${slug}`,
     '',
     `文件 / Files:`,
     filesList,
@@ -236,9 +239,28 @@ git commit -m "[改进] ProfileCreateForm: 传递 metadata 到 submit-pr API"
 **Files:**
 - Modify: `apps/web/app/(auth)/edit/proposal/[hackathon]/[team]/ProposalEditorClient.tsx`
 
-- [ ] **Step 1: Add metadata to fetch body**
+- [ ] **Step 1: Add new props for hackathon/track metadata**
 
-The editor has `hackathonSlug`, `teamSlug`, and `projectName` (BilingualContent) in its props. Update the fetch call (lines 138-146):
+The editor currently has `hackathonSlug`, `teamSlug`, `projectName` (BilingualContent) in its props but is missing hackathon name and track info. Add these to the interface:
+
+```typescript
+interface ProposalEditorClientProps {
+  hackathonSlug: string;
+  teamSlug: string;
+  projectName: BilingualContent;
+  hackathonName: BilingualContent;  // NEW
+  trackName: BilingualContent;      // NEW
+  description: BilingualContent;
+  login: string;
+  lang: Lang;
+}
+```
+
+Read the parent page component to find what hackathon/track data is available and pass it down as props.
+
+- [ ] **Step 2: Add metadata to fetch body**
+
+Update the fetch call (lines 138-146):
 
 ```typescript
 body: JSON.stringify({
@@ -247,20 +269,15 @@ body: JSON.stringify({
   files,
   metadata: {
     hackathonSlug,
-    hackathonName: projectName.en || projectName.zh || teamSlug,
-    hackathonNameZh: projectName.zh || projectName.en || teamSlug,
-    trackName: teamSlug,
+    hackathonName: hackathonName.en || hackathonName.zh || hackathonSlug,
+    hackathonNameZh: hackathonName.zh || hackathonName.en || hackathonSlug,
+    trackName: trackName.en || trackName.zh || '',
+    trackNameZh: trackName.zh || trackName.en || '',
     projectName: projectName.en || projectName.zh || teamSlug,
     projectNameZh: projectName.zh || projectName.en || teamSlug,
   },
 }),
 ```
-
-Note: This editor doesn't have hackathon name or track info in its props. We need to add them. Check the parent page component to see what data is available and pass it down.
-
-- [ ] **Step 2: Check parent page for available data and add props**
-
-Read the parent page to find what hackathon/track data is available. Add `hackathonName`, `hackathonNameZh`, `trackName`, `trackNameZh` to the `ProposalEditorClientProps` interface and pass from parent.
 
 - [ ] **Step 3: Commit**
 
@@ -342,8 +359,9 @@ Expected: builds successfully.
 
 In the `actions/github-script` step for sync-registrations, add logic to:
 1. Collect unique hackathon slugs from `hackathon:*` labels on processed issues
-2. Read `hackathons/{slug}/hackathon.yml` for each slug to get `name` and `name_zh`
-3. Output: `hackathon_slug`, `hackathon_name`, `hackathon_name_zh`, `count`, `users`
+2. For each slug, try to read `hackathons/{slug}/hackathon.yml` via `fs.readFileSync`. If file doesn't exist, use slug itself as both `name` and `name_zh`.
+3. If multiple hackathon slugs found, use `multi` as slug, `多个比赛` as name_zh, `Multiple hackathons` as name.
+4. Output via `core.setOutput()`: `hackathon_slug`, `hackathon_name`, `hackathon_name_zh`, `count`, `users` (users as `- @alice\n- @bob` format)
 
 - [ ] **Step 2: Update sync-registrations PR creation step**
 
