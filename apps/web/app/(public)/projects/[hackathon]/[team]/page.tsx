@@ -5,11 +5,22 @@ import { t, localize, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Card, Avatar, AvatarImage, AvatarFallback } from '@synnovator/ui';
 import { EditProjectButton } from '@/components/EditProjectButton';
+import { UnlistedBanner } from '@/components/UnlistedBanner';
 
 export const dynamic = 'force-static';
 
 export function generateStaticParams() {
   return listSubmissions().map(s => ({ hackathon: s._hackathonSlug, team: s._teamSlug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ hackathon: string; team: string }> }) {
+  const { hackathon, team } = await params;
+  const entry = listSubmissions().find(s => s._hackathonSlug === hackathon && s._teamSlug === team);
+  if (!entry) return {};
+  if (entry.project.visibility === 'private') {
+    return { robots: { index: false, follow: false } };
+  }
+  return {};
 }
 
 export default async function ProjectDetailPage({
@@ -28,6 +39,7 @@ export default async function ProjectDetailPage({
   if (!entry) notFound();
 
   const project = entry.project;
+  const isPrivate = project.visibility === 'private';
 
   // Get hackathon name for breadcrumb
   const hackathonEntry = getHackathon(hackathon);
@@ -59,6 +71,7 @@ export default async function ProjectDetailPage({
       <Link href={`/hackathons/${hackathon}#submissions`} className="text-sm text-muted-foreground hover:text-foreground mb-6 inline-block">
         ← {hackathonName}
       </Link>
+      {isPrivate && <UnlistedBanner lang={lang} />}
 
       <div className="flex items-start justify-between mb-8">
         <div>

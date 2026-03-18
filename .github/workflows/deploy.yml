@@ -68,12 +68,14 @@ jobs:
           echo "$AUTH_SECRET" | pnpm exec wrangler secret put AUTH_SECRET --name "$PREVIEW_NAME"
           echo "$GITHUB_APP_PRIVATE_KEY" | pnpm exec wrangler secret put GITHUB_APP_PRIVATE_KEY --name "$PREVIEW_NAME"
           echo "$GITHUB_CLIENT_SECRET" | pnpm exec wrangler secret put GITHUB_CLIENT_SECRET --name "$PREVIEW_NAME"
+          echo "$DEV_ADMIN_PASSWORD" | pnpm exec wrangler secret put DEV_ADMIN_PASSWORD --name "$PREVIEW_NAME"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-          GITHUB_APP_PRIVATE_KEY: ${{ secrets.GITHUB_APP_PRIVATE_KEY }}
-          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
+          GITHUB_APP_PRIVATE_KEY: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+          DEV_ADMIN_PASSWORD: ${{ secrets.DEV_ADMIN_PASSWORD }}
 
       - name: Comment Preview URL
         if: github.event_name == 'pull_request'

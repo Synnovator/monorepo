@@ -25,6 +25,8 @@ export interface DataProvider {
   getProfile(github: string): Profile | null;
   getProfileByFilestem(filestem: string): Profile | null;
   listSubmissions(): SubmissionWithMeta[];
+  listPublicHackathons(): Hackathon[];
+  listPublicSubmissions(): SubmissionWithMeta[];
   getResults(hackathonSlug: string): unknown[];
 
   // MDX content

@@ -62,6 +62,7 @@ hackathon:
   tagline: ""
   tagline_zh: ""
   type: "${TYPE}"
+  visibility: private
   description: ""
   description_zh: ""
 

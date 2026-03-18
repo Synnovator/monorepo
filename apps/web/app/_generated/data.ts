@@ -21,6 +21,8 @@ const profiles = staticData.profiles as unknown as Profile[];
 const submissions = staticData.submissions as unknown as SubmissionWithMeta[];
 const results = staticData.results as unknown as Record<string, any[]>;
 const teams = ((staticData as any).teams ?? []) as unknown as (Team & { _slug: string })[];
+const hackathonsPublic = (staticData as any).hackathonsPublic as unknown as Hackathon[];
+const submissionsPublic = (staticData as any).submissionsPublic as unknown as SubmissionWithMeta[];
 
 interface ThemeEntry {
   _id: string;
@@ -62,6 +64,14 @@ export function getProfile(github: string): Profile | null {
 /** @deprecated Use data provider from apps/web/lib/data.ts instead */
 export function listSubmissions(): SubmissionWithMeta[] {
   return submissions;
+}
+
+export function listPublicHackathons(): Hackathon[] {
+  return hackathonsPublic;
+}
+
+export function listPublicSubmissions(): SubmissionWithMeta[] {
+  return submissionsPublic;
 }
 
 /** @deprecated Use data provider from apps/web/lib/data.ts instead */

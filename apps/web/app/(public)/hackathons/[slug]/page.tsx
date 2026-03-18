@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
-import { getHackathon, listHackathons, listSubmissions, listProfiles, getTeamsByHackathon } from '@/app/_generated/data';
+import { getHackathon, listHackathons, listSubmissions, listPublicSubmissions, listProfiles, listTeams, getTeamsByHackathon } from '@/app/_generated/data';
+import { MyPrivateSubmissions } from '@/components/MyPrivateSubmissions';
 import { t, localize, getCurrentStage, getLangFromSearchParams } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Timeline } from '@/components/Timeline';
@@ -19,6 +20,7 @@ import { AppealForm } from '@/components/forms/AppealForm';
 import { TeamsTab } from '@/components/TeamsTab';
 import { SketchUnderline, SketchDoodle } from '@/components/sketch';
 import { EditHackathonButton } from '@/components/EditHackathonButton';
+import { UnlistedBanner } from '@/components/UnlistedBanner';
 import { Separator, Badge } from '@synnovator/ui';
 
 export const dynamic = 'force-static';
@@ -49,6 +51,16 @@ function stageVariant(stage: string): StageVariant {
   }
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const entry = getHackathon(slug);
+  if (!entry) return {};
+  if (entry.hackathon.visibility === 'private') {
+    return { robots: { index: false, follow: false } };
+  }
+  return {};
+}
+
 export default async function HackathonDetailPage({
   params,
   searchParams,
@@ -63,12 +75,25 @@ export default async function HackathonDetailPage({
   const entry = getHackathon(slug);
   if (!entry) notFound();
 
+  const isPrivate = entry.hackathon.visibility === 'private';
+
   const h = entry.hackathon;
   const stage = h.timeline ? getCurrentStage(h.timeline) : 'draft';
 
-  // Load submissions
-  const allSubmissions = listSubmissions();
+  // Load submissions — public for static listing, private for client-side team member check
+  const allSubmissions = listPublicSubmissions();
   const submissions = allSubmissions.filter(s => s._hackathonSlug === slug);
+
+  const allTeams = listTeams();
+  const privateSubmissions = listSubmissions()
+    .filter(s => s._hackathonSlug === slug && s.project.visibility === 'private')
+    .map(s => {
+      const team = allTeams.find(t => t._slug === s.project.team_ref);
+      const teamMembers = team
+        ? [team.leader, ...team.members.map(m => m.github)]
+        : [];
+      return { ...s, teamMembers };
+    });
 
   // Load results (embedded in hackathon data or separate)
   const showLeaderboard = ['announcement', 'award', 'ended'].includes(stage);
@@ -99,6 +124,7 @@ export default async function HackathonDetailPage({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" data-hackathon={h.slug}>
+      {isPrivate && <UnlistedBanner lang={lang} />}
 
       {/* Hero */}
       <div className="mb-12">
@@ -327,6 +353,11 @@ export default async function HackathonDetailPage({
           {/* Tab 2: Submissions */}
           <div data-tab-panel="submissions" role="tabpanel" id="panel-submissions" aria-labelledby="tab-submissions" className="hidden">
             <div className="space-y-6 pt-6">
+              <MyPrivateSubmissions
+                privateSubmissions={privateSubmissions}
+                hackathonSlug={slug}
+                lang={lang}
+              />
               {submissionTracks.length > 1 && (
                 <div className="flex flex-wrap gap-2">
                   <span className="text-xs px-3 py-1.5 rounded-full bg-primary/20 text-primary cursor-pointer">

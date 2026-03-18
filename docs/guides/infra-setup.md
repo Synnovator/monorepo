@@ -54,7 +54,9 @@ Repo → Settings → Secrets and variables → Actions → New repository secre
 
 ### 1.5 PR Preview
 
-当前未启用自动 PR Preview 部署。如需启用，可在 deploy.yml 中添加 `pull_request` 触发器并使用 `wrangler versions upload`。
+PR 部署为独立 Worker，名称格式 `synnovator-pr-{N}`，URL 为 `synnovator-pr-{N}.allenwoods.workers.dev`。
+
+> **Admin 登录限制**：PR Preview 站无法使用 GitHub OAuth 登录（callback URL 不匹配），只能通过 `/login` 页面使用密码登录。需为 PR Preview Worker 配置 `DEV_ADMIN_PASSWORD` 和 `AUTH_SECRET` Secrets（见 §4.2）。
 
 ---
 
@@ -133,16 +135,31 @@ Workers & Pages → `synnovator` → Settings → Variables and Secrets → Add
 | `R2_SECRET_ACCESS_KEY` | §2.2 API Token | 同上 |
 | `R2_BUCKET_NAME` | `synnovator-assets` | 同上 |
 | `R2_ENDPOINT` | §2.2 S3 Endpoint | 同上 |
+| `GITHUB_APP_PRIVATE_KEY` | GitHub App → Private keys → Generate | GitHub App PR 创建（Admin 操作） |
+| `DEV_ADMIN_PASSWORD` | 自定义强密码 | Admin 密码登录（PR Preview 和主站均需配置） |
 
-CLI 方式配置 Secrets（需 `CLOUDFLARE_API_TOKEN`）：
+CLI 方式配置 Secrets（需已执行 `wrangler login`）：
 ```bash
-cd apps/web
-pnpm exec wrangler secret put GITHUB_CLIENT_SECRET
-pnpm exec wrangler secret put AUTH_SECRET
-# 按提示粘贴值
+# 主站 Worker
+echo "<value>" | wrangler secret put GITHUB_CLIENT_SECRET --name synnovator
+echo "<value>" | wrangler secret put AUTH_SECRET --name synnovator
+echo "<value>" | wrangler secret put DEV_ADMIN_PASSWORD --name synnovator
+# ... 其他 secrets 同理
 ```
 
 > **注意**: 所有运行时变量必须通过 `wrangler.jsonc [vars]` 或 Worker Secrets 配置。
+
+#### PR Preview Workers 的 Secrets
+
+PR Preview Workers（`synnovator-pr-{N}`）是独立的 Worker 实例，**不会继承主站的 Secrets**。每个 PR Preview Worker 至少需要配置以下 Secrets 才能正常使用 admin 功能：
+
+```bash
+# 对每个需要测试的 PR Preview Worker 配置
+echo "<password>" | wrangler secret put DEV_ADMIN_PASSWORD --name synnovator-pr-{N}
+echo "<value>" | wrangler secret put AUTH_SECRET --name synnovator-pr-{N}
+```
+
+> **为什么需要 `DEV_ADMIN_PASSWORD`**：PR Preview 的域名（`synnovator-pr-{N}.*.workers.dev`）与 GitHub OAuth callback URL（`home.synnovator.space`）不同，导致 GitHub OAuth 登录会回调到主站而非 Preview 站。因此 Preview 站只能通过密码方式以 admin 身份登录（`/login` 页面）。
 
 ### 4.3 GitHub Repo Secrets
 
@@ -294,7 +311,8 @@ Worker 部署配置（`apps/web/wrangler.jsonc`）:
 ### 7.5 环境变量
 
 - [ ] `wrangler.jsonc [vars]`: `SITE_URL`, `GITHUB_CLIENT_ID`, `GITHUB_OWNER`, `GITHUB_REPO`, `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID` 已配置
-- [ ] Worker Secrets: `GITHUB_CLIENT_SECRET`, `AUTH_SECRET`, `GITHUB_APP_PRIVATE_KEY`, R2 相关 4 项已配置
+- [ ] Worker Secrets: `GITHUB_CLIENT_SECRET`, `AUTH_SECRET`, `GITHUB_APP_PRIVATE_KEY`, `DEV_ADMIN_PASSWORD`, R2 相关 4 项已配置
+- [ ] PR Preview Workers: `DEV_ADMIN_PASSWORD` 和 `AUTH_SECRET` 已配置
 - [ ] GitHub Actions Secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, R2 4 项, `CLAUDE_CODE_OAUTH_TOKEN` 已配置（`gh secret list` 验证）
 
 ---

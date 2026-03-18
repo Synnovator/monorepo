@@ -51,6 +51,18 @@ if [ "$TYPE" != "null" ] && [ -n "$TYPE" ]; then
   esac
 fi
 
+# --- Rule: visibility field validation ---
+VISIBILITY=$(yq '.hackathon.visibility' "$FILE")
+if [ "$VISIBILITY" = "null" ] || [ -z "$VISIBILITY" ]; then
+  echo "WARNING: hackathon.visibility is not set — defaulting to 'public'. New hackathons should set visibility: private" >&2
+fi
+if [ "$VISIBILITY" != "null" ] && [ -n "$VISIBILITY" ]; then
+  case "$VISIBILITY" in
+    public|private) ;;
+    *) err "hackathon.visibility must be 'public' or 'private' (got \"$VISIBILITY\")" ;;
+  esac
+fi
+
 # --- Rule 4: slug format ---
 if [ "$SLUG" != "null" ] && [ -n "$SLUG" ]; then
   if ! echo "$SLUG" | grep -qE '^[a-z0-9-]+$'; then

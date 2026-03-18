@@ -210,12 +210,21 @@
     "theme_comp_accordion": "手风琴",
     "theme_comp_alerts": "警告",
     "theme_comp_dropdown": "下拉菜单",
-    "theme_comp_palette": "调色板"
+    "theme_comp_palette": "调色板",
+    "visibility": "内容可见性",
+    "publish": "发布",
+    "unpublish": "取消发布",
+    "visibility_private": "未发布",
+    "visibility_public": "已发布",
+    "publish_success": "发布 PR 已创建",
+    "publish_error": "操作失败，请重试",
+    "visibility_warning_parent_private": "注意：该活动尚未发布，提交内容在活动发布前不会出现在公开列表中"
   },
   "common": {
     "back_home": "返回首页",
     "not_found": "页面未找到",
-    "not_found_desc": "抱歉，您访问的页面不存在"
+    "not_found_desc": "抱歉，您访问的页面不存在",
+    "unlisted_banner": "此内容正在审核中，尚未公开展示。"
   },
   "auth": {
     "login": "登录",

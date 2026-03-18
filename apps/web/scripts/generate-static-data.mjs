@@ -450,7 +450,16 @@ async function main() {
     collectRoles(),
   ]);
 
-  const data = { hackathons, profiles, submissions, teams, results, themes: themeData, roles };
+  // Filter public-only subsets for listing pages
+  const hackathonsPublic = hackathons.filter(h => h.hackathon?.visibility !== 'private');
+  const privateHackathonSlugs = new Set(
+    hackathons.filter(h => h.hackathon?.visibility === 'private').map(h => h.hackathon?.slug),
+  );
+  const submissionsPublic = submissions.filter(
+    s => s.project?.visibility !== 'private' && !privateHackathonSlugs.has(s._hackathonSlug),
+  );
+
+  const data = { hackathons, hackathonsPublic, profiles, submissions, submissionsPublic, teams, results, themes: themeData, roles };
 
   await fs.mkdir(path.dirname(OUT_FILE), { recursive: true });
   await fs.writeFile(OUT_FILE, JSON.stringify(data, null, 2));
@@ -463,6 +472,8 @@ async function main() {
   console.log(`  hackathons: ${hackathons.length}`);
   console.log(`  profiles: ${profiles.length}`);
   console.log(`  submissions: ${submissions.length}`);
+  console.log(`  hackathonsPublic: ${hackathonsPublic.length}`);
+  console.log(`  submissionsPublic: ${submissionsPublic.length}`);
   console.log(`  teams: ${teams.length}`);
   console.log(`  results: ${Object.keys(results).length} hackathons with results`);
   console.log(`  themes: ${themeData.themes.length} (active: ${themeData.activeTheme || 'none'}, variants: ${Object.keys(themeData.variants).length})`);

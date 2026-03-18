@@ -65,6 +65,7 @@ synnovator_submission: "2.0"
 project:
   name: ""
   name_zh: ""
+  visibility: private
   tagline: ""
   track: "${TRACK}"
 
