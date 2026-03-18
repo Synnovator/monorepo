@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Badge, Card, ScrollArea } from '@synnovator/ui';
-import { formatYaml } from './form-utils';
+import { formatYaml, toSlug } from './form-utils';
 import { TimelineEditor, DEFAULT_STAGES, type Stage } from './TimelineEditor';
 
 // MDX templates (raw imports for build-time bundling)
@@ -53,9 +53,6 @@ const STEP_LABELS_ZH = ['类型', '基本信息', '组织者', '时间线', '赛
 const STEP_LABELS_EN = ['Type', 'Basic Info', 'Organizers', 'Timeline', 'Tracks', 'Legal', 'Settings', 'Preview'];
 const TOTAL_STEPS = 8;
 
-function toSlug(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-}
 
 interface MdxFile {
   path: string;
@@ -84,7 +81,7 @@ function generateMdxFiles(opts: {
   // Track MDX files (en + zh for each track)
   for (const tr of tracks) {
     if (!tr.name) continue;
-    const trackSlug = tr.slug || toSlug(tr.name);
+    const trackSlug = tr.slug || toSlug('', tr.name);
     const trackName = tr.name;
     const trackNameZh = tr.name_zh || tr.name;
     files.push({
@@ -201,12 +198,12 @@ const TrackEditor = memo(function TrackEditor({
                 )}
               </div>
               <input type="text" value={tr.name}
-                onChange={e => { onUpdateTrack(tIdx, 'name', e.target.value); if (!tr.slug) onUpdateTrack(tIdx, 'slug', toSlug(e.target.value)); }}
+                onChange={e => { onUpdateTrack(tIdx, 'name', e.target.value); if (!tr.slug) onUpdateTrack(tIdx, 'slug', toSlug('', e.target.value)); }}
                 placeholder={t(lang, 'form.create_hackathon.track_name_en')} className={inputClass} />
               <input type="text" value={tr.name_zh} onChange={e => onUpdateTrack(tIdx, 'name_zh', e.target.value)}
                 placeholder={t(lang, 'form.create_hackathon.track_name_zh')} className={inputClass} />
               <input type="text" value={tr.slug} onChange={e => onUpdateTrack(tIdx, 'slug', e.target.value)}
-                placeholder={toSlug(tr.name) || 'track-slug'} className={inputClass} />
+                placeholder={toSlug('', tr.name) || 'track-slug'} className={inputClass} />
 
               <div>
                 <label className="block text-xs text-muted-foreground mb-1">
@@ -289,7 +286,7 @@ const TrackEditor = memo(function TrackEditor({
 });
 
 export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
-  const { loading, isLoggedIn } = useAuth();
+  const { user, loading, isLoggedIn } = useAuth();
   const [step, setStep] = useState(0);
 
   // Step 0: Type
@@ -336,7 +333,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
   // Auto-slug from name
   function handleNameChange(val: string) {
     setName(val);
-    if (!slugManual) setSlug(toSlug(val));
+    if (!slugManual) setSlug(toSlug(user?.login ?? '', val));
   }
 
   // Organizer helpers — wrapped in useCallback for memoized sub-component
@@ -440,7 +437,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
       return {
         name: tr.name,
         name_zh: tr.name_zh || undefined,
-        slug: tr.slug || toSlug(tr.name),
+        slug: tr.slug || toSlug('', tr.name),
         rewards: rewards.length > 0 ? rewards : undefined,
         judging: criteria.length > 0 ? { mode: 'weighted', criteria } : undefined,
       };
@@ -490,7 +487,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
   }, [name, nameZh, slug, tagline, taglineZh, hackathonType, organizers, timelineStages, tracks, license, ipOwnership, ndaRequired, ndaDocUrl, ndaSummary, langOptions, publicVote, eligibilityOpen, teamMin, teamMax, allowSolo]);
 
   async function handleSubmit() {
-    const finalSlug = slug || toSlug(name);
+    const finalSlug = slug || toSlug(user?.login ?? '', name);
     setSubmitting(true);
     setSubmitError('');
     try {
@@ -626,7 +623,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
               <label htmlFor="hack-slug" className={labelClass}>Slug</label>
               <input id="hack-slug" type="text" value={slug}
                 onChange={e => { setSlug(e.target.value); setSlugManual(true); }}
-                placeholder={toSlug(name) || 'community-hackathon-2026'}
+                placeholder={toSlug(user?.login ?? '', name) || 'community-hackathon-2026'}
                 className={inputClass} />
               <p className="text-xs text-muted-foreground mt-1">
                 {t(lang, 'form.create_hackathon.slug_hint')}
@@ -792,7 +789,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
             </div>
             <p className="text-xs text-muted-foreground">
               {t(lang, 'form.create_hackathon.submit_hint')}{' '}
-              <code className="text-primary">hackathons/{slug || toSlug(name) || '{slug}'}/hackathon.yml</code>
+              <code className="text-primary">hackathons/{slug || toSlug(user?.login ?? '', name) || '{slug}'}/hackathon.yml</code>
             </p>
           </>
         )}
