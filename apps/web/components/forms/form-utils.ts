@@ -18,6 +18,18 @@ export interface TeamInfo {
   members: string[];
 }
 
+/**
+ * Generate a URL-safe slug from a name, with username and random fallbacks.
+ * Handles pure-CJK names that would otherwise produce an empty string.
+ */
+export function toSlug(username: string, name: string): string {
+  const nameSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  if (nameSlug) return nameSlug;
+  if (username) return username;
+  const bytes = crypto.getRandomValues(new Uint8Array(4));
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 export function formatYaml(obj: Record<string, unknown>, indent = 0): string {
   const pad = '  '.repeat(indent);
   const lines: string[] = [];

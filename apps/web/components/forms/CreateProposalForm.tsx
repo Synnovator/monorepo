@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Card, ScrollArea, Badge } from '@synnovator/ui';
-import { formatYaml } from './form-utils';
+import { formatYaml, toSlug } from './form-utils';
 
 // MDX templates (raw imports for build-time bundling)
 import readmeTemplate from '../../../../config/templates/proposal/README.mdx?raw';
@@ -28,10 +28,6 @@ interface HackathonInfo {
 interface CreateProposalFormProps {
   hackathons: HackathonInfo[];
   lang: Lang;
-}
-
-function toSlug(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
 const STEP_LABELS_ZH = ['选择活动', '项目信息', '提交物', '预览'];
@@ -91,9 +87,8 @@ export function CreateProposalForm({ hackathons, lang }: CreateProposalFormProps
   }
 
   const teamSlug = useMemo(() => {
-    const projectSlug = toSlug(name) || 'project';
-    return `team-${projectSlug}`;
-  }, [name]);
+    return `team-${toSlug(user?.login ?? '', name)}`;
+  }, [name, user?.login]);
 
   const yamlContent = useMemo(() => {
     const deliverables: Record<string, unknown> = {
