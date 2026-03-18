@@ -133,14 +133,21 @@ window.open(data.pr_url, '_blank', 'noopener,noreferrer');
 
 ## Verification
 
+### 静态检查
 - [ ] `pnpm --filter @synnovator/shared test` 通过
-- [ ] `pnpm --filter @synnovator/web build` 成功
+- [ ] `pnpm --filter @synnovator/web build` 成功（OpenNext + Cloudflare 构建）
+- [ ] `buildPRUrl()` 在代码中无引用（全局搜索确认）
+
+### Wrangler 本地模拟部署
+- [ ] `pnpm --filter @synnovator/web run deploy --dry-run` 或 `wrangler dev` 启动本地 Worker 环境
+- [ ] 在 Worker 环境中验证 `/api/submit-pr` route 可正常加载（无 `node:fs` 等 Node.js API 运行时错误）
+
+### 功能验证（在 Wrangler 本地 Worker 环境中）
 - [ ] 普通用户创建团队 → PR 创建成功
 - [ ] 普通用户加入团队 → PR 创建成功
 - [ ] 普通用户退出团队 → PR 创建成功
 - [ ] 首次提交用户 → PR 含自动创建的 Profile
 - [ ] 已有 Profile 用户 → 不重复创建
-- [ ] `buildPRUrl()` 在代码中无引用（全局搜索确认）
 - [ ] 所有组件有 submitting 状态和 inline 错误提示
 
 ## Decisions
