@@ -1,0 +1,12 @@
+synnovator_submission: "2.0"
+project:
+  name: "test"
+  name_zh: "test"
+  tagline: "test"
+  tagline_zh: "test"
+  track: "edu"
+  team_ref: "team-test"
+  deliverables:
+    repo: "https://github.com/CS571-F23/hw11-Cynthialime"
+  tech_stack:
+    - "python"
