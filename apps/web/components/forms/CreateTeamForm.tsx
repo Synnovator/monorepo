@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { buildPRUrl, openGitHubUrl } from '@/lib/github-url';
 import { t } from '@synnovator/shared/i18n';
 import type { Lang } from '@synnovator/shared/i18n';
 import { Card } from '@synnovator/ui';
@@ -29,6 +28,7 @@ export function CreateTeamForm({ lang }: CreateTeamFormProps) {
   const [lookingForRoles, setLookingForRoles] = useState<string[]>([]);
   const [lookingForDesc, setLookingForDesc] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const teamSlug = teamName.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
   const canSubmit = isLoggedIn && teamName && teamSlug;
@@ -39,44 +39,54 @@ export function CreateTeamForm({ lang }: CreateTeamFormProps) {
     );
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!user || !canSubmit || submitting) return;
     setSubmitting(true);
+    setError(null);
 
-    const today = new Date().toISOString().split('T')[0];
+    try {
+      const today = new Date().toISOString().split('T')[0];
 
-    let yamlContent = `synnovator_team: "1.0"\n`;
-    yamlContent += `name: "${teamName}"\n`;
-    if (teamNameZh) yamlContent += `name_zh: "${teamNameZh}"\n`;
-    if (description) yamlContent += `description: "${description}"\n`;
-    if (descriptionZh) yamlContent += `description_zh: "${descriptionZh}"\n`;
-    if (githubUrl) yamlContent += `github_url: "${githubUrl}"\n`;
-    yamlContent += `status: recruiting\n`;
-    yamlContent += `leader: "${user.login}"\n`;
-    yamlContent += `members: []\n`;
-    if (lookingForRoles.length > 0 || lookingForDesc) {
-      yamlContent += `looking_for:\n`;
-      if (lookingForRoles.length > 0) {
-        yamlContent += `  roles:\n`;
-        for (const role of lookingForRoles) {
-          yamlContent += `    - ${role}\n`;
+      let yamlContent = `synnovator_team: "1.0"\n`;
+      yamlContent += `name: "${teamName}"\n`;
+      if (teamNameZh) yamlContent += `name_zh: "${teamNameZh}"\n`;
+      if (description) yamlContent += `description: "${description}"\n`;
+      if (descriptionZh) yamlContent += `description_zh: "${descriptionZh}"\n`;
+      if (githubUrl) yamlContent += `github_url: "${githubUrl}"\n`;
+      yamlContent += `status: recruiting\n`;
+      yamlContent += `leader: "${user.login}"\n`;
+      yamlContent += `members: []\n`;
+      if (lookingForRoles.length > 0 || lookingForDesc) {
+        yamlContent += `looking_for:\n`;
+        if (lookingForRoles.length > 0) {
+          yamlContent += `  roles:\n`;
+          for (const role of lookingForRoles) {
+            yamlContent += `    - ${role}\n`;
+          }
+        }
+        if (lookingForDesc) {
+          yamlContent += `  description: "${lookingForDesc}"\n`;
         }
       }
-      if (lookingForDesc) {
-        yamlContent += `  description: "${lookingForDesc}"\n`;
-      }
-    }
-    yamlContent += `created_at: "${today}"\n`;
+      yamlContent += `created_at: "${today}"\n`;
 
-    const url = buildPRUrl({
-      title: `[Team] Create ${teamName}`,
-      branch: `data/team-${teamSlug}`,
-      files: [
-        { path: `teams/${teamSlug}/team.yml`, content: yamlContent },
-      ],
-    });
-    openGitHubUrl(url);
-    setSubmitting(false);
+      const res = await fetch('/api/submit-pr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'team',
+          slug: teamSlug,
+          files: [{ path: `teams/${teamSlug}/team.yml`, content: yamlContent }],
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `Server error (${res.status})`);
+      window.open(data.pr_url, '_blank', 'noopener,noreferrer');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create team');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -200,6 +210,10 @@ export function CreateTeamForm({ lang }: CreateTeamFormProps) {
         >
           {t(lang, 'team.create_submit')} →
         </button>
+
+        {error && (
+          <p className="text-destructive text-sm mt-2">{error}</p>
+        )}
       </fieldset>
     </Card>
   );
