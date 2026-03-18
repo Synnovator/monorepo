@@ -17,15 +17,56 @@
 
 ### 1. API Route 扩展
 
-在 `/api/submit-pr/route.ts` 中新增 3 个提交类型：
+在 `/api/submit-pr/route.ts` 中修改以下常量/映射：
 
-| Type | Branch Prefix | Commit Message | 文件操作 |
-|------|--------------|----------------|----------|
-| `team` | `data/create-team` | `data(teams): create team {slug}` | 创建新 `teams/{slug}/team.yml` |
-| `team-join` | `data/team-join` | `data(teams): {username} join {slug}` | 修改已有 `team.yml` |
-| `team-leave` | `data/team-leave` | `data(teams): {username} leave {slug}` | 修改已有 `team.yml` |
+**`VALID_TYPES`** 新增 3 个类型：
+```ts
+const VALID_TYPES = ['hackathon', 'proposal', 'profile', 'team', 'team-join', 'team-leave'] as const;
+```
 
-新增 `FILENAME_PATTERNS` 条目：`/^teams\/[a-z0-9-]+\/team\.yml$/`
+**`FILENAME_PATTERNS`** 新增：
+```ts
+/^teams\/[a-z0-9-]+\/team\.yml$/
+```
+
+**`BRANCH_PREFIX`** 新增：
+```ts
+team: 'data/create-team',
+'team-join': 'data/team-join',
+'team-leave': 'data/team-leave',
+```
+
+**`REQUIRED_METADATA`** 新增（均无额外 metadata）：
+```ts
+team: [],
+'team-join': [],
+'team-leave': [],
+```
+
+**PR Title 模板**（扩展现有条件分支）：
+
+| Type | PR Title |
+|------|----------|
+| `team` | `[创建团队] {slug} by @{login}` |
+| `team-join` | `[加入团队] @{login} → {slug}` |
+| `team-leave` | `[退出团队] @{login} ← {slug}` |
+
+**PR Body 模板**：
+```
+操作者 / Operator: @{login}
+团队 / Team: {slug}
+
+文件 / Files:
+- `teams/{slug}/team.yml`
+```
+
+**Commit Message**：
+
+| Type | Commit Message |
+|------|---------------|
+| `team` | `data(teams): create team {slug}` |
+| `team-join` | `data(teams): {login} join {slug}` |
+| `team-leave` | `data(teams): {login} leave {slug}` |
 
 `commitMultipleFiles()` 使用 Git Tree API 创建新 tree，对新建和修改文件均适用，无需额外处理。
 
@@ -53,35 +94,41 @@ if (!res.ok) throw new Error(data.error);
 window.open(data.pr_url, '_blank', 'noopener,noreferrer');
 ```
 
-每个组件需要 `submitting` 状态和错误处理。CreateTeamForm 已有，JoinTeamButton、LeaveTeamButton、TeamActions 需添加。
+每个组件需要 `submitting` 状态和错误处理（inline error message，参照 CreateProposalForm 的 `{error && <p>...}` 模式）。CreateTeamForm 已有 submitting 状态，JoinTeamButton、LeaveTeamButton、TeamActions 需添加。
+
+**YAML 操作保持客户端**：`team-join` 和 `team-leave` 的 YAML 字符串操作（成员插入/移除）保留在前端组件中，组件构造好完整的 `team.yml` 内容后通过 API 提交。注意：组件接收的 `teamYamlContent` prop 可能存在数据时效性问题（用户打开页面后、提交前有人修改了 team.yml），但这与现有 `buildPRUrl()` 方案的时效性问题相同，不在本次范围内解决——GitHub PR 的 merge conflict 机制提供了最终一致性保障。
 
 ### 3. Profile 自动创建
 
 在 `commitMultipleFiles()` 调用前增加检查：
 
-1. 通过 GitHub API 检查 `profiles/{slug}.yml` 是否存在于 main 分支
-2. 若不存在，追加到 files 数组：
-   - `profiles/{slug}.yml` — 最小 Profile（github + created_at）
-   - `profiles/{slug}/bio.mdx` — 空 bio 模板
-   - `profiles/{slug}/bio.zh.mdx` — 空 bio 模板
+1. 从 `session.login` 获取 GitHub username
+2. 通过 GitHub Contents API (`octokit.repos.getContent()`) 检查 `profiles/{username}.yml` 是否存在于 main 分支（返回 404 表示不存在）
+3. 若不存在，追加到 files 数组：
+   - `profiles/{username}.yml` — 最小 Profile（github + created_at）
+   - `profiles/{username}/bio.mdx` — 空 bio 模板
+   - `profiles/{username}/bio.zh.mdx` — 空 bio 模板
 
-`slug` = GitHub username。`FILENAME_PATTERNS` 已覆盖 `profiles/` 路径，无需修改。自动创建的文件包含在同一个 PR 中。
+注意：此处 username 来自 `session.login`（当前登录用户），与请求 body 的 `slug` 无关。`slug` 用于团队/hackathon 的分支命名，而 Profile 文件名始终基于 GitHub username。`FILENAME_PATTERNS` 已覆盖 `profiles/` 路径，无需修改。自动创建的文件包含在同一个 PR 中。
+
+适用于所有 submit-pr 类型。副作用：hackathon 管理员创建活动时也会自动获得 hacker profile，这是可接受的——管理员本身也是平台用户。
 
 ### 4. 废弃代码清理
 
 - 移除 `lib/github-url.ts` 中的 `buildPRUrl()` 和 `PRUrlParams`
-- 保留 `buildIssueUrl()`、`openGitHubUrl()` 及常量（RegisterForm 等仍在使用）
+- 保留 `buildIssueUrl()`、`openGitHubUrl()` 及常量（RegisterForm、AppealForm、ScoreCard 仍在使用）
 - 移除各组件中的 `buildPRUrl` import
+- 清理前通过全局搜索确认无其他 `buildPRUrl` 消费者
 
 ## Files Changed
 
 | 文件 | 改动 |
 |------|------|
-| `apps/web/app/api/submit-pr/route.ts` | 扩展 types + Profile 自动创建逻辑 |
+| `apps/web/app/api/submit-pr/route.ts` | 扩展 VALID_TYPES / BRANCH_PREFIX / REQUIRED_METADATA / FILENAME_PATTERNS + PR title/body + Profile 自动创建 |
 | `apps/web/components/forms/CreateTeamForm.tsx` | 重写提交逻辑 |
-| `apps/web/components/JoinTeamButton.tsx` | 重写提交逻辑 |
-| `apps/web/components/LeaveTeamButton.tsx` | 重写提交逻辑 |
-| `apps/web/components/TeamActions.tsx` | 重写提交逻辑（join + leave） |
+| `apps/web/components/JoinTeamButton.tsx` | 重写提交逻辑 + 添加 submitting/error 状态 |
+| `apps/web/components/LeaveTeamButton.tsx` | 重写提交逻辑 + 添加 submitting/error 状态 |
+| `apps/web/components/TeamActions.tsx` | 重写提交逻辑（join + leave）+ 添加 submitting/error 状态 |
 | `apps/web/lib/github-url.ts` | 移除 buildPRUrl + PRUrlParams |
 
 ## Verification
@@ -93,13 +140,16 @@ window.open(data.pr_url, '_blank', 'noopener,noreferrer');
 - [ ] 普通用户退出团队 → PR 创建成功
 - [ ] 首次提交用户 → PR 含自动创建的 Profile
 - [ ] 已有 Profile 用户 → 不重复创建
-- [ ] `buildPRUrl()` 在代码中无引用
-- [ ] 所有组件有 submitting 状态和错误提示
+- [ ] `buildPRUrl()` 在代码中无引用（全局搜索确认）
+- [ ] 所有组件有 submitting 状态和 inline 错误提示
 
 ## Decisions
 
 | 决策 | 选择 | 理由 |
 |------|------|------|
-| Profile 文件名 | `{slug}.yml`（slug = GitHub username） | 与 API route 现有 profile type 一致，检查和创建用同一路径 |
+| Profile 文件名 | `{session.login}.yml`（GitHub username） | 与 API route 现有 profile type 一致；`slug` 字段留给团队/hackathon 的分支命名 |
 | team-join/leave 文件操作 | Git Tree API（与其他 type 相同） | `commitMultipleFiles()` 已支持，无需区分新建/修改 |
-| Profile 自动创建时机 | 所有 submit-pr 调用前 | 统一入口，避免遗漏 |
+| YAML 操作位置 | 客户端（保持现状） | 服务端 YAML 解析超出本次范围；PR merge conflict 提供一致性保障 |
+| Profile 自动创建范围 | 所有 submit-pr 类型 | 统一入口避免遗漏；管理员获得 profile 是可接受的副作用 |
+| Profile 存在性检查 | GitHub Contents API (`octokit.repos.getContent`) | Workers 环境禁用 `node:fs`，必须通过 API 检查 |
+| 错误展示 | Inline error message | 与 CreateProposalForm 一致 |
