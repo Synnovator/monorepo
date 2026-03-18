@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Migrate all team operations from broken `buildPRUrl()` (client-side GitHub web editor) to working `/api/submit-pr` (server-side GitHub App), and auto-create profiles for first-time submitters.
+**Goal:** Migrate all team operations from broken `buildPRUrl()` (client-side GitHub web editor) to working `/api/submit-pr` (server-side GitHub App).
 
-**Architecture:** Extend the existing `/api/submit-pr` API route with 3 new submission types (`team`, `team-join`, `team-leave`). Rewrite 4 frontend components to call the API instead of constructing GitHub URLs. Add a profile existence check before `commitMultipleFiles()` that appends profile files to the PR when missing.
+**Architecture:** Extend the existing `/api/submit-pr` API route with 3 new submission types (`team`, `team-join`, `team-leave`). Rewrite 4 frontend components to call the API instead of constructing GitHub URLs. Remove deprecated `buildPRUrl` code.
 
 **Tech Stack:** Next.js API Routes, GitHub REST API (Octokit), React client components, YAML string construction (client-side)
 
@@ -174,89 +174,11 @@ git add apps/web/app/api/submit-pr/route.ts
 git commit -m "fix(submit-pr): add PR title/body/commit templates for team types"
 ```
 
-### Task 3: Add profile auto-creation
-
-**Files:**
-- Modify: `apps/web/app/api/submit-pr/route.ts` (before `commitMultipleFiles` call, ~line 317)
-
-- [ ] **Step 1: Add `ensureProfileExists` helper function**
-
-Add this function before the `export async function POST` (e.g., after the `commitMultipleFiles` function, around line 129):
-
-```ts
-async function ensureProfileExists(
-  octokit: any,
-  owner: string,
-  repo: string,
-  username: string,
-  files: FileEntry[],
-): Promise<void> {
-  const profilePath = `profiles/${username}.yml`;
-  try {
-    await octokit.repos.getContent({ owner, repo, path: profilePath, ref: 'main' });
-    // Profile exists, nothing to do
-  } catch (err: unknown) {
-    if ((err as { status?: number }).status === 404) {
-      const today = new Date().toISOString().split('T')[0];
-      files.push(
-        {
-          path: profilePath,
-          content: [
-            'synnovator_profile: "2.0"',
-            'hacker:',
-            `  github: "${username}"`,
-            `  languages:`,
-            `    - "zh"`,
-            `    - "en"`,
-            `  created_at: "${today}"`,
-            '',
-          ].join('\n'),
-        },
-        {
-          path: `profiles/${username}/bio.mdx`,
-          content: '---\n---\n',
-        },
-        {
-          path: `profiles/${username}/bio.zh.mdx`,
-          content: '---\n---\n',
-        },
-      );
-    } else {
-      // Non-404 error (e.g., rate limit) — log but don't block the submission
-      console.error('ensureProfileExists: failed to check profile', err);
-    }
-  }
-}
-```
-
-- [ ] **Step 2: Call `ensureProfileExists` before `commitMultipleFiles`**
-
-Insert before the `// 5d. Commit files` comment (around line 317):
-
-```ts
-    // 5d. Auto-create profile if not exists
-    await ensureProfileExists(octokit, OWNER, REPO, session.login, files);
-```
-
-Update the existing `// 5d.` comment to `// 5e.` and `// 5e.` to `// 5f.`.
-
-- [ ] **Step 3: Verify build compiles**
-
-Run: `pnpm --filter @synnovator/web build`
-Expected: Build succeeds
-
-- [ ] **Step 4: Commit**
-
-```bash
-git add apps/web/app/api/submit-pr/route.ts
-git commit -m "feat(submit-pr): auto-create profile for first-time submitters"
-```
-
 ---
 
 ## Chunk 2: Frontend Component Migration
 
-### Task 4: Migrate CreateTeamForm
+### Task 3: Migrate CreateTeamForm
 
 **Files:**
 - Modify: `apps/web/components/forms/CreateTeamForm.tsx`
@@ -358,7 +280,7 @@ git add apps/web/components/forms/CreateTeamForm.tsx
 git commit -m "fix(teams): migrate CreateTeamForm from buildPRUrl to /api/submit-pr"
 ```
 
-### Task 5: Migrate JoinTeamButton
+### Task 4: Migrate JoinTeamButton
 
 **Files:**
 - Modify: `apps/web/components/JoinTeamButton.tsx`
@@ -447,7 +369,7 @@ git add apps/web/components/JoinTeamButton.tsx
 git commit -m "fix(teams): migrate JoinTeamButton from buildPRUrl to /api/submit-pr"
 ```
 
-### Task 6: Migrate LeaveTeamButton
+### Task 5: Migrate LeaveTeamButton
 
 **Files:**
 - Modify: `apps/web/components/LeaveTeamButton.tsx`
@@ -553,7 +475,7 @@ git add apps/web/components/LeaveTeamButton.tsx
 git commit -m "fix(teams): migrate LeaveTeamButton from buildPRUrl to /api/submit-pr"
 ```
 
-### Task 7: Migrate TeamActions
+### Task 6: Migrate TeamActions
 
 **Files:**
 - Modify: `apps/web/components/TeamActions.tsx`
@@ -747,7 +669,7 @@ git commit -m "fix(teams): migrate TeamActions from buildPRUrl to /api/submit-pr
 
 ## Chunk 3: Cleanup & Verification
 
-### Task 8: Remove `buildPRUrl` from github-url.ts
+### Task 7: Remove `buildPRUrl` from github-url.ts
 
 **Files:**
 - Modify: `apps/web/lib/github-url.ts:27-46`
@@ -809,7 +731,7 @@ git add apps/web/lib/github-url.ts
 git commit -m "refactor(github-url): remove deprecated buildPRUrl and PRUrlParams"
 ```
 
-### Task 9: Full verification
+### Task 8: Full verification
 
 - [ ] **Step 1: Run shared tests**
 
@@ -837,9 +759,7 @@ Test each scenario manually in the local Worker:
 1. Create team → PR created with `[创建团队]` title
 2. Join team → PR created with `[加入团队]` title
 3. Leave team → PR created with `[退出团队]` title
-4. First-time user → PR includes auto-created profile files
-5. Existing user → No duplicate profile created
-6. All buttons show submitting state and error messages on failure
+4. All buttons show submitting state and error messages on failure
 
 - [ ] **Step 6: Final commit (if any fixes needed)**
 
