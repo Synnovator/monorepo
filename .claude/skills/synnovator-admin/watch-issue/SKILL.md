@@ -143,9 +143,28 @@ Triage comments are split into two phases to serve different audiences:
    f. Add the `discussion-completed` label: `gh issue edit {number} --add-label "discussion-completed"`
    g. @mention @allenwoods in the comment for final confirmation
 
+### Scan C — Watched Issues with New Replies (Follow-up)
+
+5. **Query watched issues that may have new replies**:
+   ```bash
+   gh issue list --label "watched" --state open --search "-label:solution-confirmed" --json number,title,author,createdAt,labels,comments --limit 50
+   ```
+
+6. **For each issue**, check if there are comments from the issue author **after** the last
+   bot/triage comment. If so, the author has replied to the Phase 1 triage and needs follow-up.
+
+   a. Read the latest comments to understand the author's response
+   b. Summarize what the author said (direction choice, clarification, pushback, etc.)
+   c. **Do not auto-post** — instead, include these in the scan report for admin attention.
+      The admin decides whether to add `solution-confirmed` or continue the discussion.
+
+   This scan bridges the gap between Phase 1 (triage posted, awaiting response) and Phase 2
+   (solution confirmed, ready for dev). Without it, author replies would go unnoticed until
+   someone manually checks the issue.
+
 ### Scan Report
 
-5. **Output scan report** to the terminal:
+7. **Output scan report** to the terminal:
    ```
    ━━━ watch-issue 扫描报告 ━━━
      扫描时间：{timestamp}
@@ -159,11 +178,16 @@ Triage comments are split into two phases to serve different audiences:
      #{number} [{type}] {title summary}
           → 确认方案：{solution direction}
 
+     待跟进 — 作者已回复：{count} 个
+
+     #{number} [{type}] {title summary} — @{author} 回复于 {time}
+          → 回复摘要：{summary of reply}
+
      无需处理：{count} 个
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━
    ```
 
-6. **If no new issues found in either scan**, output:
+8. **If no new issues found in any scan**, output:
    ```
    ━━━ watch-issue 扫描报告 ━━━
      扫描时间：{timestamp}
