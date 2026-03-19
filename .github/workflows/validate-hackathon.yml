@@ -6,6 +6,10 @@ on:
       - 'hackathons/**/hackathon.yml'
       - 'docs/templates/**/hackathon.yml'
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -28,18 +32,41 @@ jobs:
           echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Validate hackathon YAML files
+        id: validate
         run: |
           FAILED=0
+          ERRORS=""
           while IFS= read -r file; do
             [ -z "$file" ] && continue
             echo "─── Validating $file ───"
-            if ! bash scripts/validate-hackathon.sh "$file"; then
+            OUTPUT=$(bash scripts/validate-hackathon.sh "$file" 2>&1) || {
               FAILED=1
-            fi
+              ERRORS="${ERRORS}${OUTPUT}"$'\n'
+            }
+            echo "$OUTPUT"
           done <<< "${{ steps.changed.outputs.files }}"
+
+          # Save errors for comment step
+          echo "errors<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$ERRORS" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
           if [ "$FAILED" -eq 1 ]; then
             echo ""
             echo "::error::One or more hackathon YAML files failed validation"
             exit 1
           fi
+
+      - name: Comment validation errors on PR
+        if: failure() && steps.validate.outputs.errors != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const errors = `${{ steps.validate.outputs.errors }}`;
+            const body = `## ❌ Hackathon 校验失败 / Validation Failed\n\n\`\`\`\n${errors.trim()}\n\`\`\`\n\n请修复以上错误后重新提交。/ Please fix the errors above and push again.`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });

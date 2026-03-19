@@ -398,6 +398,8 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
         if (!reg || !reg.start || !reg.end) return false;
         for (const st of timelineStages) {
           if (st.start && !st.description) return false;
+          // start must be before end (CI Rule 5)
+          if (st.start && st.end && st.start > st.end) return false;
         }
         return true;
       }
@@ -819,7 +821,7 @@ export function CreateHackathonForm({ lang }: CreateHackathonFormProps) {
           ) : (
             <div className="flex flex-col items-end gap-3">
               <button type="button" onClick={handleSubmit}
-                disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(4) || submitting}
+                disabled={!isLoggedIn || !isStepValid(0) || !isStepValid(1) || !isStepValid(2) || !isStepValid(3) || !isStepValid(4) || submitting}
                 aria-describedby={submitError ? 'hackathon-submit-error' : undefined}
                 className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {submitting ? t(lang, 'form.common.submitting') : t(lang, 'form.create_hackathon.submit_pr')} {'\u2192'}
