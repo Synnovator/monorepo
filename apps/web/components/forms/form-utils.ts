@@ -40,11 +40,12 @@ export function formatYaml(obj: Record<string, unknown>, indent = 0): string {
         if (typeof item === 'string') {
           lines.push(`${pad}  - "${item}"`);
         } else if (typeof item === 'object' && item !== null) {
-          const itemLines = formatYaml(item as Record<string, unknown>, indent + 2).split('\n');
+          const baseIndent = '  '.repeat(indent + 2);
+          const itemLines = formatYaml(item as Record<string, unknown>, indent + 2).split('\n').filter(l => l.length > 0);
           if (itemLines.length > 0) {
-            lines.push(`${pad}  - ${itemLines[0].trimStart()}`);
+            lines.push(`${pad}  - ${itemLines[0].slice(baseIndent.length)}`);
             for (const il of itemLines.slice(1)) {
-              lines.push(`${pad}    ${il.trimStart()}`);
+              lines.push(`${pad}    ${il.slice(baseIndent.length)}`);
             }
           }
         }
