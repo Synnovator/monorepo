@@ -1,33 +1,29 @@
 synnovator_team: "1.0"
-
 name: "AI Voyager"
 name_zh: "AI 远航者"
-
 description: "Building an AI-powered travel assistant that helps users plan personalized trips using natural language. Our focus is on combining LLM capabilities with real-time travel data APIs."
 description_zh: "构建一个 AI 驱动的旅行助手，帮助用户使用自然语言规划个性化行程。我们专注于将 LLM 能力与实时旅行数据 API 相结合。"
 github_url: "https://github.com/ai-voyager/travel-assistant"
-
 status: recruiting
-
 leader: "allenwoods"
-
 members:
+  - github: "Cynthialime"
+    role: developer
+    joined_at: "2026-03-19"
+
   - github: "zhou-haoran"
     role: developer
     joined_at: "2026-03-11"
   - github: "wu-hao"
     role: designer
     joined_at: "2026-03-12"
-
 looking_for:
   roles:
     - researcher
     - product
   description: "Looking for a researcher with NLP experience and a product manager to help shape our AI assistant project."
-
 hackathons:
   - hackathon: "dishuihu-ai-opc-global-challenge-2026"
     track: "ai-applications"
     registered_at: "2026-03-10"
-
 created_at: "2026-03-10"
