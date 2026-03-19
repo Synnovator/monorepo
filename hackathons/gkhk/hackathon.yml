@@ -1,0 +1,67 @@
+synnovator_version: "2.0"
+hackathon:
+  name: "gkhk"
+  name_zh: "不过哈哈哈"
+  slug: "gkhk"
+  type: "enterprise"
+  organizers:
+    - name: "ghjk"
+      name_zh: "刚回家"
+      role: "organizer"
+  eligibility:
+    open_to: "all"
+    team_size:
+      min: 1
+      max: 5
+    allow_solo: true
+  legal:
+    license: "Apache-2.0"
+    ip_ownership: "participant"
+  timeline:
+    draft:
+      start: "2026-03-17T16:00Z"
+      end: "2026-03-17T15:59Z"
+      description: "1"
+    registration:
+      start: "2026-03-17T16:00Z"
+      end: "2026-03-21T14:04Z"
+      description: "1"
+    development:
+      start: "2026-03-21T14:04Z"
+      end: "2026-03-25T12:09Z"
+      description: "1"
+    submission:
+      start: "2026-03-25T12:09Z"
+      end: "2026-04-06T13:07Z"
+      description: "1"
+    judging:
+      start: "2026-04-06T13:07Z"
+      end: "2026-04-10T11:11Z"
+      description: "1"
+    announcement:
+      start: "2026-04-10T11:12Z"
+      end: "2026-04-12T10:14Z"
+      description: "1"
+    award:
+      start: "2026-04-12T10:14Z"
+      end: "2026-04-14T09:16Z"
+      description: "1"
+  tracks:
+    - name: "rfghjk"
+      name_zh: "法国红酒"
+      slug: "r"
+      rewards:
+      - type: "prize"
+      rank: "1st"
+      amount: "$1,000"
+      judging:
+      mode: "weighted"
+      criteria:
+      - name: "Innovation"
+      weight: 0.3
+      score_range:
+  settings:
+    language:
+      - "zh"
+      - "en"
+    public_vote: "reactions"
