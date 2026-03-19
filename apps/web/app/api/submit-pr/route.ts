@@ -5,7 +5,7 @@ import { getInstallationOctokit } from '@/lib/github-app';
 const OWNER = process.env.GITHUB_OWNER || 'Synnovator';
 const REPO = process.env.GITHUB_REPO || 'monorepo';
 
-const VALID_TYPES = ['hackathon', 'proposal', 'profile'] as const;
+const VALID_TYPES = ['hackathon', 'proposal', 'profile', 'team', 'team-join', 'team-leave'] as const;
 type SubmitType = (typeof VALID_TYPES)[number];
 
 const FILENAME_PATTERNS: RegExp[] = [
@@ -22,12 +22,17 @@ const FILENAME_PATTERNS: RegExp[] = [
   /^hackathons\/[a-z0-9-]+\/assets\/[a-z0-9._-]+\.(png|jpg|jpeg|gif|webp|pdf)$/i,
   /^hackathons\/[a-z0-9-]+\/submissions\/[a-z0-9-]+\/assets\/[a-z0-9._-]+\.(png|jpg|jpeg|gif|webp|pdf)$/i,
   /^profiles\/[a-z0-9][\w.-]*\/assets\/[a-z0-9._-]+\.(png|jpg|jpeg|gif|webp|pdf)$/i,
+  // Teams
+  /^teams\/[a-z0-9-]+\/team\.yml$/,
 ];
 
 const BRANCH_PREFIX: Record<SubmitType, string> = {
   hackathon: 'data/create-hackathon',
   proposal: 'data/submit',
   profile: 'data/create-profile',
+  team: 'data/create-team',
+  'team-join': 'data/team-join',
+  'team-leave': 'data/team-leave',
 };
 
 interface FileEntry {
@@ -50,6 +55,9 @@ const REQUIRED_METADATA: Record<SubmitType, (keyof SubmitMetadata)[]> = {
   proposal: ['hackathonSlug', 'hackathonName', 'hackathonNameZh', 'trackName', 'projectName'],
   hackathon: ['hackathonName', 'hackathonNameZh'],
   profile: [],
+  team: [],
+  'team-join': [],
+  'team-leave': [],
 };
 
 async function commitMultipleFiles(
@@ -265,12 +273,19 @@ export async function POST(request: NextRequest) {
     }
 
     // 5c. Build PR title and body
+    const isTeamType = submitType === 'team' || submitType === 'team-join' || submitType === 'team-leave';
     const prTitle =
       submitType === 'proposal'
         ? `[提交] ${metadata.projectName} → ${metadata.hackathonNameZh} · ${metadata.trackNameZh || metadata.trackName}赛道`
         : submitType === 'hackathon'
           ? `[创建比赛] ${metadata.hackathonNameZh} / ${metadata.hackathonName}`
-          : `[创建档案] @${session.login}`;
+          : submitType === 'team'
+            ? `[创建团队] ${slug} by @${session.login}`
+            : submitType === 'team-join'
+              ? `[加入团队] @${session.login} → ${slug}`
+              : submitType === 'team-leave'
+                ? `[退出团队] @${session.login} ← ${slug}`
+                : `[创建档案] @${session.login}`;
 
     const filePaths = files.map((f) => f.path);
     const filesList = filePaths.map((p) => `- \`${p}\``).join('\n');
@@ -302,6 +317,17 @@ export async function POST(request: NextRequest) {
         '---',
         '> Auto-created via [Synnovator Platform](https://home.synnovator.space)',
       ].join('\n');
+    } else if (isTeamType) {
+      prBody = [
+        `操作者 / Operator: @${session.login}`,
+        `团队 / Team: ${slug}`,
+        '',
+        `文件 / Files:`,
+        filesList,
+        '',
+        '---',
+        '> Auto-created via [Synnovator Platform](https://home.synnovator.space)',
+      ].join('\n');
     } else {
       prBody = [
         `提交者 / Submitted by: @${session.login}`,
@@ -315,12 +341,20 @@ export async function POST(request: NextRequest) {
     }
 
     // 5d. Commit files via Git Tree API
+    const commitMessage = submitType === 'team'
+      ? `data(teams): create team ${slug}`
+      : submitType === 'team-join'
+        ? `data(teams): ${session.login} join ${slug}`
+        : submitType === 'team-leave'
+          ? `data(teams): ${session.login} leave ${slug}`
+          : prTitle;
+
     await commitMultipleFiles(octokit, {
       owner: OWNER,
       repo: REPO,
       branchName,
       files,
-      commitMessage: prTitle,
+      commitMessage,
     });
 
     // 5e. Create PR
