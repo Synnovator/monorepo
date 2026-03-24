@@ -7,10 +7,13 @@ github_url: "https://github.com/ai-voyager/travel-assistant"
 status: recruiting
 leader: "allenwoods"
 members:
+  - github: "Jerryxiaohei"
+    role: developer
+    joined_at: "2026-03-24"
+
   - github: "Cynthialime"
     role: developer
     joined_at: "2026-03-19"
-
   - github: "zhou-haoran"
     role: developer
     joined_at: "2026-03-11"
