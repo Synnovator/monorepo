@@ -76,7 +76,7 @@ jobs:
                       owner: context.repo.owner,
                       repo: context.repo.repo,
                       issue_number: issue.number,
-                      body: `❌ **Appeal window has closed.** Announcement period: ${h.timeline.announcement.start} — ${h.timeline.announcement.end}`,
+                      body: `❌ **Appeal window has closed.** @${author} Announcement period: ${h.timeline.announcement.start} — ${h.timeline.announcement.end}`,
                     });
                     return;
                   }
@@ -129,7 +129,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                body: `❌ **Appeal validation failed:**\n\n${errors.map(e => `- ${e}`).join('\n')}`,
+                body: `❌ **Appeal validation failed:**\n\n@${author} 请修复以下问题：\n\n${errors.map(e => `- ${e}`).join('\n')}`,
               });
             } else {
               // Add structured labels

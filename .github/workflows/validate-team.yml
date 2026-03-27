@@ -139,7 +139,8 @@ jobs:
             }
 
             if (errors.length > 0) {
-              const body = `## ❌ Team Validation Failed\n\n${errors.map(e => `- ${e}`).join('\n')}`;
+              const author = context.payload.pull_request.user.login;
+              const body = `## ❌ Team Validation Failed\n\n@${author} Please fix the following issues:\n\n${errors.map(e => `- ${e}`).join('\n')}`;
               await github.rest.issues.createComment({
                 ...context.repo,
                 issue_number: context.payload.pull_request.number,

@@ -145,7 +145,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                body: `❌ **Score validation failed:**\n\n${errors.map(e => `- ${e}`).join('\n')}\n\nPlease fix and re-edit this issue.`,
+                body: `❌ **Score validation failed:**\n\n@${author} 请修复以下问题：\n\n${errors.map(e => `- ${e}`).join('\n')}\n\nPlease fix and re-edit this issue.`,
               });
             } else {
               await github.rest.issues.addLabels({
