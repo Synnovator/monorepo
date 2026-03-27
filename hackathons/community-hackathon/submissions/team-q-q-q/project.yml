@@ -1,0 +1,11 @@
+synnovator_submission: "2.0"
+project:
+  name: "q'q'q"
+  name_zh: "21"
+  tagline: "12"
+  track: "edu"
+  team_ref: "team-q-q-q"
+  deliverables:
+    repo: "github.com/elfiee-naive.com"
+  tech_stack:
+    - "python"
