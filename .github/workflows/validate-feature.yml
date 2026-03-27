@@ -76,7 +76,7 @@ jobs:
                 repo: context.repo.repo,
                 issue_number: issue.number,
                 body: [
-                  '⚠️ **Feature Request 信息不完整**\n',
+                  `⚠️ **Feature Request 信息不完整**\n\n@${issue.user.login} 请补充以下信息：\n`,
                   ...errors.map(e => `- ${e}`),
                   '',
                   '请编辑 Issue 补充以上信息。示例：',
