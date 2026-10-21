@@ -8,7 +8,8 @@
     "clean": "turbo clean"
   },
   "devDependencies": {
-    "turbo": "^2"
+    "turbo": "^2",
+        "@mdx-js/mdx": "^3.0.0"
   },
   "packageManager": "pnpm@10.12.1",
   "dependencies": {
