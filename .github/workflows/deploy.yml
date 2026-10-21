@@ -36,7 +36,7 @@ jobs:
 
       - name: Build
         working-directory: apps/web
-        run: pnpm exec opennextjs-cloudflare build
+        run: pnpm exec opennextjs-cloudflare build1 --dangerouslyUseUnsupportedNextVersion
 
       - name: Deploy Production
         if: github.event_name == 'push'
